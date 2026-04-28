@@ -68,9 +68,9 @@ const StandingsPreview: React.FC = () => {
                 <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-left text-xs sm:text-sm w-8 sm:w-12">#</th>
                 <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-left text-xs sm:text-sm">Team</th>
                 <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm">Record</th>
-                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm hidden md:table-cell">Win %</th>
-                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm hidden lg:table-cell">Last 10</th>
-                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm hidden lg:table-cell">Streak</th>
+                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm whitespace-nowrap">Win %</th>
+                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm whitespace-nowrap">Last 10</th>
+                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm whitespace-nowrap">Streak</th>
               </tr>
             </thead>
             <tbody>
@@ -105,11 +105,11 @@ const StandingsPreview: React.FC = () => {
                       </Link>
                     </td>
                     <td className="py-3 sm:py-4 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold tabular-nums">{team.record}</td>
-                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-center hidden md:table-cell text-sm">
+                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-center text-sm whitespace-nowrap">
                       {winPercentage.toFixed(3).substring(1)}
                     </td>
-                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-center hidden lg:table-cell text-sm">{last10}</td>
-                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-center hidden lg:table-cell font-medium text-sm">
+                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-center text-sm whitespace-nowrap">{last10}</td>
+                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-center font-medium text-sm whitespace-nowrap">
                       <span className={streak.startsWith('W') ? 'text-green-600' : 'text-red-600'}>
                         {streak}
                       </span>

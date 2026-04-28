@@ -114,12 +114,12 @@ const StandingsPage: React.FC = () => {
                   <th className="px-4 sm:px-5 py-3 sm:py-4 w-8 sm:w-12 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">Rank</th>
                   <th className="px-4 sm:px-4 py-3 sm:py-4 text-[10px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest">Team</th>
                   <th className="px-4 sm:px-4 py-3 sm:py-4 w-12 sm:w-20 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">W-L</th>
-                  <th className="px-4 sm:px-4 py-3 sm:py-4 w-12 sm:w-20 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest hidden sm:table-cell">Win %</th>
-                  <th className="px-4 sm:px-4 py-3 sm:py-4 w-10 sm:w-16 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">GB</th>
-                  <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest hidden md:table-cell">Home</th>
-                  <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest hidden md:table-cell">Away</th>
-                  <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest hidden lg:table-cell">L10</th>
-                  <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest hidden lg:table-cell">Streak</th>
+                  <th className="px-4 sm:px-4 py-3 sm:py-4 w-12 sm:w-20 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest whitespace-nowrap">Win %</th>
+                  <th className="px-4 sm:px-4 py-3 sm:py-4 w-10 sm:w-16 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest whitespace-nowrap">GB</th>
+                  <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Home</th>
+                  <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Away</th>
+                  <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest whitespace-nowrap">L10</th>
+                  <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Streak</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -165,24 +165,24 @@ const StandingsPage: React.FC = () => {
                       <td className="px-4 sm:px-4 py-3 sm:py-4 text-center font-black text-navy-900 tabular-nums text-[10px] sm:text-base">
                         {team.record}
                       </td>
-                      <td className="px-4 sm:px-4 py-3 sm:py-4 text-center hidden sm:table-cell">
+                      <td className="px-4 sm:px-4 py-3 sm:py-4 text-center whitespace-nowrap">
                         <span className="inline-flex px-1.5 sm:px-2 py-0.5 bg-gray-100 font-bold tabular-nums text-[10px] sm:text-sm text-navy-900 border border-gray-200">
                           {team.winPercentage.toFixed(3).substring(1)}
                         </span>
                       </td>
-                      <td className="px-4 sm:px-4 py-3 sm:py-4 text-center font-bold text-gray-500 tabular-nums text-[10px] sm:text-base">
+                      <td className="px-4 sm:px-4 py-3 sm:py-4 text-center font-bold text-gray-500 tabular-nums text-[10px] sm:text-base whitespace-nowrap">
                         {team.gamesBehind === 0 ? '-' : team.gamesBehind}
                       </td>
-                      <td className="px-4 py-4 text-center font-semibold text-gray-500 tabular-nums text-sm hidden md:table-cell">
+                      <td className="px-4 py-4 text-center font-semibold text-gray-500 tabular-nums text-sm whitespace-nowrap">
                         {team.homeRecord}
                       </td>
-                      <td className="px-4 py-4 text-center font-semibold text-gray-500 tabular-nums text-sm hidden md:table-cell">
+                      <td className="px-4 py-4 text-center font-semibold text-gray-500 tabular-nums text-sm whitespace-nowrap">
                         {team.awayRecord}
                       </td>
-                      <td className="px-4 py-4 text-center font-bold text-gray-600 tabular-nums text-sm hidden lg:table-cell">
+                      <td className="px-4 py-4 text-center font-bold text-gray-600 tabular-nums text-sm whitespace-nowrap">
                         {team.last10}
                       </td>
-                      <td className="px-4 py-4 text-center hidden lg:table-cell">
+                      <td className="px-4 py-4 text-center whitespace-nowrap">
                         <span className={`inline-flex items-center justify-center gap-1 px-2 py-1 text-xs font-black uppercase tracking-wider ${
                           team.streak.startsWith('W') 
                           ? 'text-green-700 bg-green-50 border border-green-200' 
