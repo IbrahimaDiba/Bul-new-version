@@ -23,23 +23,23 @@ const StandingsPreview: React.FC = () => {
     .sort((a, b) => a.standing - b.standing);
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-12 sm:py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-navy-900">Conference Standings</h2>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-navy-900">Conference Standings</h2>
           <Link 
             to="/teams/standings" 
-            className="text-crimson-500 hover:text-crimson-600 font-semibold flex items-center transition-colors"
+            className="text-crimson-500 hover:text-crimson-600 font-semibold flex items-center transition-colors text-sm sm:text-base"
           >
             Full Standings
-            <ArrowRight className="ml-2 h-5 w-5" />
+            <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
           </Link>
         </div>
 
         {/* Conference Tabs */}
-        <div className="flex border-b border-gray-200 mb-8">
+        <div className="flex border-b border-gray-200 mb-6 sm:mb-8">
           <button
-            className={`py-3 px-6 font-medium text-lg ${
+            className={`py-2 sm:py-3 px-3 sm:px-6 font-medium text-sm sm:text-lg ${
               activeConference === 'East'
                 ? 'text-crimson-500 border-b-2 border-crimson-500'
                 : 'text-gray-600 hover:text-navy-900'
@@ -49,7 +49,7 @@ const StandingsPreview: React.FC = () => {
             Division 1
           </button>
           <button
-            className={`py-3 px-6 font-medium text-lg ${
+            className={`py-2 sm:py-3 px-3 sm:px-6 font-medium text-sm sm:text-lg ${
               activeConference === 'West'
                 ? 'text-crimson-500 border-b-2 border-crimson-500'
                 : 'text-gray-600 hover:text-navy-900'
@@ -61,16 +61,16 @@ const StandingsPreview: React.FC = () => {
         </div>
 
         {/* Standings Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto shadow-sm border border-gray-200 rounded-xl mb-4">
           <table className="min-w-full bg-white">
             <thead>
               <tr className="bg-navy-900 text-white">
-                <th className="py-3 px-4 text-left">#</th>
-                <th className="py-3 px-4 text-left">Team</th>
-                <th className="py-3 px-4 text-center">Record</th>
-                <th className="py-3 px-4 text-center hidden md:table-cell">Win %</th>
-                <th className="py-3 px-4 text-center hidden lg:table-cell">Last 10</th>
-                <th className="py-3 px-4 text-center hidden lg:table-cell">Streak</th>
+                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-left text-xs sm:text-sm w-8 sm:w-12">#</th>
+                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-left text-xs sm:text-sm">Team</th>
+                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm">Record</th>
+                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm hidden md:table-cell">Win %</th>
+                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm hidden lg:table-cell">Last 10</th>
+                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm hidden lg:table-cell">Streak</th>
               </tr>
             </thead>
             <tbody>
@@ -88,25 +88,28 @@ const StandingsPreview: React.FC = () => {
                     key={team.id} 
                     className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
                   >
-                    <td className="py-4 px-4">{index + 1}</td>
-                    <td className="py-4 px-4">
+                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-xs sm:text-sm font-bold">{index + 1}</td>
+                    <td className="py-3 sm:py-4 px-4 sm:px-6">
                       <Link to={`/teams/${team.id}`} className="flex items-center group">
                         <img 
                           src={team.logo} 
                           alt={team.name} 
-                          className="w-10 h-10 object-contain mr-3"
+                          className="w-7 h-7 sm:w-10 sm:h-10 object-contain mr-2 sm:mr-3 shrink-0"
                         />
-                        <span className="font-medium group-hover:text-crimson-500 transition-colors">
+                        <span className="font-medium group-hover:text-crimson-500 transition-colors text-xs sm:text-base hidden sm:inline">
                           {team.name}
+                        </span>
+                        <span className="font-medium group-hover:text-crimson-500 transition-colors text-xs inline sm:hidden">
+                          {team.abbreviation}
                         </span>
                       </Link>
                     </td>
-                    <td className="py-4 px-4 text-center">{team.record}</td>
-                    <td className="py-4 px-4 text-center hidden md:table-cell">
+                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold tabular-nums">{team.record}</td>
+                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-center hidden md:table-cell text-sm">
                       {winPercentage.toFixed(3).substring(1)}
                     </td>
-                    <td className="py-4 px-4 text-center hidden lg:table-cell">{last10}</td>
-                    <td className="py-4 px-4 text-center hidden lg:table-cell font-medium">
+                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-center hidden lg:table-cell text-sm">{last10}</td>
+                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-center hidden lg:table-cell font-medium text-sm">
                       <span className={streak.startsWith('W') ? 'text-green-600' : 'text-red-600'}>
                         {streak}
                       </span>

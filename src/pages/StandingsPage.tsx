@@ -111,11 +111,11 @@ const StandingsPage: React.FC = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-navy-900 text-white border-b-4 border-crimson-600">
-                  <th className="px-2 sm:px-5 py-3 sm:py-4 w-8 sm:w-12 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">Rank</th>
-                  <th className="px-2 sm:px-4 py-3 sm:py-4 text-[10px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest">Team</th>
-                  <th className="px-2 sm:px-4 py-3 sm:py-4 w-12 sm:w-20 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">W-L</th>
-                  <th className="px-2 sm:px-4 py-3 sm:py-4 w-12 sm:w-20 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest hidden sm:table-cell">Win %</th>
-                  <th className="px-2 sm:px-4 py-3 sm:py-4 w-10 sm:w-16 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">GB</th>
+                  <th className="px-4 sm:px-5 py-3 sm:py-4 w-8 sm:w-12 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">Rank</th>
+                  <th className="px-4 sm:px-4 py-3 sm:py-4 text-[10px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest">Team</th>
+                  <th className="px-4 sm:px-4 py-3 sm:py-4 w-12 sm:w-20 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">W-L</th>
+                  <th className="px-4 sm:px-4 py-3 sm:py-4 w-12 sm:w-20 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest hidden sm:table-cell">Win %</th>
+                  <th className="px-4 sm:px-4 py-3 sm:py-4 w-10 sm:w-16 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">GB</th>
                   <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest hidden md:table-cell">Home</th>
                   <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest hidden md:table-cell">Away</th>
                   <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest hidden lg:table-cell">L10</th>
@@ -134,7 +134,7 @@ const StandingsPage: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <td className="px-2 sm:px-5 py-3 sm:py-4 relative text-center">
+                      <td className="px-4 sm:px-5 py-3 sm:py-4 relative text-center">
                         {isPlayoffBound && (
                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500" title="Playoff Position" />
                         )}
@@ -142,7 +142,7 @@ const StandingsPage: React.FC = () => {
                           {index + 1}
                         </span>
                       </td>
-                      <td className="px-2 sm:px-4 py-3 sm:py-4 whitespace-nowrap">
+                      <td className="px-4 sm:px-4 py-3 sm:py-4 whitespace-nowrap">
                         <Link to={`/teams/${team.id}`} className="flex items-center gap-2 sm:gap-4">
                           <img 
                             src={team.logo} 
@@ -162,15 +162,15 @@ const StandingsPage: React.FC = () => {
                           </div>
                         </Link>
                       </td>
-                      <td className="px-2 sm:px-4 py-3 sm:py-4 text-center font-black text-navy-900 tabular-nums text-[10px] sm:text-base">
+                      <td className="px-4 sm:px-4 py-3 sm:py-4 text-center font-black text-navy-900 tabular-nums text-[10px] sm:text-base">
                         {team.record}
                       </td>
-                      <td className="px-2 sm:px-4 py-3 sm:py-4 text-center hidden sm:table-cell">
+                      <td className="px-4 sm:px-4 py-3 sm:py-4 text-center hidden sm:table-cell">
                         <span className="inline-flex px-1.5 sm:px-2 py-0.5 bg-gray-100 font-bold tabular-nums text-[10px] sm:text-sm text-navy-900 border border-gray-200">
                           {team.winPercentage.toFixed(3).substring(1)}
                         </span>
                       </td>
-                      <td className="px-2 sm:px-4 py-3 sm:py-4 text-center font-bold text-gray-500 tabular-nums text-[10px] sm:text-base">
+                      <td className="px-4 sm:px-4 py-3 sm:py-4 text-center font-bold text-gray-500 tabular-nums text-[10px] sm:text-base">
                         {team.gamesBehind === 0 ? '-' : team.gamesBehind}
                       </td>
                       <td className="px-4 py-4 text-center font-semibold text-gray-500 tabular-nums text-sm hidden md:table-cell">
