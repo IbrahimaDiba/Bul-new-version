@@ -125,7 +125,7 @@ const TermsOfServicePage: React.FC = () => {
               </p>
               <div className="mt-4">
                 <p className="text-gray-600">
-                  Email: legal@basketballuniversityleague.com
+                  Email: universityleague221@gmail.com
                 </p>
                 <p className="text-gray-600">
                   Phone: +1 (555) 123-4567

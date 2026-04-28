@@ -104,28 +104,18 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100"
+      className="min-h-[100dvh] sm:min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 overflow-x-hidden w-full"
     >
       {/* Hero Section */}
       <div className="relative bg-navy-900 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-navy-900 via-navy-800 to-navy-900 opacity-90" />
-        <motion.div 
-          className="absolute inset-0 bg-[url('/court-pattern.png')] opacity-5"
-          animate={{ 
-            scale: [1, 1.1, 1],
-            rotate: [0, 1, 0],
-          }}
-          transition={{ 
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-        />
+
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative">
           <motion.button
+            type="button"
             onClick={onBack}
-            className="inline-flex items-center text-white/80 hover:text-white transition-colors mb-8 group"
+            className="inline-flex items-center min-h-[44px] text-white/80 hover:text-white transition-colors mb-6 sm:mb-8 group text-sm sm:text-base"
             whileHover={{ x: -5 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -141,33 +131,33 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
               transition={{ delay: 0.2 }}
             >
               <motion.div 
-                className="flex items-center space-x-4 mb-4"
+                className="flex flex-wrap items-center gap-2 mb-4"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
               >
                 <motion.span 
-                  className="px-4 py-1.5 bg-crimson-500/20 text-crimson-400 rounded-full text-sm font-semibold tracking-wide"
+                  className="px-3 sm:px-4 py-1.5 bg-crimson-500/20 text-crimson-400 rounded-full text-xs sm:text-sm font-semibold tracking-wide"
                   whileHover={{ scale: 1.05, backgroundColor: "rgba(220, 38, 38, 0.3)" }}
                 >
                   #{player.jerseyNumber}
                 </motion.span>
                 <motion.span 
-                  className="px-4 py-1.5 bg-white/10 text-white/90 rounded-full text-sm tracking-wide"
+                  className="px-3 sm:px-4 py-1.5 bg-white/10 text-white/90 rounded-full text-xs sm:text-sm tracking-wide max-w-full truncate"
                   whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.15)" }}
                 >
                   {player.position}
                 </motion.span>
                 <motion.span 
-                  className="px-4 py-1.5 bg-white/10 text-white/90 rounded-full text-sm tracking-wide"
+                  className="px-3 sm:px-4 py-1.5 bg-white/10 text-white/90 rounded-full text-xs sm:text-sm tracking-wide max-w-full"
                   whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.15)" }}
                 >
-                  {player.team}
+                  <span className="truncate inline-block max-w-[200px] sm:max-w-none align-bottom">{player.team}</span>
                 </motion.span>
               </motion.div>
               
               <motion.h1 
-                className="text-5xl md:text-6xl font-bold text-white mb-4 tracking-tight"
+                className="text-3xl sm:text-5xl md:text-6xl font-bold text-white mb-4 tracking-tight break-words"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
@@ -176,7 +166,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
               </motion.h1>
 
               <motion.div 
-                className="flex flex-wrap gap-6 text-white/90 mb-8"
+                className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-6 text-white/90 mb-6 sm:mb-8"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
@@ -232,23 +222,23 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
               </motion.div>
 
               <motion.div 
-                className="grid grid-cols-3 gap-4 bg-white/5 rounded-xl p-6 backdrop-blur-sm"
+                className="grid grid-cols-3 gap-2 sm:gap-4 bg-white/5 rounded-xl p-4 sm:p-6 backdrop-blur-sm"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
                 whileHover={{ scale: 1.02 }}
               >
-                <div className="text-center">
-                  <p className="text-sm text-white/60">Height</p>
-                  <p className="text-xl font-semibold text-white">{player.height}</p>
+                <div className="text-center min-w-0 px-0.5">
+                  <p className="text-xs sm:text-sm text-white/60">Height</p>
+                  <p className="text-base sm:text-xl font-semibold text-white truncate">{player.height}</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-sm text-white/60">Weight</p>
-                  <p className="text-xl font-semibold text-white">{player.weight}</p>
+                <div className="text-center min-w-0 px-0.5">
+                  <p className="text-xs sm:text-sm text-white/60">Weight</p>
+                  <p className="text-base sm:text-xl font-semibold text-white truncate">{player.weight}</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-sm text-white/60">Experience</p>
-                  <p className="text-xl font-semibold text-white">{player.year}</p>
+                <div className="text-center min-w-0 px-0.5">
+                  <p className="text-xs sm:text-sm text-white/60">Experience</p>
+                  <p className="text-base sm:text-xl font-semibold text-white truncate">{player.playerClass}</p>
                 </div>
               </motion.div>
             </motion.div>
@@ -257,7 +247,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
       </div>
 
       {/* Stats Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pb-12">
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           initial={{ opacity: 0 }}
@@ -321,23 +311,16 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
                   {stat.value}
                 </motion.p>
 
-                <AnimatePresence>
-                  {hoveredStat === stat.label && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white to-transparent p-4 rounded-b-xl cursor-pointer"
-                      onClick={handleViewDetails}
-                      whileHover={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
-                    >
-                      <div className="flex items-center justify-between text-sm text-gray-600">
-                        <span>View Details</span>
-                        <ChevronRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <motion.div
+                  className="mt-4 flex items-center justify-between text-xs font-bold text-crimson-600 uppercase tracking-widest pt-4 border-t border-gray-100 group-hover:text-navy-900 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleViewDetails();
+                  }}
+                >
+                  <span>View Details</span>
+                  <ChevronRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                </motion.div>
               </div>
             </motion.div>
           ))}
@@ -372,7 +355,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
             </motion.h3>
             <div className="space-y-6">
               <motion.div 
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 bg-gray-50 rounded-lg"
                 whileHover={{ 
                   scale: 1.02,
                   rotateY: 5,
@@ -387,7 +370,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
                     <p className="text-sm text-gray-600">vs. Lakers - Jan 15, 2024</p>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right shrink-0">
                   <span className="text-xl font-bold text-crimson-500">42 PTS</span>
                   <p className="text-sm text-gray-600">+15 REB, 8 AST</p>
                 </div>

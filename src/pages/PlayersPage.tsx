@@ -1,30 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Users, Star, ChevronRight } from 'lucide-react';
 import TeamRoster from '../components/players/TeamRoster';
-import { supabase } from '../supabaseClient';
-import { teams as mockTeams } from '../data/mockData';
+import { ADMIN_CONTENT_EVENT, getManagedTeams } from '../data/adminContent';
+import { Team } from '../types';
 
 const PlayersPage: React.FC = () => {
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
-  const [teams, setTeams] = useState<any[]>([]);
+  const [allTeams, setAllTeams] = useState<Team[]>([]);
 
   useEffect(() => {
-    const fetchTeams = async () => {
-      const { data, error } = await supabase.from('teams').select('*');
-      if (!error && data && data.length > 0) {
-        setTeams(data);
-      } else {
-        setTeams(mockTeams);
-      }
+    const reload = () => setAllTeams(getManagedTeams());
+    reload();
+    window.addEventListener('storage', reload);
+    window.addEventListener(ADMIN_CONTENT_EVENT, reload);
+    return () => {
+      window.removeEventListener('storage', reload);
+      window.removeEventListener(ADMIN_CONTENT_EVENT, reload);
     };
-    fetchTeams();
   }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       {/* Hero Section */}
-      <div className="relative bg-navy-900 text-white py-20 overflow-hidden">
+      <div className="relative bg-navy-900 text-white py-12 sm:py-16 lg:py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-navy-900 to-crimson-900 opacity-50" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -33,10 +32,10 @@ const PlayersPage: React.FC = () => {
             transition={{ duration: 0.5 }}
             className="text-center"
           >
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 px-2">
               Our Teams
             </h1>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-3xl mx-auto px-2 leading-relaxed">
               Discover the talented players that make up our university basketball teams. 
               Click on a team to view their roster and player statistics.
             </p>
@@ -46,9 +45,9 @@ const PlayersPage: React.FC = () => {
 
       {/* Teams Grid */}
       {!selectedTeam ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-            {teams.map((team) => (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {allTeams.map((team) => (
               <motion.div
                 key={team.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -93,10 +92,12 @@ const PlayersPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <TeamRoster 
-          team={teams.find(t => t.id === selectedTeam)!} 
-          onBack={() => setSelectedTeam(null)} 
-        />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 pb-12 sm:pb-16 w-full min-w-0">
+          <TeamRoster
+            team={allTeams.find((t) => t.id === selectedTeam)!}
+            onBack={() => setSelectedTeam(null)}
+          />
+        </div>
       )}
     </div>
   );

@@ -10,8 +10,7 @@ const Footer: React.FC = () => {
           {/* Logo and info */}
           <div className="col-span-1 md:col-span-2 lg:col-span-1">
             <Link to="/" className="flex items-center">
-              <span className="text-2xl font-bold text-white">BUL</span>
-              <span className="ml-1 text-crimson-500 font-bold text-2xl">HOOPS</span>
+              <img src="/bul_logo.png" alt="BUL HOOPS" className="h-28 w-auto object-contain" />
             </Link>
             <p className="mt-4 text-gray-400">
               The premier basketball league for university students. Showcasing talent, fostering competition, and building future stars.
@@ -44,6 +43,12 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <Link to="/games/schedule" className="text-gray-400 hover:text-white transition-colors">Schedule</Link>
+              </li>
+              <li>
+                <Link to="/games/results" className="text-gray-400 hover:text-white transition-colors">Results</Link>
+              </li>
+              <li>
+                <Link to="/games/highlights" className="text-gray-400 hover:text-white transition-colors">Highlights</Link>
               </li>
               <li>
                 <Link to="/news" className="text-gray-400 hover:text-white transition-colors">News</Link>

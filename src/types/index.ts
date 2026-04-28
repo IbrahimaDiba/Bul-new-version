@@ -11,6 +11,8 @@ export interface Player {
   year: string;
   hometown: string;
   avatar: string;
+  dateOfBirth?: string;    // ex: '2002-05-14'
+  playerClass?: string;   // ex: 'Licence 2', 'Master 1'
   stats: PlayerStats;
   achievements?: Achievement[];
   socialMedia?: SocialMedia;
@@ -135,7 +137,22 @@ export interface Game {
   broadcast?: BroadcastInfo;
   stats?: GameStats;
   highlights?: string[];
+  /** YouTube embed URL (e.g. https://www.youtube.com/embed/VIDEO_ID) */
+  highlightVideoUrl?: string;
   officials?: string[];
+}
+
+export interface PlayerGameStats {
+  playerId: string;
+  name: string;
+  minutes: number;
+  points: number;
+  rebounds: number;
+  assists: number;
+  steals: number;
+  blocks: number;
+  turnovers: number;
+  fouls: number;
 }
 
 export interface BroadcastInfo {
@@ -151,6 +168,10 @@ export interface GameStats {
   timesTied?: number;
   largestLead?: number;
   quarters?: QuarterStats[];
+  playerStats?: {
+    home: PlayerGameStats[];
+    away: PlayerGameStats[];
+  };
 }
 
 export interface QuarterStats {
@@ -191,6 +212,47 @@ export interface Product {
   inStock: boolean;
   featured: boolean;
   isNew?: boolean;
+}
+
+export interface Sponsor {
+  id: string;
+  name: string;
+  logo: string;
+  category: string;
+  description: string;
+  benefits: string[];
+}
+
+export interface OrderItem {
+  productId: string;
+  quantity: number;
+  size?: string;
+  color?: string;
+  priceAtPurchase: number;
+  name: string;
+}
+
+export interface Order {
+  id: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  shippingAddress: string;
+  items: OrderItem[];
+  totalAmount: number;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  date: string;
+}
+
+export interface Ticket {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  type: 'season' | 'game';
+  date?: string;
+  venue?: string;
+  inStock: boolean;
 }
 
 export type NavItem = {

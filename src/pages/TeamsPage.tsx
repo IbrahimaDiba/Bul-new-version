@@ -1,160 +1,154 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { supabase } from '../supabaseClient';
-import { teams as mockTeams } from '../data/mockData';
+import { ArrowRight, Shield } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ADMIN_CONTENT_EVENT, getManagedTeams } from '../data/adminContent';
+import { Team } from '../types';
 
 const TeamsPage: React.FC = () => {
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 500], [0, 150]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
   const [activeConference, setActiveConference] = useState<'East' | 'West'>('East');
-  const [teams, setTeams] = useState<any[]>([]);
+  const [allTeams, setAllTeams] = useState<Team[]>([]);
 
   useEffect(() => {
-    const fetchTeams = async () => {
-      const { data, error } = await supabase.from('teams').select('*');
-      if (!error && data && data.length > 0) {
-        setTeams(data);
-      } else {
-        setTeams(mockTeams);
-      }
+    const reload = () => setAllTeams(getManagedTeams());
+    reload();
+    window.addEventListener('storage', reload);
+    window.addEventListener(ADMIN_CONTENT_EVENT, reload);
+    return () => {
+      window.removeEventListener('storage', reload);
+      window.removeEventListener(ADMIN_CONTENT_EVENT, reload);
     };
-    fetchTeams();
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section with Parallax */}
-      <motion.div 
-        className="relative bg-navy-900 text-white py-20 overflow-hidden"
-        style={{ y }}
-      >
-        <motion.div 
-          className="absolute inset-0 bg-gradient-to-r from-navy-900 to-crimson-900 opacity-50"
-          style={{ opacity }}
-        />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.h1 
-            className="text-4xl font-bold mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            Basketball University League Teams
-          </motion.h1>
-          <motion.p 
-            className="text-xl text-gray-200 max-w-2xl"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Explore detailed information about all teams in the league, including rosters, statistics, and schedules.
-          </motion.p>
-        </div>
-      </motion.div>
+    <div className="min-h-screen bg-gray-50 font-sans pb-20">
+      
+      {/* ══════════════ HERO SECTION (Brand Navy) ══════════════ */}
+      <div className="bg-navy-900 border-b-4 border-crimson-600 mb-8 sm:mb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative overflow-hidden">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Conference Tabs */}
-        <motion.div 
-          className="flex border-b border-gray-200 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <motion.button
-            className={`py-3 px-6 font-medium text-lg ${
+
+          <div className="relative z-10 flex flex-col items-center sm:items-start text-center sm:text-left">
+            <span className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 text-white text-[10px] font-bold uppercase tracking-widest border border-white/20 mb-6">
+              Official Franchises
+            </span>
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight uppercase leading-none">
+              League <span className="text-crimson-500">Teams</span>
+            </h1>
+            <p className="mt-6 text-lg text-gray-300 max-w-2xl font-medium leading-relaxed">
+              Explore the official franchises of the Basketball University League. Access team rosters, deep statistical profiles, and seasonal schedules.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-20">
+        
+        {/* ══════════════ DIVISION SELECTOR ══════════════ */}
+        <div className="flex bg-white rounded-sm shadow-xl border border-gray-200 overflow-hidden mb-12 max-w-md w-full">
+          <button
+            type="button"
+            className={`flex-1 py-3 sm:py-5 px-3 sm:px-6 font-black text-[10px] sm:text-xs tracking-wider sm:tracking-widest uppercase transition-all ${
               activeConference === 'East'
-                ? 'text-crimson-500 border-b-2 border-crimson-500'
-                : 'text-gray-600 hover:text-navy-900'
+                ? 'bg-navy-900 text-white border-b-4 border-crimson-600'
+                : 'text-gray-500 hover:text-navy-900 hover:bg-gray-50 border-b-4 border-transparent'
             }`}
             onClick={() => setActiveConference('East')}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
           >
-            Division 1
-          </motion.button>
-          <motion.button
-            className={`py-3 px-6 font-medium text-lg ${
+            Div 1 <span className="hidden sm:inline">(East)</span>
+          </button>
+          <button
+            type="button"
+            className={`flex-1 py-3 sm:py-5 px-3 sm:px-6 font-black text-[10px] sm:text-xs tracking-wider sm:tracking-widest uppercase transition-all ${
               activeConference === 'West'
-                ? 'text-crimson-500 border-b-2 border-crimson-500'
-                : 'text-gray-600 hover:text-navy-900'
+                ? 'bg-navy-900 text-white border-b-4 border-crimson-600'
+                : 'text-gray-500 hover:text-navy-900 hover:bg-gray-50 border-b-4 border-transparent'
             }`}
             onClick={() => setActiveConference('West')}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
           >
-            Division 2
-          </motion.button>
-        </motion.div>
+            Div 2 <span className="hidden sm:inline">(West)</span>
+          </button>
+        </div>
 
-        {/* Teams Grid */}
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 gap-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-        >
+        {/* ══════════════ TEAMS GRID ══════════════ */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           <AnimatePresence mode="wait">
-            {teams
+            {allTeams
               .filter(team => team.conference === activeConference)
               .map((team, index) => (
                 <motion.div
                   key={team.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
                 >
                   <Link
                     to={`/teams/${team.id}`}
-                    className="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                    className="group block bg-white border border-gray-200 shadow-sm hover:border-navy-900 hover:shadow-xl transition-all relative overflow-hidden"
                   >
-                    <motion.div 
-                      className="p-6 flex items-center"
-                      whileHover={{ 
-                        scale: 1.02,
-                        rotateY: 5,
-                        transition: { duration: 0.2 }
-                      }}
-                    >
-                      <motion.img
-                        src={team.logo}
-                        alt={team.name}
-                        className="w-24 h-24 object-contain mr-6"
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ duration: 0.2 }}
-                      />
-                      <div>
-                        <motion.h2 
-                          className="text-2xl font-bold text-navy-900 mb-2"
-                          whileHover={{ x: 5 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {team.name}
-                        </motion.h2>
-                        <p className="text-gray-600 mb-2">Record: {team.record}</p>
-                        <motion.div 
-                          className="flex items-center text-crimson-500 font-medium"
-                          whileHover={{ x: 5 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          View Team Details
-                          <motion.div
-                            animate={{ x: [0, 5, 0] }}
-                            transition={{ duration: 1, repeat: Infinity }}
-                          >
-                            <ArrowRight className="ml-2 h-5 w-5" />
-                          </motion.div>
-                        </motion.div>
+                    
+                    {/* Team Color Accent Bar */}
+                    <div 
+                      className="absolute top-0 left-0 w-full h-2 transition-all duration-300 group-hover:h-3"
+                      style={{ backgroundColor: team.primaryColor || '#1a365d' }} 
+                    />
+
+                    {/* Faint Logo Watermark */}
+                    <div className="absolute -right-8 -bottom-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500 pointer-events-none transform group-hover:scale-110">
+                      <img src={team.logo} alt="" className="w-64 h-64 object-contain grayscale" />
+                    </div>
+
+                    <div className="p-8 pb-0 flex flex-col items-center relative z-10">
+                      <div className="w-32 h-32 mb-8 bg-white border border-gray-100 p-4 shadow-sm group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 relative">
+                         {/* Subtle glowing shadow based on team color */}
+                         <div 
+                           className="absolute inset-0 blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-full"
+                           style={{ backgroundColor: team.primaryColor || '#1a365d' }}
+                         ></div>
+                         <img
+                           src={team.logo}
+                           alt={team.name}
+                           className="w-full h-full object-contain relative z-10"
+                         />
                       </div>
-                    </motion.div>
+                      
+                      <div className="text-center w-full">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] block mb-2">
+                          {team.abbreviation} Franchise
+                        </span>
+                        <h2 className="text-2xl lg:text-3xl font-black text-navy-900 uppercase tracking-tighter leading-none mb-4 group-hover:text-crimson-600 transition-colors">
+                          {team.name}
+                        </h2>
+                        
+                        <div className="flex items-center justify-center gap-4 mb-8">
+                          <div className="flex flex-col items-center">
+                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">W-L</span>
+                            <span className="font-black text-navy-900 tabular-nums text-lg">{team.record}</span>
+                          </div>
+                          <div className="w-px h-8 bg-gray-200"></div>
+                          <div className="flex flex-col items-center">
+                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Rank</span>
+                            <span className="font-black text-navy-900 tabular-nums text-lg">#{team.standing}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* View Profile Bar */}
+                    <div className="bg-gray-50 border-t border-gray-200 p-4 flex items-center justify-center gap-2 group-hover:bg-navy-900 transition-colors">
+                      <span className="text-xs font-black uppercase tracking-widest text-navy-900 group-hover:text-white transition-colors">
+                        Team Profile
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-crimson-600 group-hover:translate-x-2 transition-transform" />
+                    </div>
+
                   </Link>
                 </motion.div>
               ))}
           </AnimatePresence>
-        </motion.div>
+        </div>
+
       </div>
     </div>
   );

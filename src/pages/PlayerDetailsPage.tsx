@@ -1,468 +1,326 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, 
   Trophy, 
-  Star, 
   Target, 
   Zap, 
   Shield, 
   Crosshair,
-  TrendingUp,
-  Award,
-  Calendar,
-  MapPin,
-  Clock,
-  Play,
-  Image,
   BarChart3,
   Video,
-  Activity
+  Image as ImageIcon,
+  ChevronRight
 } from 'lucide-react';
-import PlayerDetailedStats from '../components/PlayerDetailedStats';
 import ShotChart from '../components/ShotChart';
-import { supabase } from '../supabaseClient';
-import { players as mockPlayers } from '../data/mockData';
+import { ADMIN_CONTENT_EVENT, getManagedPlayers, getManagedTeams } from '../data/adminContent';
+import { Player, Team } from '../types';
 
 const PlayerDetailsPage: React.FC = () => {
   const { playerId } = useParams<{ playerId: string }>();
   const navigate = useNavigate();
-  const [players, setPlayers] = useState<any[]>([]);
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 500], [0, 100]);
   const [activeTab, setActiveTab] = useState('overview');
+  const [allPlayers, setAllPlayers] = useState<Player[]>([]);
+  const [allTeams, setAllTeams] = useState<Team[]>([]);
 
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      const { data, error } = await supabase.from('players').select('*');
-      if (!error && data && data.length > 0) {
-        setPlayers(data);
-      } else {
-        setPlayers(mockPlayers);
-      }
-    };
-    fetchPlayers();
-  }, []);
-
-  const player = players.find(p => p.id === playerId);
+  const player = allPlayers.find((p) => p.id === playerId);
+  const team = player ? allTeams.find((t) => t.id === player.team) : null;
 
   // Scroll to top when player changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [playerId]);
 
+  useEffect(() => {
+    const reload = () => {
+      setAllPlayers(getManagedPlayers());
+      setAllTeams(getManagedTeams());
+    };
+    reload();
+    window.addEventListener('storage', reload);
+    window.addEventListener(ADMIN_CONTENT_EVENT, reload);
+    return () => {
+      window.removeEventListener('storage', reload);
+      window.removeEventListener(ADMIN_CONTENT_EVENT, reload);
+    };
+  }, []);
+
   if (!player) {
     return (
-      <motion.div 
-        className="min-h-screen bg-gradient-to-br from-navy-900 via-purple-900 to-crimson-900 flex items-center justify-center px-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <motion.div 
-          className="text-center max-w-md bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20"
-          initial={{ scale: 0.8, y: 50 }}
-          animate={{ scale: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-4xl font-bold text-white mb-4">
-            Player Not Found
-          </h1>
-          <p className="text-white/80 mb-8 text-lg">
-            The player you're looking for doesn't exist.
-          </p>
-          <motion.button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-crimson-500 to-purple-600 text-white rounded-xl hover:from-crimson-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center bg-white rounded-lg shadow-sm border border-gray-200 p-12 max-w-md">
+          <h1 className="text-3xl font-bold text-navy-900 mb-4">Player Not Found</h1>
+          <p className="text-gray-500 mb-8">We couldn't find the player you're looking for.</p>
+          <button
+            onClick={() => navigate('/players')}
+            className="px-6 py-3 bg-navy-900 text-white rounded-md font-semibold hover:bg-navy-800 transition-colors inline-flex items-center"
           >
-            <ArrowLeft className="mr-3 h-6 w-6" />
-            Go Back
-          </motion.button>
-        </motion.div>
-      </motion.div>
+            <ArrowLeft className="mr-2 h-5 w-5" /> Back to Players
+          </button>
+        </div>
+      </div>
     );
   }
-
-  const hasDetailedStats = player.detailedStats && player.shotChart && player.media;
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'shot-chart', label: 'Shot Chart', icon: Target },
     { id: 'videos', label: 'Videos', icon: Video },
-    { id: 'gallery', label: 'Gallery', icon: Image },
-    { id: 'detailed-stats', label: 'Detailed Stats', icon: Activity }
+    { id: 'gallery', label: 'Gallery', icon: ImageIcon }
   ];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0
-    }
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.8, rotateY: -15 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      rotateY: 0
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
-      {/* Hero Section with 3D Parallax */}
-      <div className="relative h-[70vh] overflow-hidden">
-        <motion.div
-          className="absolute inset-0"
-          style={{ y }}
-          initial={{ scale: 1.1 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5 }}
-        >
-          <img
-            src={player.avatar}
-            alt={player.name}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-navy-900/60 via-navy-900/40 to-navy-900/80" />
-          <div className="absolute inset-0 bg-gradient-to-r from-crimson-500/20 to-purple-600/20" />
-        </motion.div>
+    <div className="min-h-screen bg-gray-50 font-sans pb-20">
+      
+      {/* ══════════════ NAVBAR / BACK BUTTON ══════════════ */}
+      <div className="bg-navy-900 pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto flex items-center text-sm font-semibold text-gray-400">
+          <button 
+            onClick={() => navigate('/players')}
+            className="hover:text-white transition-colors flex items-center group"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1.5 group-hover:-translate-x-1 transition-transform" />
+            Players
+          </button>
+          <ChevronRight className="w-4 h-4 mx-2 text-gray-600" />
+          <span className="text-white">{player.name}</span>
+        </div>
+      </div>
 
-        <div className="relative h-full flex items-end">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 w-full">
-            <motion.div 
-              className="max-w-6xl"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <motion.div variants={itemVariants}>
-                <motion.button
-                  onClick={() => navigate(-1)}
-                  className="inline-flex items-center text-white/90 hover:text-white transition-all duration-300 mb-8 group"
-                  whileHover={{ x: -5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <ArrowLeft className="mr-3 h-6 w-6" />
-                  <span className="text-lg font-medium">Back to Players</span>
-                </motion.button>
-              </motion.div>
+      {/* ══════════════ HERO SECTION (Brand Navy) ══════════════ */}
+      <div className="bg-navy-900 relative border-b-[6px] border-crimson-600">
+        {/* Ghosted Jersey Number in Background */}
 
-              <motion.div className="flex flex-col lg:flex-row items-end gap-8" variants={itemVariants}>
-                <motion.div
-                  className="relative"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <motion.div
-                    className="w-48 h-48 lg:w-64 lg:h-64 rounded-full overflow-hidden border-4 border-white/20 shadow-2xl"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 0.3 }}
-                  >
-                    <img
-                      src={player.avatar}
-                      alt={player.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </motion.div>
-                  <motion.div
-                    className="absolute -bottom-4 -right-4 w-16 h-16 bg-gradient-to-r from-crimson-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg"
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ duration: 0.6, delay: 0.8 }}
-                  >
-                    <span className="text-white font-bold text-xl">#{player.jerseyNumber}</span>
-                  </motion.div>
-                </motion.div>
 
-                <motion.div className="flex-1 text-white" variants={itemVariants}>
-                  <motion.h1 
-                    className="text-5xl lg:text-7xl font-bold leading-tight tracking-tight mb-4"
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, delay: 0.4 }}
-                  >
-                    {player.name}
-                  </motion.h1>
-                  
-                  <motion.div 
-                    className="flex flex-wrap items-center gap-4 mb-6"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
-                  >
-                    <motion.span 
-                      className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-semibold"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {player.position}
-                    </motion.span>
-                    <motion.span 
-                      className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-semibold"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {player.year}
-                    </motion.span>
-                    <motion.span 
-                      className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-semibold"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {player.height} • {player.weight}
-                    </motion.span>
-                  </motion.div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6 sm:pt-16 sm:pb-0 relative z-10 flex flex-col sm:flex-row items-center sm:items-end gap-6 sm:gap-10">
+          
+          {/* Avatar / Photo */}
+          <div className="relative">
+            <div className="w-40 h-40 sm:w-56 sm:h-56 bg-gray-200 border-4 border-white shadow-2xl rounded-sm overflow-hidden z-20 relative sm:translate-y-12">
+              <img
+                src={player.avatar}
+                alt={player.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            {/* Team Logo Badge */}
+            {team && (
+              <div className="absolute -bottom-4 sm:bottom-8 -right-4 sm:-right-6 w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full p-2 sm:p-3 shadow-lg border-2 border-gray-100 z-30 flex items-center justify-center">
+                <img src={team.logo} alt={team.name} className="w-full h-full object-contain" />
+              </div>
+            )}
+          </div>
 
-                  <motion.div 
-                    className="grid grid-cols-3 gap-6"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.8 }}
-                  >
-                    <motion.div 
-                      className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-4"
-                      whileHover={{ scale: 1.05, rotateY: 5 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Target className="h-8 w-8 text-crimson-400 mx-auto mb-2" />
-                      <div className="text-2xl font-bold">{player.stats.ppg}</div>
-                      <div className="text-sm text-white/70">PPG</div>
-                    </motion.div>
-                    <motion.div 
-                      className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-4"
-                      whileHover={{ scale: 1.05, rotateY: 5 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Shield className="h-8 w-8 text-purple-400 mx-auto mb-2" />
-                      <div className="text-2xl font-bold">{player.stats.rpg}</div>
-                      <div className="text-sm text-white/70">RPG</div>
-                    </motion.div>
-                    <motion.div 
-                      className="text-center bg-white/10 backdrop-blur-sm rounded-xl p-4"
-                      whileHover={{ scale: 1.05, rotateY: 5 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Zap className="h-8 w-8 text-yellow-400 mx-auto mb-2" />
-                      <div className="text-2xl font-bold">{player.stats.apg}</div>
-                      <div className="text-sm text-white/70">APG</div>
-                    </motion.div>
-                  </motion.div>
-                </motion.div>
-              </motion.div>
-            </motion.div>
+          {/* Player Info Text */}
+          <div className="flex-1 text-center sm:text-left sm:pb-8">
+            <div className="flex items-center justify-center sm:justify-start gap-3 mb-3">
+              <span className="px-3 py-1 bg-white/10 text-white text-xs font-bold uppercase tracking-widest rounded-sm border border-white/20">
+                {player.position}
+              </span>
+              <span className="text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                {player.height} | {player.weight} | {player.playerClass}
+              </span>
+            </div>
+            
+            <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight uppercase leading-none mb-2">
+              {player.name}
+            </h1>
+            
+            <p className="text-xl text-gray-400 font-medium tracking-wide">
+              #{player.jerseyNumber} • {team?.name || 'Free Agent'}
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ══════════════ QUICK STATS STRIP ══════════════ */}
+      <div className="bg-white border-b border-gray-200 shadow-sm relative z-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-4 sm:pl-[320px] py-4">
+          <div className="flex gap-8 sm:gap-16 justify-center sm:justify-start overflow-x-auto scrollbar-none">
+            <div className="text-center">
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">PPG</p>
+              <p className="text-2xl font-black text-navy-900">{player.stats.ppg}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">RPG</p>
+              <p className="text-2xl font-black text-navy-900">{player.stats.rpg}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">APG</p>
+              <p className="text-2xl font-black text-navy-900">{player.stats.apg}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">PER</p>
+              <p className="text-2xl font-black text-navy-900">{player.stats.per || '24.5'}</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Content Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-10">
-        <motion.div 
-          className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-white/20"
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {/* Tab Navigation */}
-          <motion.div 
-            className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100"
-            variants={itemVariants}
-          >
-            <div className="flex overflow-x-auto">
-              {tabs.map((tab, index) => (
-                <motion.button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-6 py-4 font-medium transition-all duration-300 whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'text-crimson-600 border-b-2 border-crimson-600 bg-white'
-                      : 'text-gray-600 hover:text-navy-900 hover:bg-gray-50'
-                  }`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  <tab.icon className="h-5 w-5" />
-                  <span>{tab.label}</span>
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
+      {/* ══════════════ TABS NAVIGATION ══════════════ */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12">
+        <div className="bg-white border border-gray-200 rounded-t-lg flex overflow-x-auto scrollbar-none">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-all whitespace-nowrap outline-none flex-1 sm:flex-none justify-center border-b-4 ${
+                activeTab === tab.id
+                  ? 'text-navy-900 border-crimson-600 bg-gray-50/50'
+                  : 'text-gray-500 border-transparent hover:text-navy-900 hover:bg-gray-50'
+              }`}
+            >
+              <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-crimson-600' : 'text-gray-400'}`} />
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-          {/* Tab Content */}
-          <div className="p-8">
-            <AnimatePresence mode="wait">
-              {activeTab === 'overview' && (
-                <motion.div
-                  key="overview"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-8"
-                >
-                  {/* Season Averages */}
-                  <motion.div
-                    className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-6 shadow-lg"
-                    whileHover={{ scale: 1.02, rotateY: 2 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="flex items-center mb-6">
-                      <Trophy className="h-6 w-6 text-crimson-500 mr-3" />
-                      <h3 className="text-xl font-bold text-navy-900">Season Averages</h3>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
+        {/* ══════════════ TAB CONTENT ══════════════ */}
+        <div className="bg-white border-x border-b border-gray-200 rounded-b-lg p-6 sm:p-10 shadow-sm min-h-[500px]">
+          <AnimatePresence mode="wait">
+            
+            {/* OVERVIEW TAB */}
+            {activeTab === 'overview' && (
+              <motion.div
+                key="overview"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+              >
+                {/* Left Column - Season Stats */}
+                <div className="col-span-1 lg:col-span-2 space-y-8">
+                  <div>
+                    <h3 className="text-xl font-bold text-navy-900 mb-4 border-b-2 border-gray-100 pb-2 inline-block">2025-2026 Regular Season</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       {[
-                        { label: 'PPG', value: player.stats.ppg, icon: Target, color: 'text-crimson-500' },
-                        { label: 'RPG', value: player.stats.rpg, icon: Shield, color: 'text-purple-500' },
-                        { label: 'APG', value: player.stats.apg, icon: Zap, color: 'text-yellow-500' },
-                        { label: 'SPG', value: player.stats.spg, icon: Crosshair, color: 'text-green-500' }
-                      ].map((stat, index) => (
-                        <motion.div
-                          key={stat.label}
-                          className="bg-white rounded-xl p-4 shadow-md"
-                          whileHover={{ scale: 1.05, rotateY: 5 }}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3, delay: index * 0.1 }}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-sm text-gray-600">{stat.label}</p>
-                              <p className="text-2xl font-bold text-navy-900">{stat.value}</p>
-                            </div>
-                            <stat.icon className={`h-8 w-8 ${stat.color}`} />
-                          </div>
-                        </motion.div>
+                        { label: 'Points', value: player.stats.ppg, icon: Target },
+                        { label: 'Rebounds', value: player.stats.rpg, icon: Shield },
+                        { label: 'Assists', value: player.stats.apg, icon: Zap },
+                        { label: 'Steals', value: player.stats.spg, icon: Crosshair }
+                      ].map((stat, i) => (
+                        <div key={i} className="bg-gray-50 border border-gray-100 rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                          <stat.icon className="h-6 w-6 text-gray-400 mb-2" />
+                          <span className="text-2xl font-black text-navy-900">{stat.value}</span>
+                          <span className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">{stat.label}</span>
+                        </div>
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
 
-                  {/* Shooting Percentages */}
-                  <motion.div
-                    className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 shadow-lg"
-                    whileHover={{ scale: 1.02, rotateY: 2 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="flex items-center mb-6">
-                      <Target className="h-6 w-6 text-green-500 mr-3" />
-                      <h3 className="text-xl font-bold text-navy-900">Shooting Percentages</h3>
-                    </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-navy-900 mb-4 border-b-2 border-gray-100 pb-2 inline-block">Shooting</h3>
                     <div className="grid grid-cols-3 gap-4">
                       {[
-                        { label: 'FG%', value: player.stats.fgp, color: 'text-green-500' },
-                        { label: '3P%', value: player.stats.tpp, color: 'text-blue-500' },
-                        { label: 'FT%', value: player.stats.ftp, color: 'text-purple-500' }
+                        { label: 'Field Goals', value: player.stats.fgp },
+                        { label: '3-Pointers', value: player.stats.tpp },
+                        { label: 'Free Throws', value: player.stats.ftp }
                       ].map((stat, index) => (
-                        <motion.div
-                          key={stat.label}
-                          className="bg-white rounded-xl p-4 shadow-md text-center"
-                          whileHover={{ scale: 1.05, rotateY: 5 }}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3, delay: index * 0.1 }}
-                        >
-                          <p className="text-3xl font-bold text-navy-900">{stat.value}%</p>
-                          <p className="text-sm text-gray-600">{stat.label}</p>
-                        </motion.div>
+                        <div key={index} className="bg-white border border-gray-200 rounded-lg p-5 text-center shadow-sm relative overflow-hidden">
+                          <div className="absolute top-0 left-0 right-0 h-1 bg-crimson-600" />
+                          <span className="text-3xl font-black text-navy-900 block mt-2">{stat.value}%</span>
+                          <span className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1 block">{stat.label}</span>
+                        </div>
                       ))}
                     </div>
-                  </motion.div>
-                </motion.div>
-              )}
+                  </div>
+                </div>
 
-              {activeTab === 'shot-chart' && (
-                <motion.div
-                  key="shot-chart"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {player.shotChart ? (
+                {/* Right Column - Player Info & Awards */}
+                <div className="space-y-6">
+                  {/* Bio block */}
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                    <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Player Profile</h4>
+                    <ul className="space-y-4">
+                      <li className="flex justify-between items-center border-b border-gray-200 xl:border-b-0 pb-3 xl:pb-0">
+                        <span className="text-gray-500 font-semibold">Hometown</span>
+                        <span className="text-navy-900 font-bold">{player.hometown}</span>
+                      </li>
+                      <li className="flex justify-between items-center border-b border-gray-200 xl:border-b-0 pb-3 xl:pb-0">
+                        <span className="text-gray-500 font-semibold">Experience</span>
+                        <span className="text-navy-900 font-bold">{player.year}</span>
+                      </li>
+                      <li className="flex justify-between items-center border-b border-gray-200 xl:border-b-0 pb-3 xl:pb-0">
+                        <span className="text-gray-500 font-semibold">Position</span>
+                        <span className="text-navy-900 font-bold">{player.position}</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Achievements */}
+                  {player.achievements && player.achievements.length > 0 && (
+                    <div className="bg-navy-900 rounded-lg p-6 text-white overflow-hidden relative">
+                      <h4 className="text-sm font-bold text-gold-400 uppercase tracking-widest mb-4 relative z-10">Trophy Room</h4>
+                      <ul className="space-y-4 relative z-10">
+                        {player.achievements.slice(0, 3).map(ach => (
+                          <li key={ach.id} className="flex items-start gap-3">
+                            <Trophy className="w-5 h-5 text-gold-500 shrink-0 mt-0.5" />
+                            <div>
+                              <p className="font-bold text-white text-sm">{ach.title}</p>
+                              <p className="text-gray-400 text-xs mt-1">{ach.date}</p>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+              </motion.div>
+            )}
+
+            {/* SHOT CHART TAB */}
+            {activeTab === 'shot-chart' && (
+              <motion.div
+                key="shot-chart"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                {player.shotChart ? (
+                  <div className="max-w-2xl mx-auto">
+                    <h3 className="text-2xl font-black text-navy-900 mb-6 text-center uppercase tracking-tight">Shot Distribution</h3>
                     <ShotChart shotChart={player.shotChart} playerName={player.name} />
-                  ) : (
-                    <div className="text-center py-12">
-                      <Target className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-gray-600 mb-2">Shot Chart</h3>
-                      <p className="text-gray-500">Shot chart data not available for this player.</p>
-                    </div>
-                  )}
-                </motion.div>
-              )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-20 text-center">
+                    <Target className="h-16 w-16 text-gray-200 mb-4" />
+                    <h3 className="text-2xl font-bold text-navy-900 mb-2">No Shot Data Available</h3>
+                    <p className="text-gray-500">Analytics are not yet available for this player's current season.</p>
+                  </div>
+                )}
+              </motion.div>
+            )}
 
-              {activeTab === 'videos' && (
-                <motion.div
-                  key="videos"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="text-center py-12"
-                >
-                  <Video className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-600 mb-2">Videos</h3>
-                  <p className="text-gray-500">Player videos and highlights coming soon...</p>
-                </motion.div>
-              )}
+            {/* MEDIA TABS */}
+            {(activeTab === 'videos' || activeTab === 'gallery') && (
+              <motion.div
+                key="media"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col items-center justify-center py-20 text-center"
+              >
+                {activeTab === 'videos' ? (
+                  <Video className="h-16 w-16 text-gray-200 mb-4" />
+                ) : (
+                  <ImageIcon className="h-16 w-16 text-gray-200 mb-4" />
+                )}
+                <h3 className="text-2xl font-bold text-navy-900 mb-2">Media Library</h3>
+                <p className="text-gray-500">Photos and videos coverage is currently being processed for {player.name}.</p>
+              </motion.div>
+            )}
 
-              {activeTab === 'gallery' && (
-                <motion.div
-                  key="gallery"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="text-center py-12"
-                >
-                  <Image className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-600 mb-2">Photo Gallery</h3>
-                  <p className="text-gray-500">Player photos and media coming soon...</p>
-                </motion.div>
-              )}
-
-              {activeTab === 'detailed-stats' && (
-                <motion.div
-                  key="detailed-stats"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {hasDetailedStats ? (
-                    <PlayerDetailedStats player={player} />
-                  ) : (
-                    <div className="text-center py-12">
-                      <Activity className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-gray-600 mb-2">Detailed Statistics</h3>
-                      <p className="text-gray-500">Detailed statistics are not available for this player.</p>
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
+
     </div>
   );
 };

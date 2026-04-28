@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingBag, Eye, Star } from 'lucide-react';
 import { Product } from '../../types';
 
 interface ProductCardProps {
@@ -8,10 +8,10 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  // Fonction pour ajouter au panier
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    // Vérifier si le produit est déjà dans le panier
     const existing = cart.find((item: any) => item.id === product.id);
     if (existing) {
       existing.qty = (existing.qty || 1) + 1;
@@ -19,102 +19,117 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       cart.push({ ...product, qty: 1 });
     }
     localStorage.setItem('cart', JSON.stringify(cart));
-    alert('Produit ajouté au panier !');
+    
+    // Custom non-intrusive notification logic could go here
+    const event = new CustomEvent('cartUpdated');
+    window.dispatchEvent(event);
   };
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden group hover:shadow-md transition-shadow">
-      <div className="relative">
-        {/* Product Image */}
-        <div className="h-64 overflow-hidden">
-          <img 
-            src={product.image} 
-            alt={product.name} 
-            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
-          />
+    <div className="bg-white group relative flex flex-col h-full border border-gray-100 hover:border-crimson-200 transition-all duration-300 shadow-[0_4px_20px_rgb(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)]">
+      
+      {/* ══════════════ PRODUCT IMAGE ══════════════ */}
+      <div className="relative aspect-[1/1] overflow-hidden bg-gray-50 border-b border-gray-50">
+        <img 
+          src={product.image} 
+          alt={product.name} 
+          className="w-full h-full object-contain p-4 transition-transform duration-700 group-hover:scale-105"
+        />
+        
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
+          {/* Les badges équipe/autre pourront être rajoutés proprement ici plus tard si besoin */}
+          {product.category === 'Jerseys' && (
+            <span className="px-3 py-1 bg-crimson-600 text-white text-[10px] font-bold uppercase tracking-widest shadow-sm">
+              Authentic
+            </span>
+          )}
         </div>
-        
-        {/* Quick Add Button (appears on hover) */}
-        <button
-          type="button"
+
+        {/* Action Overlay */}
+        <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black/60 to-transparent backdrop-blur-[2px] hidden md:flex gap-2">
+          <button 
+            onClick={handleAddToCart}
+            disabled={!product.inStock}
+            className="flex-1 bg-white hover:bg-navy-900 hover:text-white text-navy-900 py-2.5 rounded-sm text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ShoppingBag className="w-4 h-4" /> Add to Cart
+          </button>
+          <Link 
+            to={`/shop/product/${product.id}`}
+            className="w-12 bg-white/20 hover:bg-white text-white hover:text-navy-900 border border-white/30 hover:border-white transition-all rounded-sm flex items-center justify-center shadow-lg"
+          >
+            <Eye className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* Mobile quick add button */}
+        <button 
           onClick={handleAddToCart}
-          className="absolute bottom-0 left-0 right-0 bg-crimson-500 text-white py-3 flex items-center justify-center transform translate-y-full group-hover:translate-y-0 transition-transform focus:outline-none"
           disabled={!product.inStock}
+          className="md:hidden absolute bottom-3 right-3 w-12 h-12 bg-crimson-600 text-white rounded-full shadow-xl flex items-center justify-center active:scale-95 transition-transform disabled:bg-gray-400"
         >
-          <ShoppingCart className="w-5 h-5 mr-2" />
-          <span>Quick Add</span>
+          <ShoppingBag className="w-5 h-5" />
         </button>
-        
-        {/* Team Badge */}
-        {product.team && (
-          <span className="absolute top-3 left-3 bg-white text-navy-900 px-2 py-1 text-sm font-medium rounded-md">
-            {product.team}
-          </span>
-        )}
-        
-        {/* Out of Stock Badge */}
+
+        {/* Out of Stock Overlay */}
         {!product.inStock && (
-          <div className="absolute top-0 right-0 bottom-0 left-0 bg-black/40 flex items-center justify-center">
-            <span className="bg-red-600 text-white px-4 py-2 rounded-md font-bold transform -rotate-6 text-lg">
-              Out of Stock
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-[1px] flex items-center justify-center p-4">
+            <span className="px-4 py-2 bg-gray-900 text-white text-sm font-black uppercase tracking-tighter rotate-[-4deg] border-2 border-white shadow-xl">
+              Sold Out
             </span>
           </div>
         )}
       </div>
-      
-      <div className="p-4">
-        {/* Product Category */}
-        <div className="mb-1">
-          <span className="text-xs text-gray-500 uppercase tracking-wider">{product.category}</span>
+
+      {/* ══════════════ PRODUCT INFO ══════════════ */}
+      <div className="p-5 flex flex-col flex-1">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+            {product.category}
+          </span>
+          <div className="flex items-center gap-0.5 text-gold-500">
+            <Star className="w-3.5 h-3.5 fill-current" />
+            <span className="text-[10px] font-bold text-gray-700">4.9</span>
+          </div>
         </div>
-        
-        {/* Product Name */}
+
         <Link to={`/shop/product/${product.id}`}>
-          <h3 className="text-lg font-semibold text-navy-900 hover:text-crimson-500 transition-colors mb-1">
+          <h3 className="text-lg font-black text-navy-900 uppercase tracking-tight group-hover:text-crimson-600 transition-colors leading-tight mb-2">
             {product.name}
           </h3>
         </Link>
         
-        {/* Product Description */}
-        <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+        <p className="text-gray-500 text-xs leading-relaxed line-clamp-2 mb-4 font-medium italic">
           {product.description}
         </p>
         
-        {/* Product Price */}
-        <div className="flex justify-between items-center">
-          <span className="text-xl font-bold text-navy-900">{product.price.toLocaleString('fr-FR')} FCFA</span>
+        <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
+            <div className="flex flex-col">
+          <span className="text-xl font-black text-navy-900 tabular-nums">
+            {product.price.toLocaleString('fr-FR')} <span className="text-xs font-bold text-gray-400">FCFA</span>
+          </span>
+            </div>
           
-          {/* Size Options - if available */}
           {product.sizes && (
-            <div className="text-sm text-gray-500">
-              {product.sizes.length} {product.sizes.length === 1 ? 'size' : 'sizes'}
+            <div className="flex -space-x-1">
+              {product.sizes.slice(0, 3).map((s, i) => (
+                <div key={i} className="w-6 h-6 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-[9px] font-bold text-gray-500 group-hover:border-gray-200 transition-colors">
+                  {s}
+                </div>
+              ))}
+              {product.sizes.length > 3 && (
+                <div className="w-6 h-6 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-[9px] font-bold text-navy-900">
+                  +{product.sizes.length - 3}
+                </div>
+              )}
             </div>
           )}
         </div>
-        
-        {/* Color Options - if available */}
-        {product.colors && product.colors.length > 0 && (
-          <div className="mt-3 flex items-center">
-            <span className="text-xs text-gray-600 mr-2">Colors:</span>
-            <div className="flex space-x-1">
-              {product.colors.map((color) => (
-                <div 
-                  key={color}
-                  className="w-4 h-4 rounded-full border border-gray-300"
-                  style={{ 
-                    backgroundColor: color.toLowerCase() === 'navy' ? '#1a365d' :
-                                    color.toLowerCase() === 'red' ? '#e53e3e' :
-                                    color.toLowerCase() === 'black' ? '#000000' :
-                                    color.toLowerCase() === 'white' ? '#ffffff' :
-                                    color.toLowerCase() === 'green' ? '#047857' :
-                                    color.toLowerCase() === 'gold' ? '#ffd700' : color
-                  }}
-                  title={color}
-                />
-              ))}
-            </div>
-          </div>
-        )}
       </div>
+      
+      {/* Brand accent bottom bar */}
+      <div className="h-1 w-0 group-hover:w-full bg-crimson-600 transition-all duration-500 absolute bottom-0 left-0" />
     </div>
   );
 };

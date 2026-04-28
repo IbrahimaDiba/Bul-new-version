@@ -1,158 +1,247 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { Trophy, ArrowUp, ArrowDown, Minus } from 'lucide-react';
+import { ADMIN_CONTENT_EVENT, getManagedTeams } from '../data/adminContent';
+import { Team } from '../types';
 
 const StandingsPage: React.FC = () => {
   const [activeConference, setActiveConference] = useState<'East' | 'West'>('East');
-  const [teams, setTeams] = useState<any[]>([]);
-  
+  const [allTeams, setAllTeams] = useState<Team[]>([]);
+
   useEffect(() => {
-    const fetchTeams = async () => {
-      const { data, error } = await supabase.from('teams').select('*');
-      if (!error && data) setTeams(data);
+    const reload = () => setAllTeams(getManagedTeams());
+    reload();
+    window.addEventListener('storage', reload);
+    window.addEventListener(ADMIN_CONTENT_EVENT, reload);
+    return () => {
+      window.removeEventListener('storage', reload);
+      window.removeEventListener(ADMIN_CONTENT_EVENT, reload);
     };
-    fetchTeams();
   }, []);
 
-  const filteredTeams = teams
+  const filteredTeams = allTeams
     .filter(team => team.conference === activeConference)
     .sort((a, b) => a.standing - b.standing);
 
   // Calculate additional statistics
   const teamsWithStats = filteredTeams.map(team => {
     const [wins, losses] = team.record.split('-').map(Number);
-    const winPercentage = wins / (wins + losses);
+    const totalGames = wins + losses;
+    const winPercentage = totalGames > 0 ? wins / totalGames : 0;
     const gamesBehind = team.standing === 1 ? 0 : 
       (filteredTeams[0].standing === 1 ? 
-        (parseInt(filteredTeams[0].record.split('-')[0]) - wins) + 
-        (losses - parseInt(filteredTeams[0].record.split('-')[1])) : 0);
+        (Number(filteredTeams[0].record.split('-')[0]) - wins) / 2 + 
+        (losses - Number(filteredTeams[0].record.split('-')[1])) / 2 : 0);
     
-    // Mock data for additional stats
-    const homeRecord = `${Math.floor(wins * 0.6)}-${Math.floor(losses * 0.4)}`;
-    const awayRecord = `${wins - Math.floor(wins * 0.6)}-${losses - Math.floor(losses * 0.4)}`;
-    const last10 = `${Math.floor(Math.random() * 6) + 5}-${Math.floor(Math.random() * 5)}`;
-    const streak = Math.random() > 0.5 ? `W${Math.floor(Math.random() * 5) + 1}` : `L${Math.floor(Math.random() * 3) + 1}`;
+    // Using mock data for stats if available, otherwise simulating
+    const stats = team.stats || {
+      homeRecord: `${Math.floor(wins * 0.6)}-${Math.floor(losses * 0.4)}`,
+      awayRecord: `${wins - Math.floor(wins * 0.6)}-${losses - Math.floor(losses * 0.4)}`,
+      lastTenGames: `${Math.floor(Math.random() * 6) + 5}-${Math.floor(Math.random() * 5)}`,
+      streak: Math.random() > 0.5 ? `W${Math.floor(Math.random() * 5) + 1}` : `L${Math.floor(Math.random() * 3) + 1}`,
+      pointsFor: 1800,
+      pointsAgainst: 1600
+    };
 
     return {
       ...team,
       winPercentage,
       gamesBehind,
-      homeRecord,
-      awayRecord,
-      last10,
-      streak
+      homeRecord: stats.homeRecord,
+      awayRecord: stats.awayRecord,
+      last10: stats.lastTenGames,
+      streak: stats.streak
     };
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-navy-900 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold mb-4">League Standings</h1>
-          <p className="text-xl text-gray-200 max-w-2xl">
-            View detailed standings and statistics for all teams in the Basketball University League.
-          </p>
+    <div className="min-h-screen bg-gray-50 font-sans pb-20">
+      
+      {/* ══════════════ HERO SECTION (Brand Navy) ══════════════ */}
+      <div className="bg-navy-900 border-b-4 border-crimson-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative overflow-hidden">
+
+
+          <div className="relative z-10 flex flex-col items-center sm:items-start text-center sm:text-left">
+            <span className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 text-white text-[10px] font-bold uppercase tracking-widest border border-white/20 mb-4">
+              Official Rankings
+            </span>
+            <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight uppercase leading-none">
+              League <span className="text-crimson-500">Standings</span>
+            </h1>
+            <p className="mt-4 text-base sm:text-lg text-gray-300 max-w-2xl font-medium leading-relaxed">
+              Live updates of team standings, division records, and playoff pictures for the Basketball University League.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Conference Tabs */}
-        <div className="flex border-b border-gray-200 mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-6">
+        
+        {/* ══════════════ DIVISION SELECTOR ══════════════ */}
+        <div className="flex bg-white rounded-sm shadow-md border border-gray-200 overflow-hidden mb-8 max-w-md w-full">
           <button
-            className={`py-3 px-6 font-medium text-lg ${
+            type="button"
+            className={`flex-1 py-3 sm:py-4 px-2 sm:px-6 font-black text-[10px] sm:text-xs tracking-wider sm:tracking-widest uppercase transition-all ${
               activeConference === 'East'
-                ? 'text-crimson-500 border-b-2 border-crimson-500'
-                : 'text-gray-600 hover:text-navy-900'
+                ? 'bg-navy-900 text-white border-b-4 border-crimson-600'
+                : 'text-gray-500 hover:text-navy-900 hover:bg-gray-50 border-b-4 border-transparent'
             }`}
             onClick={() => setActiveConference('East')}
           >
-            Division 1
+            Div 1 <span className="hidden sm:inline">(East)</span>
           </button>
           <button
-            className={`py-3 px-6 font-medium text-lg ${
+            type="button"
+            className={`flex-1 py-3 sm:py-4 px-2 sm:px-6 font-black text-[10px] sm:text-xs tracking-wider sm:tracking-widest uppercase transition-all ${
               activeConference === 'West'
-                ? 'text-crimson-500 border-b-2 border-crimson-500'
-                : 'text-gray-600 hover:text-navy-900'
+                ? 'bg-navy-900 text-white border-b-4 border-crimson-600'
+                : 'text-gray-500 hover:text-navy-900 hover:bg-gray-50 border-b-4 border-transparent'
             }`}
             onClick={() => setActiveConference('West')}
           >
-            Division 2
+            Div 2 <span className="hidden sm:inline">(West)</span>
           </button>
         </div>
 
-        {/* Standings Table */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        {/* ══════════════ STANDINGS TABLE ══════════════ */}
+        <div className="bg-white border border-gray-200 shadow-sm rounded-sm overflow-hidden mb-8">
           <div className="overflow-x-auto">
-            <table className="min-w-full">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-navy-900 text-white">
-                  <th className="py-3 px-4 text-left">#</th>
-                  <th className="py-3 px-4 text-left">Team</th>
-                  <th className="py-3 px-4 text-center">Record</th>
-                  <th className="py-3 px-4 text-center">Win %</th>
-                  <th className="py-3 px-4 text-center">GB</th>
-                  <th className="py-3 px-4 text-center">Home</th>
-                  <th className="py-3 px-4 text-center">Away</th>
-                  <th className="py-3 px-4 text-center">Last 10</th>
-                  <th className="py-3 px-4 text-center">Streak</th>
+                <tr className="bg-navy-900 text-white border-b-4 border-crimson-600">
+                  <th className="px-2 sm:px-5 py-3 sm:py-4 w-8 sm:w-12 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">Rank</th>
+                  <th className="px-2 sm:px-4 py-3 sm:py-4 text-[10px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest">Team</th>
+                  <th className="px-2 sm:px-4 py-3 sm:py-4 w-12 sm:w-20 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">W-L</th>
+                  <th className="px-2 sm:px-4 py-3 sm:py-4 w-12 sm:w-20 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest hidden sm:table-cell">Win %</th>
+                  <th className="px-2 sm:px-4 py-3 sm:py-4 w-10 sm:w-16 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">GB</th>
+                  <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest hidden md:table-cell">Home</th>
+                  <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest hidden md:table-cell">Away</th>
+                  <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest hidden lg:table-cell">L10</th>
+                  <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest hidden lg:table-cell">Streak</th>
                 </tr>
               </thead>
-              <tbody>
-                {teamsWithStats.map((team, index) => (
-                  <tr 
-                    key={team.id} 
-                    className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="py-4 px-4">{index + 1}</td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center">
-                        <img 
-                          src={team.logo} 
-                          alt={team.name} 
-                          className="w-10 h-10 object-contain mr-3"
-                        />
-                        <span className="font-medium">{team.name}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-center">{team.record}</td>
-                    <td className="py-4 px-4 text-center">
-                      {team.winPercentage.toFixed(3).substring(1)}
-                    </td>
-                    <td className="py-4 px-4 text-center">
-                      {team.gamesBehind === 0 ? '-' : team.gamesBehind}
-                    </td>
-                    <td className="py-4 px-4 text-center">{team.homeRecord}</td>
-                    <td className="py-4 px-4 text-center">{team.awayRecord}</td>
-                    <td className="py-4 px-4 text-center">{team.last10}</td>
-                    <td className="py-4 px-4 text-center font-medium">
-                      <span className={team.streak.startsWith('W') ? 'text-green-600' : 'text-red-600'}>
-                        {team.streak}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-gray-100">
+                {teamsWithStats.map((team, index) => {
+                  const isPlayoffBound = index < 2; // Assuming top 2 make playoffs
+                  
+                  return (
+                    <motion.tr 
+                      key={team.id} 
+                      className={`hover:bg-gray-50 transition-colors group ${isPlayoffBound ? 'bg-white' : 'bg-gray-50/30'}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <td className="px-2 sm:px-5 py-3 sm:py-4 relative text-center">
+                        {isPlayoffBound && (
+                           <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500" title="Playoff Position" />
+                        )}
+                        <span className={`font-black italic ${isPlayoffBound ? 'text-navy-900 text-sm sm:text-lg' : 'text-gray-400 text-xs sm:text-base'}`}>
+                          {index + 1}
+                        </span>
+                      </td>
+                      <td className="px-2 sm:px-4 py-3 sm:py-4 whitespace-nowrap">
+                        <Link to={`/teams/${team.id}`} className="flex items-center gap-2 sm:gap-4">
+                          <img 
+                            src={team.logo} 
+                            alt={team.name} 
+                            className="w-7 h-7 sm:w-10 sm:h-10 object-contain shrink-0 mix-blend-multiply"
+                          />
+                          <div>
+                            <div className="font-black text-navy-900 uppercase tracking-tight group-hover:text-crimson-600 transition-colors text-xs sm:text-base hidden sm:block">
+                              {team.name}
+                            </div>
+                            <div className="font-black text-navy-900 uppercase tracking-tight group-hover:text-crimson-600 transition-colors text-[11px] block sm:hidden">
+                              {team.abbreviation}
+                            </div>
+                            <div className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest hidden sm:block">
+                              {team.abbreviation}
+                            </div>
+                          </div>
+                        </Link>
+                      </td>
+                      <td className="px-2 sm:px-4 py-3 sm:py-4 text-center font-black text-navy-900 tabular-nums text-[10px] sm:text-base">
+                        {team.record}
+                      </td>
+                      <td className="px-2 sm:px-4 py-3 sm:py-4 text-center hidden sm:table-cell">
+                        <span className="inline-flex px-1.5 sm:px-2 py-0.5 bg-gray-100 font-bold tabular-nums text-[10px] sm:text-sm text-navy-900 border border-gray-200">
+                          {team.winPercentage.toFixed(3).substring(1)}
+                        </span>
+                      </td>
+                      <td className="px-2 sm:px-4 py-3 sm:py-4 text-center font-bold text-gray-500 tabular-nums text-[10px] sm:text-base">
+                        {team.gamesBehind === 0 ? '-' : team.gamesBehind}
+                      </td>
+                      <td className="px-4 py-4 text-center font-semibold text-gray-500 tabular-nums text-sm hidden md:table-cell">
+                        {team.homeRecord}
+                      </td>
+                      <td className="px-4 py-4 text-center font-semibold text-gray-500 tabular-nums text-sm hidden md:table-cell">
+                        {team.awayRecord}
+                      </td>
+                      <td className="px-4 py-4 text-center font-bold text-gray-600 tabular-nums text-sm hidden lg:table-cell">
+                        {team.last10}
+                      </td>
+                      <td className="px-4 py-4 text-center hidden lg:table-cell">
+                        <span className={`inline-flex items-center justify-center gap-1 px-2 py-1 text-xs font-black uppercase tracking-wider ${
+                          team.streak.startsWith('W') 
+                          ? 'text-green-700 bg-green-50 border border-green-200' 
+                          : team.streak.startsWith('L') 
+                            ? 'text-red-700 bg-red-50 border border-red-200'
+                            : 'text-gray-700 bg-gray-100 border border-gray-200'
+                        }`}>
+                          {team.streak.startsWith('W') ? <ArrowUp className="w-3 h-3" /> : team.streak.startsWith('L') ? <ArrowDown className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
+                          {team.streak}
+                        </span>
+                      </td>
+                    </motion.tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-navy-900 mb-4">Standings Legend</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-            <div>
-              <p><span className="font-medium">GB:</span> Games Behind</p>
-              <p><span className="font-medium">Home/Away:</span> Home/Away Record</p>
-            </div>
-            <div>
-              <p><span className="font-medium">Last 10:</span> Record in last 10 games</p>
-              <p><span className="font-medium">Streak:</span> Current win/loss streak</p>
+        {/* ══════════════ DIRECTORY & LEGEND ══════════════ */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-2 bg-white border border-gray-200 shadow-sm p-6 sm:p-8">
+            <h3 className="text-sm font-black text-navy-900 uppercase tracking-widest mb-6 flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-gold-500" /> Playoff Scenario
+            </h3>
+            <p className="text-gray-600 leading-relaxed text-sm mb-4">
+              The top 2 teams from each division will qualify for the post-season championship tournament. Teams with identical records are seeded based on head-to-head match results, followed by overall point differential.
+            </p>
+            <div className="flex items-center gap-3">
+               <div className="w-3 h-3 bg-green-500 rounded-sm"></div>
+               <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Clinched Playoff Berth</span>
             </div>
           </div>
+
+          <div className="md:col-span-1 bg-white border border-gray-200 shadow-sm p-6">
+            <h3 className="text-sm font-black text-navy-900 uppercase tracking-widest mb-4 border-b border-gray-100 pb-2">Legend</h3>
+            <ul className="space-y-3 text-xs font-semibold text-gray-500">
+              <li className="flex justify-between">
+                <span className="text-navy-900 w-12 uppercase">W-L</span> <span>Win-Loss Record</span>
+              </li>
+              <li className="flex justify-between">
+                <span className="text-navy-900 w-12 uppercase">Win %</span> <span>Winning Percentage</span>
+              </li>
+              <li className="flex justify-between">
+                <span className="text-navy-900 w-12 uppercase">GB</span> <span>Games Behind Leader</span>
+              </li>
+              <li className="flex justify-between">
+                <span className="text-navy-900 w-12 uppercase">L10</span> <span>Record in Last 10</span>
+              </li>
+              <li className="flex justify-between">
+                <span className="text-navy-900 w-12 uppercase">Strk</span> <span>Current Streak</span>
+              </li>
+            </ul>
+          </div>
         </div>
+
       </div>
     </div>
   );
 };
 
-export default StandingsPage; 
+export default StandingsPage;

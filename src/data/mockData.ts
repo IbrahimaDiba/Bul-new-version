@@ -794,6 +794,7 @@ export const games: Game[] = [
       'Mouhamed Camara hits the game-winning three-pointer',
       'Defensive play of the game by Ousmane Fall'
     ],
+    highlightVideoUrl: 'https://www.youtube.com/embed/jNQXAC9IVRw',
     officials: ['Referee 1', 'Referee 2', 'Referee 3']
   },
   {
@@ -806,27 +807,69 @@ export const games: Game[] = [
     time: '20:00',
     venue: 'UCAO Stadium',
     isFeatured: false,
-    isCompleted: true
+    isCompleted: true,
+    highlights: [
+      'Back-and-forth fourth quarter with six lead changes',
+      'Clutch free throws seal the win in the final seconds',
+      'Career night from beyond the arc for the home side'
+    ],
+    highlightVideoUrl: 'https://www.youtube.com/embed/ScMzIvxBSi4'
   },
   {
     id: '3',
     homeTeam: teams[1],
     awayTeam: teams[2],
-    date: '2025-04-02',
+    date: '2026-04-12',
     time: '19:30',
     venue: 'DAUST stadium',
     isFeatured: true,
-    isCompleted: false
+    isCompleted: false,
+    status: 'scheduled',
+    broadcast: {
+      network: 'BUL Sports',
+      commentators: ['Mamadou Diallo', 'Fatou Ndiaye']
+    }
   },
   {
     id: '4',
     homeTeam: teams[3],
     awayTeam: teams[0],
-    date: '2025-04-05',
+    date: '2026-04-15',
     time: '18:00',
     venue: 'UCAO stadium',
     isFeatured: false,
-    isCompleted: false
+    isCompleted: false,
+    status: 'scheduled',
+    broadcast: {
+      network: 'BUL TV',
+      commentators: ['Ibrahima Sow', 'Aïssatou Ba']
+    }
+  },
+  {
+    id: '5',
+    homeTeam: teams[0],
+    awayTeam: teams[3],
+    date: '2026-04-12',
+    time: '21:00',
+    venue: 'Wildcat Arena',
+    isFeatured: false,
+    isCompleted: false,
+    status: 'scheduled'
+  },
+  {
+    id: '6',
+    homeTeam: teams[2],
+    awayTeam: teams[1],
+    date: '2026-04-22',
+    time: '20:00',
+    venue: 'Eagles Gymnasium',
+    isFeatured: true,
+    isCompleted: false,
+    status: 'scheduled',
+    broadcast: {
+      network: 'BUL Sports',
+      commentators: ['Mamadou Diallo', 'Fatou Ndiaye']
+    }
   }
 ];
 

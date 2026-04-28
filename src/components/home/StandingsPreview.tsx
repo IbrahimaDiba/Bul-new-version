@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Team } from '../../types';
-import { teams } from '../../data/mockData';
+import { ADMIN_CONTENT_EVENT, getManagedTeams } from '../../data/adminContent';
 
 const StandingsPreview: React.FC = () => {
   const [activeConference, setActiveConference] = useState<'East' | 'West'>('East');
+  const [teams, setTeams] = useState<Team[]>([]);
+
+  useEffect(() => {
+    const reload = () => setTeams(getManagedTeams());
+    reload();
+    window.addEventListener('storage', reload);
+    window.addEventListener(ADMIN_CONTENT_EVENT, reload);
+    return () => {
+      window.removeEventListener('storage', reload);
+      window.removeEventListener(ADMIN_CONTENT_EVENT, reload);
+    };
+  }, []);
   
   const filteredTeams = teams.filter(team => team.conference === activeConference)
     .sort((a, b) => a.standing - b.standing);

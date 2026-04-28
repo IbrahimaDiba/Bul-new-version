@@ -5,28 +5,28 @@ export default {
     extend: {
       colors: {
         navy: {
-          50: '#f0f4f8',
-          100: '#d9e2ed',
-          200: '#b3c5dc',
-          300: '#8ca8cb',
-          400: '#6688ba',
-          500: '#4d6fa3',
-          600: '#3f5985',
-          700: '#34496f',
-          800: '#2c3c5c',
-          900: '#1a365d', // Primary navy color
+          50: '#f6f6f6',
+          100: '#e7e7e7',
+          200: '#d1d1d1',
+          300: '#b0b0b0',
+          400: '#888888',
+          500: '#6d6d6d',
+          600: '#5d5d5d',
+          700: '#4f4f4f',
+          800: '#1a1a1a',
+          900: '#050505', // Deep black for premium background/text
         },
         crimson: {
-          50: '#fce8ec',
-          100: '#f9d0da',
-          200: '#f2a5b9',
-          300: '#eb7998',
-          400: '#e44f77',
-          500: '#dc2755',
-          600: '#c41e3a', // Secondary crimson color
-          700: '#a5193a',
-          800: '#851539',
-          900: '#6b1336',
+          50: '#fffae6',
+          100: '#fff0b3',
+          200: '#ffe680',
+          300: '#ffdc4d',
+          400: '#ffd21a',
+          500: '#d4af37', // Metallic gold base
+          600: '#b08d28', // Darker metallic gold for strong contrast
+          700: '#806921',
+          800: '#554616',
+          900: '#2b230b',
         },
         gold: {
           50: '#fffbe6',
@@ -34,7 +34,7 @@ export default {
           200: '#fff199',
           300: '#ffea66',
           400: '#ffe333',
-          500: '#ffd700', // Accent gold color
+          500: '#ffd700', // Standard gold
           600: '#ccac00',
           700: '#998100',
           800: '#665600',

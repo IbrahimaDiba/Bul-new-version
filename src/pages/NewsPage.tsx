@@ -1,30 +1,20 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { Search, Tag, Calendar, User, Clock, ChevronRight } from 'lucide-react';
-import { supabase } from '../supabaseClient';
-import { newsArticles as mockNewsArticles } from '../data/mockData';
+import { ADMIN_CONTENT_EVENT, getManagedNewsArticles } from '../data/adminContent';
+import { NewsArticle } from '../types';
+import { NewsCardSkeleton } from '../components/ui/Skeleton';
 
 const NewsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [hoveredArticle, setHoveredArticle] = useState<string | null>(null);
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-  const [newsArticles, setNewsArticles] = useState<any[]>([]);
-
-  useEffect(() => {
-    const fetchNews = async () => {
-      const { data, error } = await supabase.from('news').select('*');
-      if (!error && data && data.length > 0) {
-        setNewsArticles(data);
-      } else {
-        setNewsArticles(mockNewsArticles);
-      }
-    };
-    fetchNews();
-  }, []);
 
   // Spring animation for card hover
   const springConfig = { stiffness: 300, damping: 30 };
@@ -35,7 +25,21 @@ const NewsPage: React.FC = () => {
 
   const categories = ['player', 'team', 'league', 'general'];
 
-  const filteredArticles = newsArticles.filter(article => {
+  useEffect(() => {
+    const reload = () => {
+      setArticles(getManagedNewsArticles());
+      setIsLoading(false);
+    };
+    reload();
+    window.addEventListener('storage', reload);
+    window.addEventListener(ADMIN_CONTENT_EVENT, reload);
+    return () => {
+      window.removeEventListener('storage', reload);
+      window.removeEventListener(ADMIN_CONTENT_EVENT, reload);
+    };
+  }, []);
+
+  const filteredArticles = articles.filter(article => {
     const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          article.content.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory ? article.category === selectedCategory : true;
@@ -151,6 +155,13 @@ const NewsPage: React.FC = () => {
         </motion.div>
 
         {/* News Grid */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <NewsCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : (
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           variants={{
@@ -227,9 +238,10 @@ const NewsPage: React.FC = () => {
             ))}
           </AnimatePresence>
         </motion.div>
+        )}
 
         {/* Empty State */}
-        {filteredArticles.length === 0 && (
+        {!isLoading && filteredArticles.length === 0 && (
           <motion.div 
             className="text-center py-12"
             initial={{ opacity: 0 }}
