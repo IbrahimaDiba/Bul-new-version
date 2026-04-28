@@ -52,7 +52,7 @@ const Header: React.FC = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const navRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Scroll handler
@@ -65,7 +65,7 @@ const Header: React.FC = () => {
   // Fermer les menus au clic extérieur
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+      if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
         setOpenSubMenu(null);
       }
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
@@ -169,7 +169,7 @@ const Header: React.FC = () => {
   const displayName = userEmail ? userEmail.split('@')[0] : null;
 
   return (
-    <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-navy-900 shadow-md' : 'bg-transparent'}`}>
+    <header ref={headerRef} className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-navy-900 shadow-md' : 'bg-transparent'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
 
@@ -181,7 +181,7 @@ const Header: React.FC = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav ref={navRef} className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <div
                 key={item.title}
