@@ -37,26 +37,26 @@ const StandingsPreview: React.FC = () => {
         </div>
 
         {/* Conference Tabs */}
-        <div className="flex border-b border-gray-200 mb-6 sm:mb-8">
+        <div className="bg-white border border-gray-200 rounded-lg flex overflow-x-auto scrollbar-none mb-6 sm:mb-8">
           <button
-            className={`py-2 sm:py-3 px-3 sm:px-6 font-medium text-sm sm:text-lg ${
+            className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-all whitespace-nowrap outline-none flex-1 sm:flex-none justify-center border-b-4 ${
               activeConference === 'East'
-                ? 'text-crimson-500 border-b-2 border-crimson-500'
-                : 'text-gray-600 hover:text-navy-900'
+                ? 'text-navy-900 border-crimson-600 bg-gray-50/50'
+                : 'text-gray-500 border-transparent hover:text-navy-900 hover:bg-gray-50'
             }`}
             onClick={() => setActiveConference('East')}
           >
-            Division 1
+            Division 1 (East)
           </button>
           <button
-            className={`py-2 sm:py-3 px-3 sm:px-6 font-medium text-sm sm:text-lg ${
+            className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-all whitespace-nowrap outline-none flex-1 sm:flex-none justify-center border-b-4 ${
               activeConference === 'West'
-                ? 'text-crimson-500 border-b-2 border-crimson-500'
-                : 'text-gray-600 hover:text-navy-900'
+                ? 'text-navy-900 border-crimson-600 bg-gray-50/50'
+                : 'text-gray-500 border-transparent hover:text-navy-900 hover:bg-gray-50'
             }`}
             onClick={() => setActiveConference('West')}
           >
-            Division 2
+            Division 2 (West)
           </button>
         </div>
 

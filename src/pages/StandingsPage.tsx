@@ -80,28 +80,28 @@ const StandingsPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-6">
         
         {/* ══════════════ DIVISION SELECTOR ══════════════ */}
-        <div className="flex bg-white rounded-sm shadow-md border border-gray-200 overflow-hidden mb-8 max-w-md w-full">
+        <div className="bg-white border border-gray-200 rounded-lg flex overflow-x-auto scrollbar-none mb-8 max-w-2xl">
           <button
             type="button"
-            className={`flex-1 py-3 sm:py-4 px-2 sm:px-6 font-black text-[10px] sm:text-xs tracking-wider sm:tracking-widest uppercase transition-all ${
+            className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-all whitespace-nowrap outline-none flex-1 sm:flex-none justify-center border-b-4 ${
               activeConference === 'East'
-                ? 'bg-navy-900 text-white border-b-4 border-crimson-600'
-                : 'text-gray-500 hover:text-navy-900 hover:bg-gray-50 border-b-4 border-transparent'
+                ? 'text-navy-900 border-crimson-600 bg-gray-50/50'
+                : 'text-gray-500 border-transparent hover:text-navy-900 hover:bg-gray-50'
             }`}
             onClick={() => setActiveConference('East')}
           >
-            Div 1 <span className="hidden sm:inline">(East)</span>
+            Division 1 <span className="hidden sm:inline">(East)</span>
           </button>
           <button
             type="button"
-            className={`flex-1 py-3 sm:py-4 px-2 sm:px-6 font-black text-[10px] sm:text-xs tracking-wider sm:tracking-widest uppercase transition-all ${
+            className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-all whitespace-nowrap outline-none flex-1 sm:flex-none justify-center border-b-4 ${
               activeConference === 'West'
-                ? 'bg-navy-900 text-white border-b-4 border-crimson-600'
-                : 'text-gray-500 hover:text-navy-900 hover:bg-gray-50 border-b-4 border-transparent'
+                ? 'text-navy-900 border-crimson-600 bg-gray-50/50'
+                : 'text-gray-500 border-transparent hover:text-navy-900 hover:bg-gray-50'
             }`}
             onClick={() => setActiveConference('West')}
           >
-            Div 2 <span className="hidden sm:inline">(West)</span>
+            Division 2 <span className="hidden sm:inline">(West)</span>
           </button>
         </div>
 
