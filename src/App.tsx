@@ -42,21 +42,29 @@ const App: React.FC = () => {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            
+            {/* Teams Routes */}
             <Route path="/teams" element={<TeamsPage />} />
-            <Route path="/teams/:teamId" element={<TeamDetailsPage />} />
             <Route path="/teams/standings" element={<StandingsPage />} />
             <Route path="/teams/rosters" element={<RostersPage />} />
             <Route path="/teams/stats" element={<TeamStatsPage />} />
+            <Route path="/teams/:teamId" element={<TeamDetailsPage />} />
+            
+            {/* Players Routes */}
             <Route path="/players" element={<PlayersPage />} />
             <Route path="/players/leaders" element={<LeadersPage />} />
             <Route path="/players/awards" element={<AwardsPage />} />
             <Route path="/players/stats" element={<PlayerStatsPage />} />
             <Route path="/players/:playerId" element={<PlayerDetailsPage />} />
             <Route path="/players/:playerId/details" element={<PlayerDetailsPage />} />
+            
+            {/* Games Routes */}
             <Route path="/games" element={<GamesPage />} />
             <Route path="/games/schedule" element={<GamesSchedulePage />} />
             <Route path="/games/results" element={<GamesResultsPage />} />
             <Route path="/games/highlights" element={<GamesHighlightsPage />} />
+            
+            {/* Other Routes */}
             <Route path="/news" element={<NewsPage />} />
             <Route path="/news/:articleId" element={<NewsArticlePage />} />
             <Route path="/shop" element={<ShopPage />} />

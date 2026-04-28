@@ -10,6 +10,7 @@ const navItems: NavItem[] = [
     title: 'Teams', 
     href: '/teams',
     subItems: [
+      { title: 'All Teams', href: '/teams' },
       { title: 'Standings', href: '/teams/standings' },
       { title: 'Statistics', href: '/teams/stats' },
       { title: 'Rosters', href: '/teams/rosters' },
@@ -19,6 +20,7 @@ const navItems: NavItem[] = [
     title: 'Players', 
     href: '/players',
     subItems: [
+      { title: 'All Players', href: '/players' },
       { title: 'Leaders', href: '/players/leaders' },
       { title: 'Statistics', href: '/players/stats' },
       { title: 'Awards', href: '/players/awards' },
@@ -28,6 +30,7 @@ const navItems: NavItem[] = [
     title: 'Games', 
     href: '/games',
     subItems: [
+      { title: 'All Games', href: '/games' },
       { title: 'Schedule', href: '/games/schedule' },
       { title: 'Results', href: '/games/results' },
       { title: 'Highlights', href: '/games/highlights' },
@@ -189,7 +192,18 @@ const Header: React.FC = () => {
                 <Link
                   to={item.href}
                   className="flex items-center gap-1 text-white hover:text-gold-400 font-medium transition-colors py-2"
-                  onClick={() => setOpenSubMenu(null)}
+                  onClick={(e) => {
+                    if (item.subItems) {
+                      if (openSubMenu !== item.title) {
+                        e.preventDefault();
+                        setOpenSubMenu(item.title);
+                      } else {
+                        setOpenSubMenu(null);
+                      }
+                    } else {
+                      setOpenSubMenu(null);
+                    }
+                  }}
                 >
                   {item.title}
                   {item.subItems && (
@@ -209,7 +223,6 @@ const Header: React.FC = () => {
                           key={subItem.title}
                           to={subItem.href}
                           className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-navy-900 transition-colors"
-                          onClick={() => setOpenSubMenu(null)}
                         >
                           {subItem.title}
                         </Link>
@@ -310,12 +323,27 @@ const Header: React.FC = () => {
                   <Link
                     to={item.href}
                     className="text-white hover:text-gold-400 block px-3 py-2 font-medium"
-                    onClick={() => !item.subItems && setIsOpen(false)}
+                    onClick={(e) => {
+                      if (item.subItems) {
+                        if (openSubMenu !== item.title) {
+                          e.preventDefault();
+                          setOpenSubMenu(item.title);
+                        }
+                      } else {
+                        setIsOpen(false);
+                      }
+                    }}
                   >
                     {item.title}
                   </Link>
                   {item.subItems && (
-                    <button onClick={() => toggleSubMenu(item.title)} className="text-white px-2">
+                    <button 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        toggleSubMenu(item.title);
+                      }} 
+                      className="text-white px-4 py-2"
+                    >
                       <ChevronDown className={`h-4 w-4 transform transition-transform ${openSubMenu === item.title ? 'rotate-180' : ''}`} />
                     </button>
                   )}
@@ -327,7 +355,6 @@ const Header: React.FC = () => {
                         key={subItem.title}
                         to={subItem.href}
                         className="text-gray-300 hover:text-white block px-3 py-2 text-sm"
-                        onClick={() => setIsOpen(false)}
                       >
                         {subItem.title}
                       </Link>

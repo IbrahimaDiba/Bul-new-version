@@ -287,19 +287,13 @@ const ChatbotPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Support for VITE_OPENAI_API_KEY, VITE_GEMINI_API_KEY, or VITE_GROQ_API_KEY
       const openAiKey = import.meta.env.VITE_OPENAI_API_KEY;
       const geminiKey = import.meta.env.VITE_GEMINI_API_KEY;
       const groqKey = import.meta.env.VITE_GROQ_API_KEY;
 
-      if (openAiKey || geminiKey || groqKey) {
-        const responseText = await callLLM(currentInput, openAiKey, geminiKey, groqKey);
-        setMessages((msgs: ChatMessage[]) => [...msgs, { from: 'bot', text: responseText, type: 'text' }]);
-      } else {
-        // Fallback local algorithme
-        const botMsg = getBotResponse(currentInput);
-        setMessages((msgs: ChatMessage[]) => [...msgs, botMsg]);
-      }
+      // On tente toujours l'appel au LLM. callLLM va gérer les clés locales OU la Supabase Edge Function
+      const responseText = await callLLM(currentInput, openAiKey, geminiKey, groqKey);
+      setMessages((msgs: ChatMessage[]) => [...msgs, { from: 'bot', text: responseText, type: 'text' }]);
     } catch (error: any) {
       console.error("Erreur API IA, basculement sur le moteur local :", error);
       const botMsg = getBotResponse(currentInput);
