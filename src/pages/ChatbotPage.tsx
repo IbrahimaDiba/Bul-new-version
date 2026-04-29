@@ -314,9 +314,9 @@ const ChatbotPage: React.FC = () => {
   };
 
   return (
-    <div className="h-[100dvh] w-full flex flex-col items-center justify-center pt-20 sm:pt-24 pb-4 sm:pb-6 px-2 sm:px-4 relative overflow-hidden">
+    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center pt-20 sm:pt-24 pb-4 sm:pb-6 px-2 sm:px-4 bg-navy-900 overflow-hidden">
       <motion.div
-        className="fixed inset-0 z-0 bg-navy-900"
+        className="absolute inset-0 z-0 bg-navy-900"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
