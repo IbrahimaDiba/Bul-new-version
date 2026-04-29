@@ -134,7 +134,7 @@ const NewsPage: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
               {categories.map((category) => (
                 <motion.button
                   key={category}

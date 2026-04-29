@@ -56,10 +56,10 @@ const LatestNews: React.FC = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex justify-between items-end mb-12 border-b-2 border-gray-200 pb-4 relative"
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-0 mb-8 sm:mb-12 border-b-2 border-gray-200 pb-4 relative"
         >
           <div>
-            <h2 className="text-3xl font-black text-navy-900 uppercase tracking-tight">Latest News</h2>
+            <h2 className="text-2xl sm:text-3xl font-black text-navy-900 uppercase tracking-tight">Latest News</h2>
             <div className="absolute bottom-[-2px] left-0 w-24 h-[2px] bg-crimson-600"></div>
           </div>
           <Link 
