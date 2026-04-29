@@ -41,7 +41,7 @@ const SponsorsPage: React.FC = () => {
           <span className="uppercase tracking-[0.3em] text-crimson-500 text-xs font-bold mb-3">
             Basketball University League
           </span>
-          <h1 className="text-5xl sm:text-7xl font-black text-white uppercase tracking-tight leading-none">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-white uppercase tracking-tight leading-none">
             Partners
           </h1>
           <p className="mt-5 text-gray-400 max-w-2xl text-base sm:text-lg font-medium leading-relaxed">
@@ -54,7 +54,7 @@ const SponsorsPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
         {isLoading ? (
-          <div className="grid grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
               <SponsorCardSkeleton key={i} />
             ))}
@@ -70,7 +70,7 @@ const SponsorsPage: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {sponsors.map((sponsor) => (
               <PartnerCard key={sponsor.id} sponsor={sponsor} />
             ))}
@@ -117,8 +117,8 @@ const PartnerCard: React.FC<{ sponsor: Sponsor }> = ({ sponsor }) => {
     >
       {/* Logo area — white background */}
       <div
-        className="flex items-center justify-center px-8 py-10"
-        style={{ minHeight: '160px', backgroundColor: '#fff' }}
+        className="flex items-center justify-center px-4 sm:px-8 py-8 sm:py-10"
+        style={{ minHeight: '120px', backgroundColor: '#fff' }}
       >
         <img
           src={sponsor.logo}
@@ -130,7 +130,7 @@ const PartnerCard: React.FC<{ sponsor: Sponsor }> = ({ sponsor }) => {
 
       {/* Text area — turns gold/dark on hover (site colors) */}
       <div
-        className="px-6 py-5 flex-1 transition-colors duration-300 flex flex-col"
+        className="px-4 sm:px-6 py-4 sm:py-5 flex-1 transition-colors duration-300 flex flex-col"
         style={{
           backgroundColor: hovered ? '#050505' : '#f9fafb',
           borderTop: hovered ? '2px solid #d4af37' : '2px solid transparent',
