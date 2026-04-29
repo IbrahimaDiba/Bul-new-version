@@ -98,15 +98,14 @@ export const initSupabaseCache = async () => {
 
   // Step 2: Refresh from Supabase in the background
   try {
-    const [tRes, pRes, gRes, nRes, sRes, prRes, tkRes, oRes] = await Promise.all([
+    // Essential data for Homepage
+    const [tRes, pRes, gRes, nRes, sRes, prRes] = await Promise.all([
       supabase.from('teams').select('id, name, mascot, abbreviation, primary_color, secondary_color, logo, conference, record, standing'),
       supabase.from('players').select('id, team_id, name, position, jersey_number, height, weight, year, hometown, avatar, date_of_birth, player_class, ppg, rpg, apg, spg, bpg, fgp, tpp, ftp'),
       supabase.from('games').select('*'),
       supabase.from('news_articles').select('id, title, summary, content, author, image, category, published_date'),
       supabase.from('sponsors').select('id, name, logo, category, description, benefits'),
-      supabase.from('products').select('*'),
-      supabase.from('tickets').select('*'),
-      supabase.from('orders').select('*')
+      supabase.from('products').select('*')
     ]);
 
     if (tRes.error) console.error('[Supabase] teams:', tRes.error.message);
@@ -181,21 +180,28 @@ export const initSupabaseCache = async () => {
       console.error('[Supabase] Products error:', prRes.error);
     }
 
-    if (tkRes.data) cache.tickets = tkRes.data.map(t => ({
-      id: t.id, name: t.name, description: t.description, price: t.price,
-      type: t.ticket_type, date: t.game_date, venue: t.venue, inStock: t.in_stock
-    }));
-
-    if (oRes.data) cache.orders = oRes.data.map(o => ({
-      id: o.id, customerName: o.customer_name, customerEmail: o.customer_email,
-      customerPhone: o.customer_phone, shippingAddress: o.shipping_address,
-      totalAmount: o.total_amount, status: o.status, date: o.order_date, items: []
-    }));
-
     isSupabaseLoaded = true;
     saveToLocalStorage(); // Persist fresh data for next reload
     triggerUpdate();      // Re-render with fresh data from Supabase
     console.log('[Cache] Refreshed from Supabase and saved to localStorage.');
+
+    // Background fetch for non-essential admin data
+    Promise.all([
+      supabase.from('tickets').select('*'),
+      supabase.from('orders').select('*')
+    ]).then(([tkRes, oRes]) => {
+      if (tkRes.data) cache.tickets = tkRes.data.map(t => ({
+        id: t.id, name: t.name, description: t.description, price: t.price,
+        type: t.ticket_type, date: t.game_date, venue: t.venue, inStock: t.in_stock
+      }));
+
+      if (oRes.data) cache.orders = oRes.data.map(o => ({
+        id: o.id, customerName: o.customer_name, customerEmail: o.customer_email,
+        customerPhone: o.customer_phone, shippingAddress: o.shipping_address,
+        totalAmount: o.total_amount, status: o.status, date: o.order_date, items: []
+      }));
+      saveToLocalStorage();
+    });
   } catch (err) {
     console.error('Failed to load from Supabase:', err);
     if (!hadCache) {
