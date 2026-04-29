@@ -36,6 +36,7 @@ const cache = {
 };
 
 let isSupabaseLoaded = false;
+export const getIsSupabaseLoaded = () => isSupabaseLoaded;
 
 const triggerUpdate = () => {
   if (typeof window !== 'undefined') {

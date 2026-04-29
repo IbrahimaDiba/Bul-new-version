@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -32,8 +32,32 @@ import ChatbotPage from './pages/ChatbotPage';
 import LoginPage from './pages/LoginPage';
 import AdminPage from './pages/AdminPage';
 import ScrollToTop from './components/layout/ScrollToTop';
+import { getIsSupabaseLoaded, ADMIN_CONTENT_EVENT } from './data/adminContent';
+import { Loader2 } from 'lucide-react';
 
 const App: React.FC = () => {
+  const [isDataLoaded, setIsDataLoaded] = useState(getIsSupabaseLoaded());
+
+  useEffect(() => {
+    const checkLoaded = () => setIsDataLoaded(getIsSupabaseLoaded());
+    window.addEventListener(ADMIN_CONTENT_EVENT, checkLoaded);
+    return () => window.removeEventListener(ADMIN_CONTENT_EVENT, checkLoaded);
+  }, []);
+
+  if (!isDataLoaded) {
+    return (
+      <div className="min-h-screen bg-navy-900 flex flex-col items-center justify-center text-white">
+        <Loader2 className="w-12 h-12 text-crimson-500 animate-spin mb-4" />
+        <h1 className="text-2xl font-black uppercase tracking-widest text-center">
+          Basketball<br/><span className="text-crimson-500">University</span><br/>League
+        </h1>
+        <p className="text-gray-400 mt-4 text-xs font-bold uppercase tracking-widest animate-pulse">
+          Loading Data...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
