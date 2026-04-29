@@ -340,13 +340,8 @@ const ChatbotPage: React.FC = () => {
           <span className="hidden sm:inline font-bold">Retour</span>
         </button>
         <div className="flex flex-col items-center">
-           <div className="font-black uppercase tracking-widest text-base sm:text-xl flex items-center gap-4">
-             <img src="/bul_logo.png" alt="BUL Logo" className="h-16 w-auto sm:h-20 object-contain drop-shadow-md" />
+           <div className="font-black uppercase tracking-widest text-lg sm:text-xl">
              BUL Assistant
-           </div>
-           <div className="text-[10px] sm:text-xs text-gold-500 font-bold tracking-widest uppercase flex items-center gap-1.5 mt-0.5">
-             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-             En ligne
            </div>
         </div>
         <div className="w-10 sm:w-20"></div> {/* Spacer for centering */}
