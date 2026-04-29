@@ -97,93 +97,107 @@ export const initSupabaseCache = async () => {
   }
 
   // Step 2: Refresh from Supabase in the background
+  // Step 2: Refresh from Supabase in the background progressively
   try {
-    // Essential data for Homepage
-    const [tRes, pRes, gRes, nRes, sRes, prRes] = await Promise.all([
-      supabase.from('teams').select('id, name, mascot, abbreviation, primary_color, secondary_color, logo, conference, record, standing'),
-      supabase.from('players').select('id, team_id, name, position, jersey_number, height, weight, year, hometown, avatar, date_of_birth, player_class, ppg, rpg, apg, spg, bpg, fgp, tpp, ftp'),
-      supabase.from('games').select('*'),
-      supabase.from('news_articles').select('id, title, summary, content, author, image, category, published_date'),
-      supabase.from('sponsors').select('id, name, logo, category, description, benefits'),
-      supabase.from('products').select('*')
+    const fetchTeams = async () => {
+      const res = await supabase.from('teams').select('id, name, mascot, abbreviation, primary_color, secondary_color, logo, conference, record, standing');
+      if (res.error) { console.error('[Supabase] teams:', res.error.message); return; }
+      if (res.data) {
+        cache.teams = res.data.map(t => ({
+          id: t.id, name: t.name, mascot: t.mascot, abbreviation: t.abbreviation,
+          primaryColor: t.primary_color, secondaryColor: t.secondary_color,
+          logo: t.logo || '',
+          conference: t.conference, record: t.record, standing: t.standing, roster: []
+        }));
+        triggerUpdate();
+      }
+    };
+
+    const fetchPlayers = async () => {
+      const res = await supabase.from('players').select('id, team_id, name, position, jersey_number, height, weight, year, hometown, avatar, date_of_birth, player_class, ppg, rpg, apg, spg, bpg, fgp, tpp, ftp');
+      if (res.error) { console.error('[Supabase] players:', res.error.message); return; }
+      if (res.data) {
+        cache.players = res.data.map(p => ({
+          id: p.id, team: p.team_id, name: p.name, position: p.position,
+          jerseyNumber: p.jersey_number, height: p.height, weight: p.weight,
+          year: p.year, hometown: p.hometown,
+          avatar: p.avatar || '',
+          dateOfBirth: p.date_of_birth,
+          playerClass: p.player_class || p.year,
+          stats: { ppg: p.ppg, rpg: p.rpg, apg: p.apg, spg: p.spg, bpg: p.bpg, fgp: p.fgp, tpp: p.tpp, ftp: p.ftp }
+        }));
+        triggerUpdate();
+      }
+    };
+
+    const fetchGames = async () => {
+      const res = await supabase.from('games').select('*');
+      if (res.error) { console.error('[Supabase] games:', res.error.message); return; }
+      if (res.data) {
+        cache.games = res.data.map(g => ({
+          id: g.id, homeTeamId: g.home_team_id, awayTeamId: g.away_team_id,
+          date: g.game_date, time: g.game_time, venue: g.venue, status: g.status,
+          homeScore: g.home_score, awayScore: g.away_score,
+          highlightVideoUrl: g.highlight_video_url || undefined,
+          playerStats: undefined
+        }));
+        triggerUpdate();
+      }
+    };
+
+    const fetchNews = async () => {
+      const res = await supabase.from('news_articles').select('id, title, summary, content, author, image, category, published_date');
+      if (res.error) { console.error('[Supabase] news:', res.error.message); return; }
+      if (res.data) {
+        cache.news = res.data.map(n => ({
+          id: n.id, title: n.title, summary: n.summary, content: n.content,
+          author: n.author,
+          image: n.image || '',
+          category: n.category, date: n.published_date
+        }));
+        triggerUpdate();
+      }
+    };
+
+    const fetchSponsors = async () => {
+      const res = await supabase.from('sponsors').select('id, name, logo, category, description, benefits');
+      if (res.error) { console.error('[Supabase] sponsors:', res.error.message); return; }
+      if (res.data) {
+        cache.sponsors = res.data.map(s => ({
+          id: s.id, name: s.name,
+          logo: s.logo || '',
+          category: s.category, description: s.description, benefits: s.benefits || []
+        }));
+        triggerUpdate();
+      }
+    };
+
+    const fetchProducts = async () => {
+      const res = await supabase.from('products').select('*');
+      if (res.error) { console.error('[Supabase] products:', res.error.message); return; }
+      if (res.data) {
+        cache.products = res.data.map(p => ({
+          id: p.id, name: p.name, description: p.description, price: p.price,
+          image: p.image_url || p.image || '',
+          category: p.category, inStock: p.in_stock, featured: p.featured, team: p.team_id
+        }));
+        triggerUpdate();
+      }
+    };
+
+    // Lancement de toutes les requêtes en parallèle, chaque requête mettra à jour l'écran dès qu'elle a fini
+    await Promise.all([
+      fetchTeams(),
+      fetchPlayers(),
+      fetchGames(),
+      fetchNews(),
+      fetchSponsors(),
+      fetchProducts()
     ]);
-
-    if (tRes.error) console.error('[Supabase] teams:', tRes.error.message);
-    if (pRes.error) console.error('[Supabase] players:', pRes.error.message);
-    if (gRes.error) console.error('[Supabase] games:', gRes.error.message);
-    if (nRes.error) console.error('[Supabase] news:', nRes.error.message);
-    if (sRes.error) console.error('[Supabase] sponsors:', sRes.error.message);
-    if (prRes.error) console.error('[Supabase] products:', prRes.error.message);
-
-    if (tRes.data) {
-      cache.teams = tRes.data.map(t => ({
-        id: t.id, name: t.name, mascot: t.mascot, abbreviation: t.abbreviation,
-        primaryColor: t.primary_color, secondaryColor: t.secondary_color,
-        logo: t.logo || '',
-        conference: t.conference, record: t.record, standing: t.standing, roster: []
-      }));
-      console.log('[Supabase] Teams loaded:', cache.teams.length);
-    }
-
-    if (pRes.data) {
-      cache.players = pRes.data.map(p => ({
-        id: p.id, team: p.team_id, name: p.name, position: p.position,
-        jerseyNumber: p.jersey_number, height: p.height, weight: p.weight,
-        year: p.year, hometown: p.hometown,
-        avatar: p.avatar || '',
-        dateOfBirth: p.date_of_birth,
-        playerClass: p.player_class || p.year,
-        stats: { ppg: p.ppg, rpg: p.rpg, apg: p.apg, spg: p.spg, bpg: p.bpg, fgp: p.fgp, tpp: p.tpp, ftp: p.ftp }
-      }));
-      console.log('[Supabase] Players loaded:', cache.players.length);
-    }
-
-    if (gRes.data) {
-      cache.games = gRes.data.map(g => ({
-        id: g.id, homeTeamId: g.home_team_id, awayTeamId: g.away_team_id,
-        date: g.game_date, time: g.game_time, venue: g.venue, status: g.status,
-        homeScore: g.home_score, awayScore: g.away_score,
-        highlightVideoUrl: g.highlight_video_url || undefined,
-        playerStats: undefined
-      }));
-      console.log('[Supabase] Games loaded:', cache.games.length);
-    }
-
-    if (nRes.data) {
-      cache.news = nRes.data.map(n => ({
-        id: n.id, title: n.title, summary: n.summary, content: n.content,
-        author: n.author,
-        image: n.image || '',
-        category: n.category, date: n.published_date
-      }));
-      console.log('[Supabase] News loaded:', cache.news.length);
-    }
-
-    if (sRes.data) {
-      cache.sponsors = sRes.data.map(s => ({
-        id: s.id, name: s.name,
-        logo: s.logo || '',
-        category: s.category, description: s.description, benefits: s.benefits || []
-      }));
-      console.log('[Supabase] Sponsors loaded:', cache.sponsors.length);
-    }
-
-    if (prRes.data) {
-      console.log('[Supabase] Raw products data:', prRes.data);
-      cache.products = prRes.data.map(p => ({
-        id: p.id, name: p.name, description: p.description, price: p.price,
-        image: p.image_url || p.image || '',
-        category: p.category, inStock: p.in_stock, featured: p.featured, team: p.team_id
-      }));
-      console.log('[Supabase] Products processed:', cache.products.length);
-    } else if (prRes.error) {
-      console.error('[Supabase] Products error:', prRes.error);
-    }
 
     isSupabaseLoaded = true;
     saveToLocalStorage(); // Persist fresh data for next reload
-    triggerUpdate();      // Re-render with fresh data from Supabase
-    console.log('[Cache] Refreshed from Supabase and saved to localStorage.');
+    console.log('[Cache] Refreshed from Supabase progressively and saved to localStorage.');
 
     // Background fetch for non-essential admin data
     Promise.all([
