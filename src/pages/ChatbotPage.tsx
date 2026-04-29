@@ -314,30 +314,26 @@ const ChatbotPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center py-12 relative overflow-hidden">
-      {/* Animated 3D background */}
+    <div className="min-h-screen flex flex-col items-center justify-center pt-24 pb-6 px-2 sm:px-4 relative overflow-hidden">
       <motion.div
-        className="fixed inset-0 z-0"
+        className="fixed inset-0 z-0 bg-navy-900"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        style={{
-          background: 'linear-gradient(135deg, #e0e7ff 0%, #fbc2eb 100%)',
-          filter: 'blur(0px)',
-        }}
       >
         <motion.div
-          className="absolute w-[120vw] h-[120vw] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          className="absolute w-[150vw] h-[150vw] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20"
           animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 40, ease: 'linear' }}
+          transition={{ repeat: Infinity, duration: 60, ease: 'linear' }}
           style={{
-            background: 'radial-gradient(circle at 60% 40%, #a5b4fc 0%, #fbc2eb 100%)',
-            opacity: 0.25,
+            background: 'conic-gradient(from 0deg, transparent 0deg, #dc2626 90deg, transparent 180deg, #eab308 270deg, transparent 360deg)',
+            filter: 'blur(100px)',
             borderRadius: '50%',
           }}
         />
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
       </motion.div>
-      <div className="w-full max-w-xl bg-white/90 rounded-2xl shadow-2xl p-3 sm:p-6 flex flex-col h-[80vh] sm:h-[70vh] z-10 backdrop-blur-md border border-white/30 mx-2 sm:mx-auto">
-        <h1 className="text-xl sm:text-2xl font-bold text-navy-900 mb-3 sm:mb-4">BUL Assistant</h1>
+      <div className="w-full max-w-2xl bg-white/95 rounded-2xl shadow-2xl p-3 sm:p-6 flex flex-col h-[calc(100vh-8rem)] sm:h-[75vh] z-10 backdrop-blur-md border border-white/50">
+        <h1 className="text-xl sm:text-2xl font-black text-navy-900 mb-3 sm:mb-4 uppercase tracking-widest border-b border-gray-100 pb-2">BUL Assistant</h1>
         <div className="flex-1 overflow-y-auto mb-4 space-y-2 scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent">
           <AnimatePresence initial={false}>
             {messages.map((msg, i) => (
@@ -352,14 +348,14 @@ const ChatbotPage: React.FC = () => {
                 {msg.type === 'ticket' && msg.data && !ticketBought ? (
                   <motion.div
                     whileHover={{ scale: 1.04, rotateY: 5 }}
-                    className="bg-gradient-to-br from-blue-200 to-purple-100 border border-blue-300 shadow-2xl rounded-2xl p-4 max-w-[80%] flex flex-col items-start"
+                    className="bg-navy-900 border border-crimson-600 shadow-2xl rounded-2xl p-4 max-w-[80%] flex flex-col items-start text-white"
                     style={{ perspective: 600 }}
                   >
-                    <div className="font-bold text-lg mb-1">{msg.data.homeTeam.name} vs {msg.data.awayTeam.name}</div>
-                    <div className="text-sm mb-2">{msg.data.date} à {msg.data.time} - {msg.data.venue}</div>
+                    <div className="font-bold text-lg mb-1 text-gold-500">{msg.data.homeTeam.name} vs {msg.data.awayTeam.name}</div>
+                    <div className="text-sm mb-3 text-gray-300">{msg.data.date} à {msg.data.time} - {msg.data.venue}</div>
                     <motion.button
                       whileTap={{ scale: 0.95 }}
-                      className="bg-crimson-500 hover:bg-crimson-600 text-white px-4 py-2 rounded-lg font-semibold shadow"
+                      className="bg-crimson-600 hover:bg-crimson-700 text-white px-4 py-2 rounded-lg font-black uppercase tracking-widest text-xs shadow transition-colors"
                       onClick={() => handleBuyTicket(msg.data)}
                     >
                       Acheter un ticket
@@ -368,14 +364,14 @@ const ChatbotPage: React.FC = () => {
                 ) : msg.type === 'product' && msg.data ? (
                   <motion.div
                     whileHover={{ scale: 1.04, rotateY: -5 }}
-                    className="bg-gradient-to-br from-pink-100 to-blue-100 border border-pink-200 shadow-2xl rounded-2xl p-4 max-w-[80%] flex flex-col items-start"
+                    className="bg-white border-2 border-gold-500 shadow-2xl rounded-2xl p-4 max-w-[80%] flex flex-col items-start text-navy-900"
                     style={{ perspective: 600 }}
                   >
-                    <div className="font-bold text-lg mb-1">{msg.data.name}</div>
-                    <div className="text-sm mb-2">Prix : {msg.data.price.toLocaleString('fr-FR')} FCFA</div>
+                    <div className="font-black text-lg mb-1 uppercase tracking-tight">{msg.data.name}</div>
+                    <div className="text-sm font-bold text-gray-500 mb-3">Prix : <span className="text-crimson-600">{msg.data.price.toLocaleString('fr-FR')} FCFA</span></div>
                     <motion.button
                       whileTap={{ scale: 0.95 }}
-                      className="bg-crimson-500 hover:bg-crimson-600 text-white px-4 py-2 rounded-lg font-semibold shadow"
+                      className="bg-navy-900 hover:bg-gold-500 hover:text-navy-900 text-white px-4 py-2 rounded-lg font-black uppercase tracking-widest text-xs shadow transition-colors"
                       onClick={() => handleAddToCart(msg.data)}
                     >
                       Ajouter au panier
@@ -383,8 +379,8 @@ const ChatbotPage: React.FC = () => {
                   </motion.div>
                 ) : (
                   <motion.div
-                    whileHover={{ scale: 1.04, rotateY: msg.from === 'user' ? -5 : 5 }}
-                    className={`px-4 py-2 rounded-xl max-w-[80%] shadow-lg ${msg.from === 'user' ? 'bg-crimson-500 text-white' : 'bg-white text-navy-900 border border-navy-100'}`}
+                    whileHover={{ scale: 1.02, rotateY: msg.from === 'user' ? -2 : 2 }}
+                    className={`px-4 py-3 rounded-2xl max-w-[85%] shadow-sm text-sm sm:text-base ${msg.from === 'user' ? 'bg-crimson-600 text-white rounded-br-sm' : 'bg-gray-50 text-navy-900 border border-gray-200 rounded-bl-sm'}`}
                     style={{ perspective: 600 }}
                   >
                     {msg.text.split('\n').map((line, idx) => <div key={idx}>{line}</div>)}
@@ -394,20 +390,23 @@ const ChatbotPage: React.FC = () => {
             ))}
           </AnimatePresence>
         </div>
-        <form onSubmit={handleSend} className="flex gap-2 mt-2">
+        <form onSubmit={handleSend} className="flex gap-2 mt-4 shrink-0">
           <input
             type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder="Pose ta question..."
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-crimson-500 shadow"
+            className="flex-1 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-crimson-600 shadow-sm text-sm sm:text-base bg-gray-50"
           />
           <motion.button
             type="submit"
             whileTap={{ scale: 0.95 }}
-            className="bg-crimson-500 hover:bg-crimson-600 text-white px-6 py-2 rounded-lg font-semibold shadow"
+            className="bg-navy-900 hover:bg-crimson-600 text-white px-5 sm:px-8 py-3 rounded-xl font-black shadow-sm transition-colors flex items-center justify-center uppercase tracking-widest text-xs sm:text-sm"
           >
-            Envoyer
+            <span className="hidden sm:inline">Envoyer</span>
+            <svg className="w-5 h-5 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
           </motion.button>
         </form>
       </div>
