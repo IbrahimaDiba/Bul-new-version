@@ -314,7 +314,7 @@ const ChatbotPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center pt-24 pb-6 px-2 sm:px-4 relative overflow-hidden">
+    <div className="h-[100dvh] w-full flex flex-col items-center justify-center pt-20 sm:pt-24 pb-4 sm:pb-6 px-2 sm:px-4 relative overflow-hidden">
       <motion.div
         className="fixed inset-0 z-0 bg-navy-900"
         initial={{ opacity: 0 }}
@@ -332,9 +332,9 @@ const ChatbotPage: React.FC = () => {
         />
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
       </motion.div>
-      <div className="w-full max-w-2xl bg-white/95 rounded-2xl shadow-2xl p-3 sm:p-6 flex flex-col h-[calc(100vh-8rem)] sm:h-[75vh] z-10 backdrop-blur-md border border-white/50">
-        <h1 className="text-xl sm:text-2xl font-black text-navy-900 mb-3 sm:mb-4 uppercase tracking-widest border-b border-gray-100 pb-2">BUL Assistant</h1>
-        <div className="flex-1 overflow-y-auto mb-4 space-y-2 scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent">
+      <div className="w-full max-w-2xl bg-white/95 rounded-2xl shadow-2xl p-3 sm:p-6 flex flex-col flex-1 min-h-0 z-10 backdrop-blur-md border border-white/50">
+        <h1 className="text-xl sm:text-2xl font-black text-navy-900 mb-3 sm:mb-4 uppercase tracking-widest border-b border-gray-100 pb-2 shrink-0">BUL Assistant</h1>
+        <div className="flex-1 overflow-y-auto mb-2 space-y-2 scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent">
           <AnimatePresence initial={false}>
             {messages.map((msg, i) => (
               <motion.div
