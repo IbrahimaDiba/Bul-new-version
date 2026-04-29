@@ -172,7 +172,7 @@ export const initSupabaseCache = async () => {
       console.log('[Supabase] Raw products data:', prRes.data);
       cache.products = prRes.data.map(p => ({
         id: p.id, name: p.name, description: p.description, price: p.price,
-        image: p.image || '',
+        image: p.image_url || p.image || '',
         category: p.category, inStock: p.in_stock, featured: p.featured, team: p.team_id
       }));
       console.log('[Supabase] Products processed:', cache.products.length);
@@ -339,7 +339,7 @@ export const addAdminProduct = async (payload: Omit<Product, 'id'> & { id?: stri
 
   const { error, data } = await supabase.from('products').insert({
     id: item.id, name: item.name, description: item.description, price: item.price,
-    image: item.image, category: item.category, in_stock: item.inStock, featured: item.featured,
+    image_url: item.image, category: item.category, in_stock: item.inStock, featured: item.featured,
     team_id: item.team
   }).select();
 
@@ -444,7 +444,7 @@ export const updateAdminProduct = async (id: string, payload: Partial<Product>):
 
     const { error, data } = await supabase.from('products').update({
       name: item.name, description: item.description, price: item.price,
-      image: item.image, category: item.category, in_stock: item.inStock, featured: item.featured,
+      image_url: item.image, category: item.category, in_stock: item.inStock, featured: item.featured,
       team_id: item.team
     })
       .eq('id', id)

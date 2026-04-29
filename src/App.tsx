@@ -42,7 +42,7 @@ const AppContent: React.FC = () => {
   return (
     <div className={`flex flex-col ${isChatbot ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'}`}>
       <ScrollToTop />
-      <Header />
+      {!isChatbot && <Header />}
       <main className="flex-grow flex flex-col relative min-h-0">
         <Routes>
             <Route path="/" element={<HomePage />} />
