@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getManagedGames, getManagedProducts, getManagedNewsArticles, getManagedPlayers, getManagedTeams, getManagedSponsors, getAdminTickets, ADMIN_CONTENT_EVENT } from '../data/adminContent';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, Send } from 'lucide-react';
 
 type ChatMessage = { from: 'user' | 'bot'; text: string; type?: 'text' | 'ticket' | 'product'; data?: any };
 
@@ -270,6 +272,16 @@ const ChatbotPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [cart, setCart] = useState<any[]>([]);
   const [ticketBought, setTicketBought] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     // Sync cart with localStorage
@@ -314,100 +326,130 @@ const ChatbotPage: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center pt-20 sm:pt-24 pb-4 sm:pb-6 px-2 sm:px-4 bg-navy-900 overflow-hidden">
-      <motion.div
-        className="absolute inset-0 z-0 bg-navy-900"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+    <div className="flex-1 w-full flex flex-col bg-gray-50 h-[100dvh] overflow-hidden relative">
+      {/* Top Bar */}
+      <div 
+        className="bg-navy-900 text-white shrink-0 px-2 sm:px-4 flex items-center justify-between shadow-md z-20"
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)', paddingBottom: '12px' }}
       >
-        <motion.div
-          className="absolute w-[150vw] h-[150vw] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20"
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 60, ease: 'linear' }}
-          style={{
-            background: 'conic-gradient(from 0deg, transparent 0deg, #dc2626 90deg, transparent 180deg, #eab308 270deg, transparent 360deg)',
-            filter: 'blur(100px)',
-            borderRadius: '50%',
-          }}
-        />
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
-      </motion.div>
-      <div className="w-full max-w-2xl bg-white/95 rounded-2xl shadow-2xl p-3 sm:p-6 flex flex-col flex-1 min-h-0 z-10 backdrop-blur-md border border-white/50">
-        <h1 className="text-xl sm:text-2xl font-black text-navy-900 mb-3 sm:mb-4 uppercase tracking-widest border-b border-gray-100 pb-2 shrink-0">BUL Assistant</h1>
-        <div className="flex-1 overflow-y-auto mb-2 space-y-2 scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="p-2 sm:p-3 rounded-full hover:bg-white/10 transition-colors flex items-center gap-1 active:bg-white/20"
+        >
+          <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7" />
+          <span className="hidden sm:inline font-bold">Retour</span>
+        </button>
+        <div className="flex flex-col items-center">
+           <div className="font-black uppercase tracking-widest text-base sm:text-xl flex items-center gap-4">
+             <img src="/bul_logo.png" alt="BUL Logo" className="h-16 w-auto sm:h-20 object-contain drop-shadow-md" />
+             BUL Assistant
+           </div>
+           <div className="text-[10px] sm:text-xs text-gold-500 font-bold tracking-widest uppercase flex items-center gap-1.5 mt-0.5">
+             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+             En ligne
+           </div>
+        </div>
+        <div className="w-10 sm:w-20"></div> {/* Spacer for centering */}
+      </div>
+
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 bg-gray-100 scrollbar-none pb-8">
+        <div className="max-w-4xl mx-auto space-y-4">
           <AnimatePresence initial={false}>
             {messages.map((msg, i) => (
               <motion.div
                 key={i}
                 className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={messageVariants}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
               >
                 {msg.type === 'ticket' && msg.data && !ticketBought ? (
-                  <motion.div
-                    whileHover={{ scale: 1.04, rotateY: 5 }}
-                    className="bg-navy-900 border border-crimson-600 shadow-2xl rounded-2xl p-4 max-w-[80%] flex flex-col items-start text-white"
-                    style={{ perspective: 600 }}
-                  >
+                  <div className="bg-navy-900 border border-crimson-600 shadow-xl rounded-2xl rounded-tl-sm p-4 sm:p-5 max-w-[85%] sm:max-w-[70%] flex flex-col items-start text-white">
                     <div className="font-bold text-lg mb-1 text-gold-500">{msg.data.homeTeam.name} vs {msg.data.awayTeam.name}</div>
-                    <div className="text-sm mb-3 text-gray-300">{msg.data.date} à {msg.data.time} - {msg.data.venue}</div>
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      className="bg-crimson-600 hover:bg-crimson-700 text-white px-4 py-2 rounded-lg font-black uppercase tracking-widest text-xs shadow transition-colors"
+                    <div className="text-sm mb-4 text-gray-300 flex items-center gap-2">
+                      <span className="bg-white/10 px-2 py-1 rounded">{msg.data.date} à {msg.data.time}</span>
+                      <span>{msg.data.venue}</span>
+                    </div>
+                    <button
+                      className="bg-crimson-600 hover:bg-crimson-700 active:scale-95 text-white px-5 py-3 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg transition-all w-full"
                       onClick={() => handleBuyTicket(msg.data)}
                     >
                       Acheter un ticket
-                    </motion.button>
-                  </motion.div>
+                    </button>
+                  </div>
                 ) : msg.type === 'product' && msg.data ? (
-                  <motion.div
-                    whileHover={{ scale: 1.04, rotateY: -5 }}
-                    className="bg-white border-2 border-gold-500 shadow-2xl rounded-2xl p-4 max-w-[80%] flex flex-col items-start text-navy-900"
-                    style={{ perspective: 600 }}
-                  >
+                  <div className="bg-white border-2 border-gold-500 shadow-xl rounded-2xl rounded-tl-sm p-4 sm:p-5 max-w-[85%] sm:max-w-[70%] flex flex-col items-start text-navy-900">
                     <div className="font-black text-lg mb-1 uppercase tracking-tight">{msg.data.name}</div>
-                    <div className="text-sm font-bold text-gray-500 mb-3">Prix : <span className="text-crimson-600">{msg.data.price.toLocaleString('fr-FR')} FCFA</span></div>
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      className="bg-navy-900 hover:bg-gold-500 hover:text-navy-900 text-white px-4 py-2 rounded-lg font-black uppercase tracking-widest text-xs shadow transition-colors"
+                    <div className="text-base font-bold text-gray-500 mb-4">Prix : <span className="text-crimson-600">{msg.data.price.toLocaleString('fr-FR')} FCFA</span></div>
+                    <button
+                      className="bg-navy-900 hover:bg-gold-500 active:scale-95 text-white hover:text-navy-900 px-5 py-3 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg transition-all w-full"
                       onClick={() => handleAddToCart(msg.data)}
                     >
                       Ajouter au panier
-                    </motion.button>
-                  </motion.div>
+                    </button>
+                  </div>
                 ) : (
-                  <motion.div
-                    whileHover={{ scale: 1.02, rotateY: msg.from === 'user' ? -2 : 2 }}
-                    className={`px-4 py-3 rounded-2xl max-w-[85%] shadow-sm text-sm sm:text-base ${msg.from === 'user' ? 'bg-crimson-600 text-white rounded-br-sm' : 'bg-gray-50 text-navy-900 border border-gray-200 rounded-bl-sm'}`}
-                    style={{ perspective: 600 }}
+                  <div
+                    className={`px-4 sm:px-5 py-3 sm:py-4 rounded-2xl max-w-[85%] sm:max-w-[70%] shadow-sm text-[15px] sm:text-base leading-relaxed ${
+                      msg.from === 'user' 
+                        ? 'bg-crimson-600 text-white rounded-br-sm' 
+                        : 'bg-white text-navy-900 border border-gray-200 rounded-tl-sm shadow-md'
+                    }`}
                   >
-                    {msg.text.split('\n').map((line, idx) => <div key={idx}>{line}</div>)}
-                  </motion.div>
+                    {msg.text.split('\n').map((line, idx) => (
+                      <div key={idx} className={idx > 0 ? "mt-2" : ""}>{line}</div>
+                    ))}
+                  </div>
                 )}
               </motion.div>
             ))}
+            {isLoading && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex justify-start"
+              >
+                <div className="bg-white text-navy-900 border border-gray-200 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm flex items-center gap-2">
+                  <div className="w-2 h-2 bg-crimson-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-2 h-2 bg-crimson-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 h-2 bg-crimson-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+              </motion.div>
+            )}
           </AnimatePresence>
+          <div ref={messagesEndRef} />
         </div>
-        <form onSubmit={handleSend} className="flex gap-2 mt-4 shrink-0">
+      </div>
+
+      {/* Input Area */}
+      <div 
+        className="shrink-0 bg-white border-t border-gray-200 px-3 sm:px-6 shadow-[0_-4px_10px_rgba(0,0,0,0.03)] z-20"
+        style={{ 
+          paddingTop: '12px',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' 
+        }}
+      >
+        <form onSubmit={handleSend} className="flex gap-2 sm:gap-3 max-w-4xl mx-auto">
           <input
             type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Pose ta question..."
-            className="flex-1 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-crimson-600 shadow-sm text-sm sm:text-base bg-gray-50"
+            placeholder="Écrivez votre message..."
+            className="flex-1 bg-gray-100 border border-transparent focus:bg-white focus:border-crimson-500 rounded-full px-5 py-3.5 focus:outline-none focus:ring-4 focus:ring-crimson-500/10 shadow-inner text-[15px] sm:text-base transition-all"
           />
-          <motion.button
+          <button
             type="submit"
-            whileTap={{ scale: 0.95 }}
-            className="bg-navy-900 hover:bg-crimson-600 text-white px-5 sm:px-8 py-3 rounded-xl font-black shadow-sm transition-colors flex items-center justify-center uppercase tracking-widest text-xs sm:text-sm"
+            disabled={!input.trim() || isLoading}
+            className={`p-3.5 sm:px-6 rounded-full flex items-center justify-center transition-all ${
+              !input.trim() || isLoading 
+                ? 'bg-gray-200 text-gray-400' 
+                : 'bg-navy-900 hover:bg-crimson-600 text-white shadow-md active:scale-95'
+            }`}
           >
-            <span className="hidden sm:inline">Envoyer</span>
-            <svg className="w-5 h-5 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
-          </motion.button>
+            <span className="hidden sm:inline font-black uppercase tracking-widest text-sm mr-2">Envoyer</span>
+            <Send className="w-5 h-5 sm:w-4 sm:h-4" />
+          </button>
         </form>
       </div>
     </div>
