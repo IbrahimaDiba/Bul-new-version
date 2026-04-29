@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
@@ -14,7 +14,8 @@ import {
   Flame,
   Target,
 } from 'lucide-react';
-import { players, teams } from '../data/mockData';
+import { getManagedPlayers, getManagedTeams, ADMIN_CONTENT_EVENT } from '../data/adminContent';
+import { Player, Team } from '../types';
 
 // ─── Award definitions ───────────────────────────────────────────────
 interface AwardEntry {
@@ -32,104 +33,12 @@ interface AwardEntry {
   criteria: string;
 }
 
-const awards: AwardEntry[] = [
-  {
-    id: 'poty',
-    awardName: 'Player of the Year',
-    category: 'season',
-    icon: Crown,
-    accentColor: '#eab308', // gold-500
-    season: '2025–2026',
-    winner: { playerId: '7', note: 'Unanimous selection' },
-    description: 'Awarded to the most outstanding player of the entire season.',
-    criteria: '29.5 PPG · 11.2 RPG · League-best efficiency rating',
-  },
-  {
-    id: 'scoring',
-    awardName: 'Scoring Champion',
-    category: 'season',
-    icon: Flame,
-    accentColor: '#dc2626', // crimson-600
-    season: '2025–2026',
-    winner: { playerId: '7', note: 'Led league for 3rd consecutive year' },
-    description: 'Highest points-per-game average over the full regular season.',
-    criteria: '29.5 PPG across 23 games',
-  },
-  {
-    id: 'rookie',
-    awardName: 'Rookie of the Year',
-    category: 'rookie',
-    icon: Star,
-    accentColor: '#16a34a', // emerald-600
-    season: '2025–2026',
-    winner: { playerId: '6', note: 'First-year sensation' },
-    description: 'Recognizing the best first-year player in the league.',
-    criteria: '28.1 PPG · 8.4 RPG · 9.2 APG',
-  },
-  {
-    id: 'dpoty',
-    awardName: 'Defensive POTY',
-    category: 'defense',
-    icon: Shield,
-    accentColor: '#2563eb', // blue-600
-    season: '2025–2026',
-    winner: { playerId: '4', note: 'Anchored the league\'s best defense' },
-    description: 'Awarded to the player with the most dominant defensive impact.',
-    criteria: '1.3 SPG · 1.3 BPG · +12 Net Rating',
-  },
-  {
-    id: 'mostimproved',
-    awardName: 'Most Improved',
-    category: 'season',
-    icon: Zap,
-    accentColor: '#8b5cf6', // violet-500
-    season: '2025–2026',
-    winner: { playerId: '8', note: '+8.3 PPG improvement from prior season' },
-    description: 'Celebrating the player who elevated their game the most.',
-    criteria: '24.8 PPG · 11.8 RPG — top-5 league-wide in both',
-  },
-  {
-    id: 'triple',
-    awardName: 'Playmaker Award',
-    category: 'weekly',
-    icon: Target,
-    accentColor: '#0ea5e9', // sky-500
-    season: '2025–2026',
-    winner: { playerId: '2', note: 'Recorded 3 triple-doubles this season' },
-    description: 'Honors the player who best facilitates team offense.',
-    criteria: '25.7 PPG · 9.1 RPG · 8.5 APG',
-  },
-  {
-    id: 'record',
-    awardName: 'All-Time Record',
-    category: 'record',
-    icon: Medal,
-    accentColor: '#f97316', // orange-500
-    season: '2023–2024',
-    winner: { playerId: '1', note: 'Historic 50-point game vs DAUST' },
-    description: 'Set a new BUL single-game scoring record.',
-    criteria: '50 Points · 7 Rebounds · 5 Assists',
-  },
-  {
-    id: 'leadership',
-    awardName: 'Leadership Award',
-    category: 'season',
-    icon: Award,
-    accentColor: '#be123c', // rose-700
-    season: '2025–2026',
-    winner: { playerId: '3', note: 'Team captain, led team to playoffs' },
-    description: 'Recognizing exceptional leadership both on and off the court.',
-    criteria: '24.3 PPG · 6.8 APG · Team Captain',
-  },
-];
-
 const categoryConfig = {
   all:     { label: 'All Awards' },
   season:  { label: 'Season' },
   rookie:  { label: 'Rookie' },
   defense: { label: 'Defense' },
   weekly:  { label: 'Playmaker' },
-  record:  { label: 'Records' },
 };
 
 type CategoryKey = keyof typeof categoryConfig;
@@ -137,18 +46,133 @@ type CategoryKey = keyof typeof categoryConfig;
 // ─── Component ───────────────────────────────────────────────────────
 const AwardsPage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>('all');
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
+
+  useEffect(() => {
+    const reload = () => {
+      setPlayers(getManagedPlayers());
+      setTeams(getManagedTeams());
+    };
+    reload();
+    window.addEventListener('storage', reload);
+    window.addEventListener(ADMIN_CONTENT_EVENT, reload);
+    return () => {
+      window.removeEventListener('storage', reload);
+      window.removeEventListener(ADMIN_CONTENT_EVENT, reload);
+    };
+  }, []);
+
+  const dynamicAwards = useMemo(() => {
+    if (players.length === 0) return [];
+
+    const currentSeason = '2024–2025';
+
+    // Scoring Champion: Highest PPG
+    const sortedByPoints = [...players].sort((a, b) => b.stats.ppg - a.stats.ppg);
+    const topScorer = sortedByPoints[0];
+
+    // MVP / POTY: Best overall efficiency (approx: ppg + rpg + apg + spg + bpg)
+    const sortedByOverall = [...players].sort((a, b) => {
+       const effA = a.stats.ppg + a.stats.rpg + a.stats.apg + a.stats.spg + a.stats.bpg;
+       const effB = b.stats.ppg + b.stats.rpg + b.stats.apg + b.stats.spg + b.stats.bpg;
+       return effB - effA;
+    });
+    const mvp = sortedByOverall[0];
+
+    // Defensive POTY: Highest steals + blocks
+    const sortedByDefense = [...players].sort((a, b) => (b.stats.spg + b.stats.bpg) - (a.stats.spg + a.stats.bpg));
+    const dpoty = sortedByDefense[0];
+
+    // Playmaker: Highest APG
+    const sortedByAssists = [...players].sort((a, b) => b.stats.apg - a.stats.apg);
+    const playmaker = sortedByAssists[0];
+
+    // Rookie of the Year: Freshman with highest overall
+    const rookies = players.filter(p => p.playerClass === 'Freshman' || p.year === '1' || p.year === 'FR');
+    const sortedRookies = rookies.sort((a, b) => b.stats.ppg - a.stats.ppg);
+    const rookie = sortedRookies.length > 0 ? sortedRookies[0] : sortedByOverall[1] || mvp;
+
+    return [
+      {
+        id: 'poty',
+        awardName: 'Player of the Year',
+        category: 'season',
+        icon: Crown,
+        accentColor: '#eab308',
+        season: currentSeason,
+        winner: { playerId: mvp.id, note: 'League MVP' },
+        description: 'Awarded to the most outstanding player of the entire season.',
+        criteria: `${mvp.stats.ppg} PPG · ${mvp.stats.rpg} RPG · ${mvp.stats.apg} APG`,
+      },
+      {
+        id: 'scoring',
+        awardName: 'Scoring Champion',
+        category: 'season',
+        icon: Flame,
+        accentColor: '#dc2626',
+        season: currentSeason,
+        winner: { playerId: topScorer.id, note: 'Highest Scoring Average' },
+        description: 'Highest points-per-game average over the full regular season.',
+        criteria: `${topScorer.stats.ppg} PPG`,
+      },
+      {
+        id: 'rookie',
+        awardName: 'Rookie of the Year',
+        category: 'rookie',
+        icon: Star,
+        accentColor: '#16a34a',
+        season: currentSeason,
+        winner: { playerId: rookie.id, note: 'Best First-Year Player' },
+        description: 'Recognizing the best first-year player in the league.',
+        criteria: `${rookie.stats.ppg} PPG · ${rookie.stats.rpg} RPG`,
+      },
+      {
+        id: 'dpoty',
+        awardName: 'Defensive POTY',
+        category: 'defense',
+        icon: Shield,
+        accentColor: '#2563eb',
+        season: currentSeason,
+        winner: { playerId: dpoty.id, note: 'Defensive Anchor' },
+        description: 'Awarded to the player with the most dominant defensive impact.',
+        criteria: `${dpoty.stats.spg} SPG · ${dpoty.stats.bpg} BPG`,
+      },
+      {
+        id: 'triple',
+        awardName: 'Playmaker Award',
+        category: 'weekly',
+        icon: Target,
+        accentColor: '#0ea5e9',
+        season: currentSeason,
+        winner: { playerId: playmaker.id, note: 'Top Assister' },
+        description: 'Honors the player who best facilitates team offense.',
+        criteria: `${playmaker.stats.apg} APG`,
+      }
+    ] as AwardEntry[];
+  }, [players]);
 
   const getPlayer = (id: string) => players.find((p) => p.id === id);
-  const getTeamName = (teamId: string) => teams.find((t) => t.id === teamId)?.name || '';
+  const getTeamName = (teamId: string) => teams.find((t) => t.id === teamId)?.name || 'Unknown Team';
   const getTeamColor = (teamId: string) => teams.find((t) => t.id === teamId)?.primaryColor || '#1a365d';
 
   const filtered = activeCategory === 'all'
-    ? awards
-    : awards.filter((a) => a.category === activeCategory);
+    ? dynamicAwards
+    : dynamicAwards.filter((a) => a.category === activeCategory);
 
   // Spotlight: Player of the Year
-  const spotlight = awards.find((a) => a.id === 'poty')!;
-  const spotlightPlayer = getPlayer(spotlight.winner.playerId)!;
+  const spotlight = dynamicAwards.find((a) => a.id === 'poty');
+  const spotlightPlayer = spotlight ? getPlayer(spotlight.winner.playerId) : null;
+
+  if (players.length === 0 || !spotlightPlayer) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-8">
+        <Trophy className="w-16 h-16 text-gray-300 mb-4" />
+        <h2 className="text-2xl font-black text-navy-900 uppercase">No Awards Available</h2>
+        <p className="text-gray-500 mt-2 text-center">Add players and stats to the system to generate league awards.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans pb-24">
