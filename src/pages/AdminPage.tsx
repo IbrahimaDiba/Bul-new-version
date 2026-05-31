@@ -226,21 +226,49 @@ const AdminPage: React.FC = () => {
     setIsAuthenticated(false);
   };
 
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, callback: (base64: string) => void) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      setFeedback({ type: 'error', text: "L'image est trop lourde (max 10 Mo)." });
-      return;
-    }
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      callback(reader.result as string);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const max_size = 1000;
+
+        if (width > height) {
+          if (width > max_size) {
+            height *= max_size / width;
+            width = max_size;
+          }
+        } else {
+          if (height > max_size) {
+            width *= max_size / height;
+            height = max_size;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          callback(dataUrl);
+        } else {
+          callback(reader.result as string);
+        }
+      };
+      img.src = reader.result as string;
     };
     reader.readAsDataURL(file);
   };
+
 
   const handleNewsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1466,8 +1494,16 @@ const AdminPage: React.FC = () => {
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setPlayerForm({ ...playerForm, avatar: base64 }))} className="hidden" />
                   </label>
                   {playerForm.avatar && (
-                    <div className="w-12 h-12 rounded-full border overflow-hidden bg-gray-100 flex-shrink-0">
-                      <img src={playerForm.avatar} alt="Preview" className="w-full h-full object-cover" />
+                    <div className="relative w-12 h-12 rounded-full border overflow-hidden bg-gray-100 flex-shrink-0 group">
+                      <img src={playerForm.avatar} alt="Preview" className="w-full h-full object-contain" />
+                      <button
+                        type="button"
+                        onClick={() => setPlayerForm({ ...playerForm, avatar: '' })}
+                        className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                        title="Supprimer la photo"
+                      >
+                        <X className="w-5 h-5 text-white" />
+                      </button>
                     </div>
                   )}
                 </div>
@@ -1496,7 +1532,7 @@ const AdminPage: React.FC = () => {
                     <div key={player.id} className="border rounded-lg p-3 flex justify-between items-center gap-3">
                       {player.avatar && (
                         <div className="w-10 h-10 rounded-full border overflow-hidden bg-gray-50 flex-shrink-0">
-                          <img src={player.avatar} alt="" className="w-full h-full object-cover" />
+                          <img src={player.avatar} alt="" className="w-full h-full object-contain" />
                         </div>
                       )}
                       <div className="flex-1">

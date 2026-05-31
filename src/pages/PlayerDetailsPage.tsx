@@ -97,11 +97,13 @@ const PlayerDetailsPage: React.FC = () => {
           
           {/* Avatar / Photo */}
           <div className="relative">
-            <div className="w-40 h-40 sm:w-56 sm:h-56 bg-gray-200 border-4 border-white shadow-2xl rounded-sm overflow-hidden z-20 relative sm:translate-y-12">
+            <div className="w-40 sm:w-56 aspect-[4672/7008] bg-gray-200 border-4 border-white shadow-2xl rounded-sm overflow-hidden z-20 relative sm:translate-y-12">
               <img
                 src={player.avatar}
                 alt={player.name}
-                className="w-full h-full object-cover"
+                width={4672}
+                height={7008}
+                className="w-full h-full object-contain"
               />
             </div>
             {/* Team Logo Badge */}

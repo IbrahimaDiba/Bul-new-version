@@ -229,7 +229,7 @@ const RostersPage: React.FC = () => {
                                   <td className="px-4 py-4">
                                     <Link to={`/players/${player.id}`} className="flex items-center gap-3 min-w-0">
                                       <div className="w-10 h-10 bg-gray-100 shrink-0 overflow-hidden border border-gray-200">
-                                        <img src={player.avatar} alt="" className="w-full h-full object-cover grayscale group-hover:grayscale-0 object-top transition-all" />
+                                        <img src={player.avatar} alt="" width={4672} height={7008} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all" />
                                       </div>
                                       <div>
                                         <div className="font-black text-navy-900 uppercase tracking-tight group-hover:text-crimson-600 transition-colors">
@@ -259,7 +259,7 @@ const RostersPage: React.FC = () => {
                           {sortedPlayers.map((player) => (
                             <Link key={player.id} to={`/players/${player.id}`} className="bg-white border border-gray-200 p-4 flex gap-4 group hover:border-gray-400 hover:shadow-md transition-all">
                               <div className="w-20 h-24 bg-gray-100 shrink-0 overflow-hidden border border-gray-200 relative">
-                                <img src={player.avatar} alt="" className="w-full h-full object-cover grayscale group-hover:grayscale-0 object-top transition-all" />
+                                <img src={player.avatar} alt="" width={4672} height={7008} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all" />
                                 <div className="absolute bottom-0 right-0 bg-navy-900 text-white text-[10px] font-black italic px-1.5 py-0.5">
                                   #{player.jerseyNumber}
                                 </div>

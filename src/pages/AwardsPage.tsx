@@ -204,7 +204,7 @@ const AwardsPage: React.FC = () => {
 
            <div className="md:w-1/3 bg-gray-100 p-8 flex items-center justify-center relative overflow-hidden border-b md:border-b-0 md:border-r border-gray-200">
               <div className="w-48 h-48 sm:w-64 sm:h-64 border-4 border-white shadow-xl relative z-10 bg-white group-hover:scale-105 transition-transform duration-500">
-                <img src={spotlightPlayer.avatar} alt={spotlightPlayer.name} className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500" />
+                <img src={spotlightPlayer.avatar} alt={spotlightPlayer.name} width={4672} height={7008} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-500" />
               </div>
            </div>
 
@@ -321,7 +321,7 @@ const AwardsPage: React.FC = () => {
 
                        <div className="flex items-center gap-4 py-4 border-t border-gray-100">
                           <div className="w-14 h-14 bg-gray-100 border border-gray-200 overflow-hidden shrink-0 group-hover:scale-110 transition-transform">
-                             <img src={player.avatar} alt={player.name} className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all" />
+                             <img src={player.avatar} alt={player.name} width={4672} height={7008} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all" />
                           </div>
                           <div className="flex-1 min-w-0">
                              <p className="font-black text-navy-900 uppercase tracking-tight text-lg leading-none mb-1 truncate">{player.name}</p>

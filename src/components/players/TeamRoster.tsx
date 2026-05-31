@@ -70,11 +70,13 @@ const TeamRoster: React.FC<TeamRosterProps> = ({ team, onBack }) => {
                   whileTap={{ scale: 0.99 }}
                   className="bg-gray-50 rounded-xl overflow-hidden h-full border border-transparent hover:border-crimson-200/80 transition-colors"
                 >
-                  <div className="relative h-40 sm:h-44 md:h-48">
+                  <div className="relative aspect-[4672/7008]">
                     <img
                       src={player.avatar}
                       alt=""
-                      className="w-full h-full object-cover"
+                      width={4672}
+                      height={7008}
+                      className="w-full h-full object-contain"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">

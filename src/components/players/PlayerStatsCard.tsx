@@ -16,11 +16,13 @@ const PlayerStatsCard: React.FC<PlayerStatsCardProps> = ({ player }) => {
       <div className="flex flex-col md:flex-row">
         
         {/* Player Image Section */}
-        <div className="w-full md:w-2/5 h-80 md:h-auto bg-gray-100 relative overflow-hidden border-b md:border-b-0 md:border-r-4 border-navy-900">
+        <div className="w-full md:w-2/5 aspect-[4672/7008] bg-gray-100 relative overflow-hidden border-b md:border-b-0 md:border-r-4 border-navy-900 flex items-center justify-center">
           <img 
             src={player.avatar} 
             alt={player.name} 
-            className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+            width={4672}
+            height={7008}
+            className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
           />
           <div className="absolute top-4 left-4 bg-navy-900 text-white px-3 py-1 font-black text-xl italic skew-x-[-12deg]">
              #{player.jerseyNumber}

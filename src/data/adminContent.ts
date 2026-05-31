@@ -353,9 +353,11 @@ export const addAdminProduct = async (payload: Omit<Product, 'id'> & { id?: stri
 
   const { error, data } = await supabase.from('products').insert({
     id: item.id, name: item.name, description: item.description, price: item.price,
-    image_url: item.image, category: item.category, in_stock: item.inStock, featured: item.featured,
+
+    image: item.image, category: item.category, in_stock: item.inStock, featured: item.featured,
     team_id: item.team
   }).select();
+
 
   if (error) {
     console.error('[Supabase Error] addAdminProduct:', error);
@@ -458,9 +460,11 @@ export const updateAdminProduct = async (id: string, payload: Partial<Product>):
 
     const { error, data } = await supabase.from('products').update({
       name: item.name, description: item.description, price: item.price,
-      image_url: item.image, category: item.category, in_stock: item.inStock, featured: item.featured,
+
+      image: item.image, category: item.category, in_stock: item.inStock, featured: item.featured,
       team_id: item.team
     })
+
       .eq('id', id)
       .select();
 
