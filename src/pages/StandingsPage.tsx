@@ -36,12 +36,12 @@ const StandingsPage: React.FC = () => {
     
     // Using mock data for stats if available, otherwise simulating
     const stats = team.stats || {
-      homeRecord: `${Math.floor(wins * 0.6)}-${Math.floor(losses * 0.4)}`,
-      awayRecord: `${wins - Math.floor(wins * 0.6)}-${losses - Math.floor(losses * 0.4)}`,
-      lastTenGames: `${Math.floor(Math.random() * 6) + 5}-${Math.floor(Math.random() * 5)}`,
-      streak: Math.random() > 0.5 ? `W${Math.floor(Math.random() * 5) + 1}` : `L${Math.floor(Math.random() * 3) + 1}`,
-      pointsFor: 1800,
-      pointsAgainst: 1600
+      homeRecord: '-',
+      awayRecord: '-',
+      lastTenGames: '-',
+      streak: '-',
+      pointsFor: 0,
+      pointsAgainst: 0
     };
 
     return {

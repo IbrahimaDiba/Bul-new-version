@@ -79,9 +79,9 @@ const StandingsPreview: React.FC = () => {
                 const [wins, losses] = team.record.split('-').map(Number);
                 const winPercentage = wins / (wins + losses);
                 
-                // Mock data for last 10 games and streak
-                const last10 = `${Math.floor(Math.random() * 6) + 5}-${Math.floor(Math.random() * 5)}`;
-                const streak = Math.random() > 0.5 ? `W${Math.floor(Math.random() * 5) + 1}` : `L${Math.floor(Math.random() * 3) + 1}`;
+                // Use real data for last 10 games and streak
+                const last10 = team.stats?.lastTenGames || '-';
+                const streak = team.stats?.streak || '-';
                 
                 return (
                   <tr 

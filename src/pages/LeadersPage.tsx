@@ -228,7 +228,7 @@ const LeadersPage: React.FC = () => {
                         className="w-full flex items-center justify-between bg-gray-50 border border-gray-100 p-3 rounded-sm hover:border-crimson-300 hover:bg-white transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <img src={leader?.avatar} alt="" className="w-10 h-10 rounded-sm object-cover grayscale group-hover:grayscale-0" />
+                          <img src={leader?.avatar} alt="" className="w-10 h-10 rounded-sm object-contain grayscale group-hover:grayscale-0" />
                           <div className="text-left">
                             <div className="font-bold text-navy-900 text-sm group-hover:text-crimson-600 transition-colors uppercase tracking-tight">{leader?.name}</div>
                             <div className="text-[10px] font-semibold text-gray-500 uppercase">{getTeamName(leader?.team)}</div>

@@ -267,20 +267,65 @@ export const getManagedGames = (): Game[] => {
 
 // --- AUTOMATION CALCULATIONS ---
 const calculateAutomatedStandings = (teams: Team[], games: AdminGameInput[]): Team[] => {
-  const completedGames = games.filter(g => g.status === 'completed' && g.homeScore !== undefined && g.awayScore !== undefined);
+  const completedGames = games
+    .filter(g => g.status === 'completed' && g.homeScore !== undefined && g.awayScore !== undefined)
+    .sort((a, b) => new Date(`${b.date}T${b.time}`).getTime() - new Date(`${a.date}T${a.time}`).getTime());
+
   const teamStats = teams.map(team => {
     let wins = 0; let losses = 0; let pf = 0; let pa = 0;
+    let homeWins = 0; let homeLosses = 0;
+    let awayWins = 0; let awayLosses = 0;
+    let last10Wins = 0; let last10Losses = 0;
+    let currentStreak = 0;
+    let streakType: 'W' | 'L' | null = null;
+    let streakActive = true;
+    let gamesPlayed = 0;
+
     completedGames.forEach(game => {
+      let isWin = false;
+      let played = false;
+
       if (game.homeTeamId === team.id) {
+        played = true;
         pf += game.homeScore!; pa += game.awayScore!;
-        if (game.homeScore! > game.awayScore!) wins++; else if (game.homeScore! < game.awayScore!) losses++;
+        if (game.homeScore! > game.awayScore!) { wins++; isWin = true; homeWins++; } 
+        else if (game.homeScore! < game.awayScore!) { losses++; homeLosses++; }
       } else if (game.awayTeamId === team.id) {
+        played = true;
         pf += game.awayScore!; pa += game.homeScore!;
-        if (game.awayScore! > game.homeScore!) wins++; else if (game.awayScore! < game.homeScore!) losses++;
+        if (game.awayScore! > game.homeScore!) { wins++; isWin = true; awayWins++; } 
+        else if (game.awayScore! < game.homeScore!) { losses++; awayLosses++; }
+      }
+
+      if (played) {
+        gamesPlayed++;
+        if (gamesPlayed <= 10) {
+          if (isWin) last10Wins++; else last10Losses++;
+        }
+        if (streakActive) {
+          const type = isWin ? 'W' : 'L';
+          if (streakType === null) {
+            streakType = type;
+            currentStreak = 1;
+          } else if (streakType === type) {
+            currentStreak++;
+          } else {
+            streakActive = false;
+          }
+        }
       }
     });
-    return { id: team.id, wins, losses, pf, pa, diff: pf - pa, winPct: (wins + losses) > 0 ? wins / (wins + losses) : 0 };
+
+    return { 
+      id: team.id, wins, losses, pf, pa, diff: pf - pa, 
+      winPct: (wins + losses) > 0 ? wins / (wins + losses) : 0,
+      homeRecord: `${homeWins}-${homeLosses}`,
+      awayRecord: `${awayWins}-${awayLosses}`,
+      lastTenGames: `${last10Wins}-${last10Losses}`,
+      streak: streakType ? `${streakType}${currentStreak}` : '-'
+    };
   });
+
   const sorted = [...teamStats].sort((a, b) => b.winPct - a.winPct || b.diff - a.diff);
   return teams.map(team => {
     const stats = sorted.find(s => s.id === team.id);
@@ -297,11 +342,11 @@ const calculateAutomatedStandings = (teams: Team[], games: AdminGameInput[]): Te
         winPercentage: stats?.winPct || 0,
         pointsFor: stats?.pf || 0,
         pointsAgainst: stats?.pa || 0,
-        streak: team.stats?.streak || '-',
-        homeRecord: team.stats?.homeRecord || '-',
-        awayRecord: team.stats?.awayRecord || '-',
+        streak: stats?.streak || '-',
+        homeRecord: stats?.homeRecord || '-',
+        awayRecord: stats?.awayRecord || '-',
         conferenceRecord: team.stats?.conferenceRecord || '-',
-        lastTenGames: team.stats?.lastTenGames || '-'
+        lastTenGames: stats?.lastTenGames || '-'
       }
     };
   });
