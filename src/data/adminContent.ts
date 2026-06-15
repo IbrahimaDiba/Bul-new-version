@@ -173,15 +173,48 @@ export const initSupabaseCache = async () => {
     };
 
     const fetchProducts = async () => {
-      const res = await supabase.from('products').select('*');
-      if (res.error) { console.error('[Supabase] products:', res.error.message); return; }
+      // Step 1: Fetch metadata only (extremely fast, avoids statement timeouts due to large base64 image strings)
+      const res = await supabase.from('products').select('id, name, description, price, category, in_stock, featured, team_id');
+      if (res.error) {
+        console.error('[Supabase] products metadata:', res.error.message);
+        return;
+      }
       if (res.data) {
+        // Populate cache with metadata instantly, images will lazy load in the background
         cache.products = res.data.map(p => ({
-          id: p.id, name: p.name, description: p.description, price: p.price,
-          image: p.image_url || p.image || '',
-          category: p.category, inStock: p.in_stock, featured: p.featured, team: p.team_id
+          id: p.id,
+          name: p.name,
+          description: p.description,
+          price: p.price,
+          image: '', // Filled in asynchronously below
+          category: p.category,
+          inStock: p.in_stock,
+          featured: p.featured,
+          team: p.team_id
         }));
         triggerUpdate();
+
+        // Step 2: Fetch images asynchronously in the background, row by row, to avoid overloading the query
+        res.data.forEach(prod => {
+          supabase
+            .from('products')
+            .select('image')
+            .eq('id', prod.id)
+            .single()
+            .then(imgRes => {
+              if (imgRes.data && imgRes.data.image) {
+                const idx = cache.products.findIndex(p => p.id === prod.id);
+                if (idx !== -1) {
+                  cache.products[idx].image = imgRes.data.image;
+                  triggerUpdate();
+                  saveToLocalStorage(); // Persist dynamically loaded image to local storage
+                }
+              }
+            })
+            .catch(err => {
+              console.error(`[Supabase] Failed to fetch image for product ${prod.id}:`, err);
+            });
+        });
       }
     };
 
