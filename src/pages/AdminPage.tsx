@@ -35,6 +35,7 @@ import {
   addAdminNewsArticle,
   updateAdminTicket,
   removeAdminTicket,
+  uploadImageToStorage,
   ADMIN_CONTENT_EVENT
 } from '../data/adminContent';
 import { Edit2, XCircle, Eye } from 'lucide-react';
@@ -227,10 +228,11 @@ const AdminPage: React.FC = () => {
   };
 
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, callback: (base64: string) => void) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, callback: (urlOrBase64: string) => void, bucket: string = 'bul-assets') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setFeedback({ type: 'success', text: 'Téléversement de la photo en cours...' });
 
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -239,7 +241,7 @@ const AdminPage: React.FC = () => {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const max_size = 1000;
+        const max_size = 600; // Optimal size for fast web loading
 
         if (width > height) {
           if (width > max_size) {
@@ -258,10 +260,30 @@ const AdminPage: React.FC = () => {
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-          callback(dataUrl);
+          canvas.toBlob(async (blob) => {
+            if (blob) {
+              try {
+                console.log(`[Storage] Uploading compressed image to bucket "${bucket}"...`);
+                const publicUrl = await uploadImageToStorage(blob, bucket);
+                console.log('[Storage] Upload success! Public URL:', publicUrl);
+                callback(publicUrl);
+                setFeedback({ type: 'success', text: 'Photo téléversée sur Supabase Storage avec succès !' });
+              } catch (storageError: any) {
+                console.warn('[Storage] Upload failed, falling back to compressed base64:', storageError);
+                // Fall back to compressed base64
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+                callback(compressedBase64);
+                setFeedback({ type: 'success', text: 'Photo compressée localement (Bucket de stockage non configuré ou inaccessible).' });
+              }
+            } else {
+              const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+              callback(compressedBase64);
+              setFeedback({ type: 'success', text: 'Photo compressée localement.' });
+            }
+          }, 'image/jpeg', 0.5); // Compress at 0.5 quality for Web
         } else {
           callback(reader.result as string);
+          setFeedback({ type: 'success', text: 'Photo importée.' });
         }
       };
       img.src = reader.result as string;

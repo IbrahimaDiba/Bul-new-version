@@ -722,5 +722,31 @@ export const clearAdminContent = (): void => {
   triggerUpdate();
 };
 
+export const uploadImageToStorage = async (file: File | Blob, bucket: string = 'bul-assets'): Promise<string> => {
+  const fileExt = file instanceof File ? file.name.split('.').pop() : 'jpg';
+  const randomId = typeof crypto !== 'undefined' && crypto.randomUUID 
+    ? crypto.randomUUID() 
+    : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  const fileName = `${randomId}.${fileExt}`;
+  const filePath = `${fileName}`;
+
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+
+  if (error) {
+    throw error;
+  }
+
+  const { data: { publicUrl } } = supabase.storage
+    .from(bucket)
+    .getPublicUrl(filePath);
+
+  return publicUrl;
+};
+
 // Start initialization automatically on import
 initSupabaseCache();
