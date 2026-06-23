@@ -437,3 +437,8 @@ export interface MatchupStats {
   };
   plusMinus: number;
 }
+
+export interface HeroImage {
+  id: string;
+  imageUrl: string;
+}

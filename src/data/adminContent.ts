@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase';
 
-import { Game, NewsArticle, Player, PlayerGameStats, Product, Sponsor, Team, Order, Ticket } from '../types';
+import { Game, NewsArticle, Player, PlayerGameStats, Product, Sponsor, Team, Order, Ticket, HeroImage } from '../types';
 
 export const ADMIN_CONTENT_EVENT = 'adminContentUpdated';
 
@@ -32,7 +32,8 @@ const cache = {
   players: [] as Player[],
   sponsors: [] as Sponsor[],
   orders: [] as Order[],
-  tickets: [] as Ticket[]
+  tickets: [] as Ticket[],
+  heroImages: [] as HeroImage[]
 };
 
 let isSupabaseLoaded = false;
@@ -99,6 +100,7 @@ const loadFromLocalStorage = () => {
     if (saved.sponsors) cache.sponsors = saved.sponsors;
     if (saved.products && saved.products.length > 0) cache.products = saved.products;
     if (saved.tickets) cache.tickets = saved.tickets;
+    if (saved.heroImages) cache.heroImages = saved.heroImages;
     console.log('[Cache] Loaded from localStorage instantly.');
     return true;
   } catch (e) {
@@ -117,7 +119,8 @@ const saveToLocalStorage = () => {
       news: cache.news,
       sponsors: cache.sponsors,
       products: cache.products,
-      tickets: cache.tickets
+      tickets: cache.tickets,
+      heroImages: cache.heroImages
     };
     localStorage.setItem(LS_KEY, JSON.stringify(toSave));
   } catch (e) {
@@ -337,6 +340,18 @@ export const initSupabaseCache = async () => {
         customerPhone: o.customer_phone, shippingAddress: o.shipping_address,
         totalAmount: o.total_amount, status: o.status, date: o.order_date, items: []
       }));
+
+      // Try to fetch hero images if table exists
+      supabase.from('hero_images').select('*').then(heroRes => {
+        if (!heroRes.error && heroRes.data) {
+          cache.heroImages = heroRes.data.map(h => ({
+            id: h.id, imageUrl: h.image_url
+          }));
+          triggerUpdate();
+          saveToLocalStorage();
+        }
+      });
+
       saveToLocalStorage();
     });
   } catch (err) {
@@ -354,6 +369,7 @@ export const initSupabaseCache = async () => {
 export const getManagedNewsArticles = (): NewsArticle[] => [...cache.news];
 export const getManagedProducts = (): Product[] => [...cache.products];
 export const getManagedSponsors = (): Sponsor[] => [...cache.sponsors];
+export const getManagedHeroImages = (): HeroImage[] => [...cache.heroImages];
 
 export const getManagedTeams = (): Team[] => {
   const allTeamsBase = [...cache.teams];
@@ -798,6 +814,35 @@ export const removeAdminPlayer = (id: string): void => {
   supabase.from('players').delete().eq('id', id).then();
 };
 
+export const addAdminHeroImage = async (imageUrl: string): Promise<HeroImage> => {
+  const item = { id: crypto.randomUUID(), imageUrl };
+  cache.heroImages.push(item);
+  triggerUpdate();
+  
+  const { error } = await supabase.from('hero_images').insert({
+    id: item.id,
+    image_url: item.imageUrl
+  });
+  
+  if (error) {
+    console.warn('[Supabase] Failed to save hero_images to DB (table might not exist yet)', error);
+    saveToLocalStorage();
+  }
+  
+  return item;
+};
+
+export const removeAdminHeroImage = async (id: string): Promise<void> => {
+  cache.heroImages = cache.heroImages.filter(x => x.id !== id); 
+  triggerUpdate();
+  
+  const { error } = await supabase.from('hero_images').delete().eq('id', id);
+  if (error) {
+    console.warn('[Supabase] Failed to delete hero_images from DB', error);
+    saveToLocalStorage();
+  }
+};
+
 export const getAdminOrders = (): Order[] => cache.orders;
 export const getAdminTickets = (): Ticket[] => cache.tickets;
 
@@ -868,6 +913,7 @@ export const clearAdminContent = (): void => {
   // We'll just reset local storage memory if needed, but since it's Cloud, "clear" isn't standard.
   cache.news = []; cache.products = []; cache.games = []; cache.teams = [];
   cache.players = []; cache.sponsors = []; cache.orders = []; cache.tickets = [];
+  cache.heroImages = [];
   triggerUpdate();
 };
 

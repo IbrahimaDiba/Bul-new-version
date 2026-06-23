@@ -36,12 +36,15 @@ import {
   updateAdminTicket,
   removeAdminTicket,
   uploadImageToStorage,
-  ADMIN_CONTENT_EVENT
+  ADMIN_CONTENT_EVENT,
+  getManagedHeroImages,
+  addAdminHeroImage,
+  removeAdminHeroImage
 } from '../data/adminContent';
 import { Edit2, XCircle, Eye } from 'lucide-react';
-import { NewsArticle, Player, PlayerGameStats, Product, Sponsor, Team, Order, Ticket } from '../types';
+import { NewsArticle, Player, PlayerGameStats, Product, Sponsor, Team, Order, Ticket, HeroImage } from '../types';
 
-type Tab = 'overview' | 'orders' | 'tickets' | 'news' | 'products' | 'games' | 'teams' | 'players' | 'sponsors';
+type Tab = 'overview' | 'orders' | 'tickets' | 'news' | 'products' | 'games' | 'teams' | 'players' | 'sponsors' | 'hero';
 
 const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
@@ -54,7 +57,12 @@ const AdminPage: React.FC = () => {
   const [sponsorItems, setSponsorItems] = useState<Sponsor[]>([]);
   const [orderItems, setOrderItems] = useState<Order[]>([]);
   const [ticketItems, setTicketItems] = useState<Ticket[]>([]);
+  const [heroItems, setHeroItems] = useState<HeroImage[]>([]);
   const [managedTeams, setManagedTeams] = useState<Team[]>([]);
+
+  const [heroImageForm, setHeroImageForm] = useState({
+    imageUrl: ''
+  });
 
   const [ticketForm, setTicketForm] = useState({
     name: '',
@@ -159,6 +167,7 @@ const AdminPage: React.FC = () => {
     setSponsorItems(getAdminSponsorsOnly());
     setOrderItems(getAdminOrders());
     setTicketItems(getAdminTickets());
+    setHeroItems(getManagedHeroImages());
     setManagedTeams(getManagedTeams());
   };
 
@@ -821,7 +830,8 @@ const AdminPage: React.FC = () => {
       players: playerItems,
       games: gameItems,
       teams: teamItems,
-      sponsors: sponsorItems
+      sponsors: sponsorItems,
+      heroImages: heroItems
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -831,6 +841,20 @@ const AdminPage: React.FC = () => {
     link.click();
     URL.revokeObjectURL(url);
     setFeedback({ type: 'success', text: 'Export JSON telecharge.' });
+  };
+
+  const handleHeroImageSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!heroImageForm.imageUrl) return;
+    try {
+      setFeedback({ type: 'success', text: 'Enregistrement en cours...' });
+      await addAdminHeroImage(heroImageForm.imageUrl);
+      setHeroImageForm({ imageUrl: '' });
+      reloadAdminData();
+      setFeedback({ type: 'success', text: 'Image ajoutée avec succès.' });
+    } catch (err: any) {
+      setFeedback({ type: 'error', text: 'Erreur lors de l\'ajout de l\'image.' });
+    }
   };
 
   const handleUpdateOrderStatus = (id: string, status: Order['status']) => {
@@ -881,7 +905,7 @@ const AdminPage: React.FC = () => {
 
         <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6 mb-6">
           <div className="flex gap-2 sm:gap-3 flex-wrap">
-            {(['overview', 'orders', 'tickets', 'news', 'products', 'games', 'teams', 'players', 'sponsors'] as Tab[]).map((tab) => (
+            {(['overview', 'hero', 'orders', 'tickets', 'news', 'products', 'games', 'teams', 'players', 'sponsors'] as Tab[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -943,6 +967,58 @@ const AdminPage: React.FC = () => {
                     </li>
                   ))}
                 </ul>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'hero' && (
+          <div className="grid lg:grid-cols-2 gap-6">
+            <form onSubmit={handleHeroImageSubmit} className="bg-white rounded-2xl shadow-md p-6 space-y-4">
+              <h2 className="text-xl font-black text-navy-900">Ajouter une Image (Section Accueil)</h2>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-500 uppercase">Téléverser une image (Format Paysage recommandé)</label>
+                <div className="flex items-center gap-4">
+                  <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-crimson-500 hover:bg-gray-50 transition-colors">
+                    <Upload className="w-5 h-5 text-gray-400" />
+                    <span className="text-sm text-gray-600">Choisir une photo</span>
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setHeroImageForm({ imageUrl: base64 }))} className="hidden" />
+                  </label>
+                  {heroImageForm.imageUrl && (
+                    <div className="w-24 h-16 rounded-lg border overflow-hidden bg-gray-100 flex-shrink-0">
+                      <img src={heroImageForm.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-3 mt-4">
+                <button type="submit" className="bg-crimson-600 hover:bg-crimson-700 text-white font-bold px-5 py-3 rounded-lg flex-1">
+                  Ajouter à la galerie
+                </button>
+              </div>
+            </form>
+
+            <div className="bg-white rounded-2xl shadow-md p-6">
+              <h3 className="text-lg font-black text-navy-900 mb-4">Images actuelles ({heroItems.length})</h3>
+              {heroItems.length === 0 ? (
+                <p className="text-gray-500 text-sm">Aucune image configurée. Les images par défaut seront utilisées.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[520px] overflow-auto pr-2">
+                  {heroItems.map((img) => (
+                    <div key={img.id} className="relative group rounded-lg overflow-hidden border border-gray-200">
+                      <img src={img.imageUrl} alt="Hero slide" className="w-full h-32 object-cover" />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button
+                          onClick={() => { removeAdminHeroImage(img.id); reloadAdminData(); }}
+                          className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors"
+                          title="Supprimer cette image"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
