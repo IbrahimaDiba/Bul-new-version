@@ -17,6 +17,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { Player } from '../../types';
+import { getManagedTeams } from '../../data/adminContent';
 
 interface PlayerStatsProps {
   player: Player;
@@ -27,6 +28,8 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [hoveredStat, setHoveredStat] = useState<string | null>(null);
+
+  const teamName = getManagedTeams().find(t => t.id === player.team)?.name || 'Free Agent';
 
   // Calculate real league rank for a given stat (lower index = better rank)
   const getRank = (statKey: keyof typeof player.stats): string => {
@@ -152,7 +155,7 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
                   className="px-3 sm:px-4 py-1.5 bg-white/10 text-white/90 rounded-full text-xs sm:text-sm tracking-wide max-w-full"
                   whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.15)" }}
                 >
-                  <span className="truncate inline-block max-w-[200px] sm:max-w-none align-bottom">{player.team}</span>
+                  <span className="truncate inline-block max-w-[200px] sm:max-w-none align-bottom">{teamName}</span>
                 </motion.span>
               </motion.div>
               
