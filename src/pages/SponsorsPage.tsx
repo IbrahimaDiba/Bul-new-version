@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Mail, Handshake } from 'lucide-react';
-import { ADMIN_CONTENT_EVENT, getManagedSponsors } from '../data/adminContent';
+import { ADMIN_CONTENT_EVENT, getManagedSponsors, getIsSupabaseLoaded } from '../data/adminContent';
 import { Sponsor } from '../types';
 import { SponsorCardSkeleton } from '../components/ui/Skeleton';
 
@@ -10,8 +10,11 @@ const SponsorsPage: React.FC = () => {
 
   useEffect(() => {
     const reload = () => {
-      setSponsors(getManagedSponsors());
-      setIsLoading(false);
+      const newSponsors = getManagedSponsors();
+      setSponsors(newSponsors);
+      if (newSponsors.length > 0 || getIsSupabaseLoaded()) {
+        setIsLoading(false);
+      }
     };
     reload();
     window.addEventListener('storage', reload);

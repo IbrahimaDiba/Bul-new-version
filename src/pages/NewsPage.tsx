@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { Search, Tag, Calendar, User, Clock, ChevronRight } from 'lucide-react';
-import { ADMIN_CONTENT_EVENT, getManagedNewsArticles } from '../data/adminContent';
+import { ADMIN_CONTENT_EVENT, getManagedNewsArticles, getIsSupabaseLoaded } from '../data/adminContent';
 import { NewsArticle } from '../types';
 import { NewsCardSkeleton } from '../components/ui/Skeleton';
 
@@ -27,8 +27,11 @@ const NewsPage: React.FC = () => {
 
   useEffect(() => {
     const reload = () => {
-      setArticles(getManagedNewsArticles());
-      setIsLoading(false);
+      const newArticles = getManagedNewsArticles();
+      setArticles(newArticles);
+      if (newArticles.length > 0 || getIsSupabaseLoaded()) {
+        setIsLoading(false);
+      }
     };
     reload();
     window.addEventListener('storage', reload);

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Search, ChevronRight, Tag, Users, DollarSign, SlidersHorizontal, ChevronDown, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductCard from '../components/shop/ProductCard';
-import { ADMIN_CONTENT_EVENT, getManagedProducts, getManagedTeams } from '../data/adminContent';
+import { ADMIN_CONTENT_EVENT, getManagedProducts, getManagedTeams, getIsSupabaseLoaded } from '../data/adminContent';
 import { Product, Team } from '../types';
 import { ProductCardSkeleton } from '../components/ui/Skeleton';
 
@@ -36,7 +36,9 @@ const ShopPage: React.FC = () => {
       const prods = getManagedProducts();
       setAllProducts(prods);
       setAllTeams(getManagedTeams());
-      setIsLoading(false);
+      if (prods.length > 0 || getIsSupabaseLoaded()) {
+        setIsLoading(false);
+      }
     }
     reload();
     window.addEventListener('storage', reload);
