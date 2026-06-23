@@ -133,7 +133,7 @@ export const initSupabaseCache = async () => {
     const fetchGames = async () => {
       const [res, statsRes] = await Promise.all([
         supabase.from('games').select('*'),
-        supabase.from('game_player_stats').select('*').catch(() => ({ data: [] }))
+        supabase.from('game_player_stats').select('*')
       ]);
 
       if (res.error) { console.error('[Supabase] games:', res.error.message); return; }
@@ -662,10 +662,12 @@ export const updateAdminGame = async (id: string, payload: Partial<AdminGameInpu
     const { error } = await supabase.from('games').update({
       home_team_id: item.homeTeamId, away_team_id: item.awayTeamId,
       game_date: item.date, game_time: item.time, venue: item.venue, status: item.status,
-      home_score: item.homeScore, away_score: item.awayScore,
-      highlight_video_url: item.highlightVideoUrl || null
+      home_score: item.homeScore, away_score: item.awayScore
     }).eq('id', id);
-    if (error) throw error;
+    if (error) {
+      console.error('[Supabase] Failed to update game:', error);
+      throw error;
+    }
   }
 };
 

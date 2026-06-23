@@ -525,7 +525,7 @@ const AdminPage: React.FC = () => {
     setEditingPlayerId(player.id);
   };
 
-  const handleGameSubmit = (e: React.FormEvent) => {
+  const handleGameSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!gameForm.date || !gameForm.time || !gameForm.venue) {
       alert('Veuillez remplir la date, l\'heure et la salle.');
@@ -559,25 +559,30 @@ const AdminPage: React.FC = () => {
       awayScore: gameForm.status !== 'scheduled' ? Number(gameForm.awayScore) : undefined
     };
 
-    if (editingGameId) {
-      updateAdminGame(editingGameId, commonData);
-      setEditingGameId(null);
-    } else {
-      addAdminGame(commonData);
-    }
+    try {
+      if (editingGameId) {
+        await updateAdminGame(editingGameId, commonData);
+        setEditingGameId(null);
+      } else {
+        await addAdminGame(commonData);
+      }
 
-    setGameForm({
-      homeTeamId: '',
-      awayTeamId: '',
-      date: new Date().toISOString().split('T')[0],
-      time: '18:00',
-      venue: 'Dakar Arena',
-      status: 'scheduled',
-      homeScore: '',
-      awayScore: ''
-    });
-    reloadAdminData();
-    setFeedback({ type: 'success', text: `Match ${editingGameId ? 'mis à jour' : 'ajoute'} avec succes.` });
+      setGameForm({
+        homeTeamId: '',
+        awayTeamId: '',
+        date: new Date().toISOString().split('T')[0],
+        time: '18:00',
+        venue: 'Dakar Arena',
+        status: 'scheduled',
+        homeScore: '',
+        awayScore: ''
+      });
+      reloadAdminData();
+      setFeedback({ type: 'success', text: `Match ${editingGameId ? 'mis à jour' : 'ajouté'} avec succès.` });
+    } catch (err) {
+      console.error(err);
+      setFeedback({ type: 'error', text: "Erreur lors de l'enregistrement du match dans la base de données." });
+    }
   };
 
   const handleEditGame = (game: any) => {
