@@ -102,7 +102,8 @@ const AdminPage: React.FC = () => {
     venue: 'Dakar Arena',
     status: 'scheduled' as 'scheduled' | 'live' | 'completed',
     homeScore: '',
-    awayScore: ''
+    awayScore: '',
+    coverImage: ''
   });
 
   const [teamForm, setTeamForm] = useState({
@@ -565,7 +566,8 @@ const AdminPage: React.FC = () => {
       venue: gameForm.venue,
       status: gameForm.status,
       homeScore: gameForm.status !== 'scheduled' ? Number(gameForm.homeScore) : undefined,
-      awayScore: gameForm.status !== 'scheduled' ? Number(gameForm.awayScore) : undefined
+      awayScore: gameForm.status !== 'scheduled' ? Number(gameForm.awayScore) : undefined,
+      coverImage: gameForm.coverImage || undefined
     };
 
     try {
@@ -584,7 +586,8 @@ const AdminPage: React.FC = () => {
         venue: 'Dakar Arena',
         status: 'scheduled',
         homeScore: '',
-        awayScore: ''
+        awayScore: '',
+        coverImage: ''
       });
       reloadAdminData();
       setFeedback({ type: 'success', text: `Match ${editingGameId ? 'mis à jour' : 'ajouté'} avec succès.` });
@@ -603,7 +606,8 @@ const AdminPage: React.FC = () => {
       venue: game.venue,
       status: game.status,
       homeScore: game.homeScore?.toString() || '',
-      awayScore: game.awayScore?.toString() || ''
+      awayScore: game.awayScore?.toString() || '',
+      coverImage: game.coverImage || ''
     });
     setEditingGameId(game.id);
   };
@@ -1273,7 +1277,7 @@ const AdminPage: React.FC = () => {
                     type="button"
                     onClick={() => {
                       setEditingGameId(null);
-                      setGameForm({ homeTeamId: '', awayTeamId: '', date: '', time: '', venue: '', status: 'scheduled', homeScore: '', awayScore: '' });
+                      setGameForm({ homeTeamId: '', awayTeamId: '', date: '', time: '', venue: '', status: 'scheduled', homeScore: '', awayScore: '', coverImage: '' });
                     }}
                     className="text-gray-400 hover:text-red-500"
                   >
@@ -1303,6 +1307,21 @@ const AdminPage: React.FC = () => {
                   <input type="number" value={gameForm.awayScore} onChange={(e) => setGameForm({ ...gameForm, awayScore: e.target.value })} placeholder="Score Away" className="w-full border rounded-lg p-3" />
                 </div>
               )}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-500 uppercase">Image de Couverture (Hero Slider)</label>
+                <div className="flex items-center gap-4">
+                  <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-crimson-500 hover:bg-gray-50 transition-colors">
+                    <Upload className="w-5 h-5 text-gray-400" />
+                    <span className="text-sm text-gray-600">Choisir une image</span>
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setGameForm({ ...gameForm, coverImage: base64 }))} className="hidden" />
+                  </label>
+                  {gameForm.coverImage && (
+                    <div className="w-20 h-16 rounded-lg border overflow-hidden bg-gray-100 flex-shrink-0">
+                      <img src={gameForm.coverImage} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              </div>
               <button type="submit" className="w-full bg-crimson-600 hover:bg-crimson-700 text-white font-bold px-5 py-3 rounded-lg">
                 {editingGameId ? 'Mettre à jour' : 'Ajouter match'}
               </button>

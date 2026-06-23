@@ -148,6 +148,7 @@ export interface Game {
   highlights?: string[];
   /** YouTube embed URL (e.g. https://www.youtube.com/embed/VIDEO_ID) */
   highlightVideoUrl?: string;
+  coverImage?: string;
   officials?: string[];
 }
 

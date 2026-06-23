@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PlayCircle, CalendarDays, ExternalLink, Trophy, ArrowRight } from 'lucide-react';
-import { Game, HeroImage } from '../../types';
-import { ADMIN_CONTENT_EVENT, getManagedGames, getManagedHeroImages } from '../../data/adminContent';
+import { Game } from '../../types';
+import { ADMIN_CONTENT_EVENT, getManagedGames } from '../../data/adminContent';
 
 // Default images if none are uploaded
 const DEFAULT_SLIDE_IMAGES = [
@@ -14,15 +14,11 @@ const DEFAULT_SLIDE_IMAGES = [
 const HeroSection: React.FC = () => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [games, setGames] = useState<Game[]>([]);
-  const [heroImages, setHeroImages] = useState<HeroImage[]>([]);
   const featuredGames = games.length > 0 ? games.slice(0, 3) : [];
   
-  const displayImages = heroImages.length > 0 ? heroImages.map(h => h.imageUrl) : DEFAULT_SLIDE_IMAGES;
-
   useEffect(() => {
     const reload = () => {
       setGames(getManagedGames());
-      setHeroImages(getManagedHeroImages());
     };
     reload();
     window.addEventListener('storage', reload);
@@ -55,7 +51,7 @@ const HeroSection: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-navy-900 via-navy-900/80 to-navy-900/40 z-10" />
           <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-transparent to-transparent z-10" />
           <img
-            src={displayImages[0]}
+            src={DEFAULT_SLIDE_IMAGES[0]}
             alt="BUL Basketball"
             className="w-full h-full object-cover object-[50%_30%] scale-105"
           />
@@ -119,7 +115,7 @@ const HeroSection: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-transparent to-transparent z-10" />
           {/* Subtle noise/texture overlay could go here */}
           <img
-            src={displayImages[index % displayImages.length]}
+            src={game.coverImage || DEFAULT_SLIDE_IMAGES[index % DEFAULT_SLIDE_IMAGES.length]}
             alt=""
             className={`w-full h-full object-cover transform object-[50%_30%] transition-transform duration-[10000ms] ${index === activeSlide ? 'scale-105' : 'scale-100'}`}
           />
