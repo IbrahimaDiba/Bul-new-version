@@ -294,7 +294,7 @@ const TeamDetailsPage: React.FC = () => {
                          className="flex items-center p-3 sm:p-4 hover:bg-gray-50 transition-colors group"
                        >
                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 shrink-0 overflow-hidden border border-gray-200 relative mr-3 sm:mr-4">
-                           <img src={player.avatar} alt="" width={4672} height={7008} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all" />
+                           <img src={player.avatar} alt="" className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all" />
                            <div className="absolute bottom-0 right-0 bg-navy-900 text-white text-[8px] font-black italic px-1 py-px leading-none">
                              #{player.jerseyNumber}
                            </div>

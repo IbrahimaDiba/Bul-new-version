@@ -26,7 +26,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <div className="bg-white group relative flex flex-col h-full border border-gray-100 hover:border-crimson-200 transition-all duration-300 shadow-[0_4px_20px_rgb(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)]">
+    <div className="bg-white group relative flex flex-col h-full min-w-0 border border-gray-100 hover:border-crimson-200 transition-all duration-300 shadow-[0_4px_20px_rgb(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)]">
       
       {/* ══════════════ PRODUCT IMAGE ══════════════ */}
       <div className="relative aspect-[1/1] overflow-hidden bg-gray-50 border-b border-gray-50">
@@ -83,7 +83,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* ══════════════ PRODUCT INFO ══════════════ */}
-      <div className="p-5 flex flex-col flex-1">
+      <div className="p-4 sm:p-5 flex flex-col flex-1 min-w-0">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
             {product.category}
@@ -94,8 +94,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
         </div>
 
-        <Link to={`/shop/product/${product.id}`}>
-          <h3 className="text-lg font-black text-navy-900 uppercase tracking-tight group-hover:text-crimson-600 transition-colors leading-tight mb-2">
+        <Link to={`/shop/product/${product.id}`} className="min-w-0">
+          <h3 className="text-base sm:text-lg font-black text-navy-900 uppercase tracking-tight group-hover:text-crimson-600 transition-colors leading-tight mb-2 break-words line-clamp-2">
             {product.name}
           </h3>
         </Link>
@@ -104,9 +104,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {product.description}
         </p>
         
-        <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
-            <div className="flex flex-col">
-          <span className="text-xl font-black text-navy-900 tabular-nums">
+        <div className="mt-auto pt-4 border-t border-gray-50 flex flex-wrap items-end justify-between gap-2">
+            <div className="flex flex-col min-w-0">
+          <span className="text-lg sm:text-xl font-black text-navy-900 tabular-nums break-words">
             {product.price.toLocaleString('fr-FR')} <span className="text-xs font-bold text-gray-400">FCFA</span>
           </span>
             </div>

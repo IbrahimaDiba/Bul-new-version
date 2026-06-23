@@ -101,9 +101,7 @@ const PlayerDetailsPage: React.FC = () => {
               <img
                 src={player.avatar}
                 alt={player.name}
-                width={4672}
-                height={7008}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover object-top"
               />
             </div>
             {/* Team Logo Badge */}

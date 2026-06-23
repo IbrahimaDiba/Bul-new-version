@@ -74,9 +74,7 @@ const TeamRoster: React.FC<TeamRosterProps> = ({ team, onBack }) => {
                     <img
                       src={player.avatar}
                       alt=""
-                      width={4672}
-                      height={7008}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-cover object-top"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">

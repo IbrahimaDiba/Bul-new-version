@@ -20,9 +20,7 @@ const PlayerStatsCard: React.FC<PlayerStatsCardProps> = ({ player }) => {
           <img 
             src={player.avatar} 
             alt={player.name} 
-            width={4672}
-            height={7008}
-            className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+            className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
           />
           <div className="absolute top-4 left-4 bg-navy-900 text-white px-3 py-1 font-black text-xl italic skew-x-[-12deg]">
              #{player.jerseyNumber}

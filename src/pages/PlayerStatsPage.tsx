@@ -353,7 +353,7 @@ const PlayerStatsPage: React.FC = () => {
                           <Link to={`/players/${player.id}`} className="flex items-center gap-4 group-hover:text-crimson-600 transition-colors">
                             <div className="relative shrink-0">
                               <div className="w-12 h-12 bg-white border border-gray-200 shadow-sm overflow-hidden group-hover:border-navy-900 transition-colors p-0.5">
-                                <img src={player.avatar} alt={player.name} width={4672} height={7008} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all" />
+                                <img src={player.avatar} alt={player.name} className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all" />
                               </div>
                             </div>
                             <div>
@@ -409,7 +409,7 @@ const PlayerStatsPage: React.FC = () => {
                   <div className="p-5">
                     <div className="flex items-center gap-4 mb-5">
                        <div className="w-14 h-14 bg-gray-50 border border-gray-100 p-0.5 overflow-hidden shadow-sm shrink-0">
-                          <img src={player.avatar} alt={player.name} width={4672} height={7008} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all" />
+                          <img src={player.avatar} alt={player.name} className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all" />
                        </div>
                        <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2 mb-1">

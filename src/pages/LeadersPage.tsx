@@ -161,7 +161,7 @@ const LeadersPage: React.FC = () => {
                             {/* Avatar */}
                             <div className="relative shrink-0 mr-4 sm:mr-6">
                               <div className={`rounded-sm overflow-hidden bg-gray-100 ${isFirst ? 'w-20 h-20 sm:w-24 sm:h-24 border-2 border-crimson-600' : 'w-16 h-16 border border-gray-200 group-hover:border-navy-900'}`}>
-                                <img src={player.avatar} alt={player.name} width={4672} height={7008} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-300" />
+                                <img src={player.avatar} alt={player.name} className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-300" />
                               </div>
                               <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-white border border-gray-200 rounded-sm flex items-center justify-center p-1 shadow-sm">
                                 <img src={getTeamLogo(player.team)} alt="" className="w-full h-full object-contain" />
@@ -228,7 +228,7 @@ const LeadersPage: React.FC = () => {
                         className="w-full flex items-center justify-between bg-gray-50 border border-gray-100 p-3 rounded-sm hover:border-crimson-300 hover:bg-white transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <img src={leader?.avatar} alt="" className="w-10 h-10 rounded-sm object-contain grayscale group-hover:grayscale-0" />
+                          <img src={leader?.avatar} alt="" className="w-10 h-10 rounded-sm object-cover object-top grayscale group-hover:grayscale-0" />
                           <div className="text-left">
                             <div className="font-bold text-navy-900 text-sm group-hover:text-crimson-600 transition-colors uppercase tracking-tight">{leader?.name}</div>
                             <div className="text-[10px] font-semibold text-gray-500 uppercase">{getTeamName(leader?.team)}</div>

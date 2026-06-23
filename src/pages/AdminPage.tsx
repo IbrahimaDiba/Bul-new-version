@@ -241,7 +241,7 @@ const AdminPage: React.FC = () => {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const max_size = 600; // Optimal size for fast web loading
+        const max_size = 2000; // High resolution size for crisp images
 
         if (width > height) {
           if (width > max_size) {
@@ -271,16 +271,16 @@ const AdminPage: React.FC = () => {
               } catch (storageError: any) {
                 console.warn('[Storage] Upload failed, falling back to compressed base64:', storageError);
                 // Fall back to compressed base64
-                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.9);
                 callback(compressedBase64);
                 setFeedback({ type: 'success', text: 'Photo compressée localement (Bucket de stockage non configuré ou inaccessible).' });
               }
             } else {
-              const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+              const compressedBase64 = canvas.toDataURL('image/jpeg', 0.9);
               callback(compressedBase64);
               setFeedback({ type: 'success', text: 'Photo compressée localement.' });
             }
-          }, 'image/jpeg', 0.5); // Compress at 0.5 quality for Web
+          }, 'image/jpeg', 0.9); // Compress at 0.9 quality for Web
         } else {
           callback(reader.result as string);
           setFeedback({ type: 'success', text: 'Photo importée.' });
@@ -1517,7 +1517,7 @@ const AdminPage: React.FC = () => {
                   </label>
                   {playerForm.avatar && (
                     <div className="relative w-12 h-12 rounded-full border overflow-hidden bg-gray-100 flex-shrink-0 group">
-                      <img src={playerForm.avatar} alt="Preview" className="w-full h-full object-contain" />
+                      <img src={playerForm.avatar} alt="Preview" className="w-full h-full object-cover object-top" />
                       <button
                         type="button"
                         onClick={() => setPlayerForm({ ...playerForm, avatar: '' })}
@@ -1554,7 +1554,7 @@ const AdminPage: React.FC = () => {
                     <div key={player.id} className="border rounded-lg p-3 flex justify-between items-center gap-3">
                       {player.avatar && (
                         <div className="w-10 h-10 rounded-full border overflow-hidden bg-gray-50 flex-shrink-0">
-                          <img src={player.avatar} alt="" className="w-full h-full object-contain" />
+                          <img src={player.avatar} alt="" className="w-full h-full object-cover object-top" />
                         </div>
                       )}
                       <div className="flex-1">

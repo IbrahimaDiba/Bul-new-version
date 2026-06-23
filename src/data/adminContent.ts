@@ -131,16 +131,54 @@ export const initSupabaseCache = async () => {
     };
 
     const fetchGames = async () => {
-      const res = await supabase.from('games').select('*');
+      const [res, statsRes] = await Promise.all([
+        supabase.from('games').select('*'),
+        supabase.from('game_player_stats').select('*').catch(() => ({ data: [] }))
+      ]);
+
       if (res.error) { console.error('[Supabase] games:', res.error.message); return; }
       if (res.data) {
-        cache.games = res.data.map(g => ({
-          id: g.id, homeTeamId: g.home_team_id, awayTeamId: g.away_team_id,
-          date: g.game_date, time: g.game_time, venue: g.venue, status: g.status,
-          homeScore: g.home_score, awayScore: g.away_score,
-          highlightVideoUrl: g.highlight_video_url || undefined,
-          playerStats: undefined
-        }));
+        cache.games = res.data.map(g => {
+          let playerStats = undefined;
+          if (statsRes.data && statsRes.data.length > 0) {
+            const gameStats = statsRes.data.filter((s: any) => s.game_id === g.id);
+            if (gameStats.length > 0) {
+              const homeStats = gameStats.filter((s: any) => s.team_id === g.home_team_id).map((s: any) => ({
+                playerId: s.player_id,
+                name: '', // Will be populated in getManagedGames
+                minutes: s.minutes || 0,
+                points: s.points || 0,
+                rebounds: s.rebounds || 0,
+                assists: s.assists || 0,
+                steals: s.steals || 0,
+                blocks: s.blocks || 0,
+                turnovers: s.turnovers || 0,
+                fouls: s.fouls || 0
+              }));
+              const awayStats = gameStats.filter((s: any) => s.team_id === g.away_team_id).map((s: any) => ({
+                playerId: s.player_id,
+                name: '', // Will be populated in getManagedGames
+                minutes: s.minutes || 0,
+                points: s.points || 0,
+                rebounds: s.rebounds || 0,
+                assists: s.assists || 0,
+                steals: s.steals || 0,
+                blocks: s.blocks || 0,
+                turnovers: s.turnovers || 0,
+                fouls: s.fouls || 0
+              }));
+              playerStats = { home: homeStats, away: awayStats };
+            }
+          }
+
+          return {
+            id: g.id, homeTeamId: g.home_team_id, awayTeamId: g.away_team_id,
+            date: g.game_date, time: g.game_time, venue: g.venue, status: g.status,
+            homeScore: g.home_score, awayScore: g.away_score,
+            highlightVideoUrl: g.highlight_video_url || undefined,
+            playerStats: playerStats
+          };
+        });
         triggerUpdate();
       }
     };
@@ -282,16 +320,27 @@ export const getManagedPlayers = (): Player[] => {
 
 export const getManagedGames = (): Game[] => {
   const allTeams = getManagedTeams();
+  const allPlayers = getManagedPlayers();
+
   const mappedAdminGames: Game[] = cache.games.map(ag => {
     // Graceful fallback to avoid crashing if teams list is completely empty
     const homeTeam = allTeams.find(t => t.id === ag.homeTeamId) || ({} as Team);
     const awayTeam = allTeams.find(t => t.id === ag.awayTeamId) || ({} as Team);
+    
+    let populatedPlayerStats = ag.playerStats;
+    if (populatedPlayerStats) {
+       populatedPlayerStats = {
+         home: populatedPlayerStats.home.map(ps => ({ ...ps, name: allPlayers.find(p => p.id === ps.playerId)?.name || ps.name || 'Unknown' })),
+         away: populatedPlayerStats.away.map(ps => ({ ...ps, name: allPlayers.find(p => p.id === ps.playerId)?.name || ps.name || 'Unknown' }))
+       };
+    }
+
     return {
       id: ag.id, date: ag.date, time: ag.time, venue: ag.venue,
       isFeatured: false, isCompleted: ag.status === 'completed', status: ag.status,
       homeTeam, awayTeam, homeScore: ag.homeScore, awayScore: ag.awayScore,
       highlightVideoUrl: ag.highlightVideoUrl,
-      stats: { playerStats: ag.playerStats }
+      stats: { playerStats: populatedPlayerStats }
     };
   });
 
@@ -505,12 +554,55 @@ export const addAdminPlayer = async (payload: Omit<Player, 'id'> & { id?: string
   return item;
 };
 
-export const updateAdminGameStats = (gameId: string, playerStats: { home: PlayerGameStats[]; away: PlayerGameStats[] }): void => {
+export const updateAdminGameStats = async (gameId: string, playerStats: { home: PlayerGameStats[]; away: PlayerGameStats[] }): Promise<void> => {
   const game = cache.games.find(g => g.id === gameId);
   if (game) {
     game.playerStats = playerStats;
     triggerUpdate();
-    // In a full implementation, we'd also push this to the game_player_stats table in Supabase.
+    
+    // Save to relational game_player_stats table in Supabase
+    try {
+      // 1. Delete existing stats for this game to prevent duplicates
+      await supabase.from('game_player_stats').delete().eq('game_id', gameId);
+      
+      // 2. Prepare new stats payload
+      const statsToInsert = [
+        ...playerStats.home.map(ps => ({
+          game_id: gameId,
+          team_id: game.homeTeamId,
+          player_id: ps.playerId,
+          minutes: ps.minutes,
+          points: ps.points,
+          rebounds: ps.rebounds,
+          assists: ps.assists,
+          steals: ps.steals,
+          blocks: ps.blocks,
+          turnovers: ps.turnovers,
+          fouls: ps.fouls
+        })),
+        ...playerStats.away.map(ps => ({
+          game_id: gameId,
+          team_id: game.awayTeamId,
+          player_id: ps.playerId,
+          minutes: ps.minutes,
+          points: ps.points,
+          rebounds: ps.rebounds,
+          assists: ps.assists,
+          steals: ps.steals,
+          blocks: ps.blocks,
+          turnovers: ps.turnovers,
+          fouls: ps.fouls
+        }))
+      ];
+      
+      // 3. Insert new stats
+      if (statsToInsert.length > 0) {
+        const { error } = await supabase.from('game_player_stats').insert(statsToInsert);
+        if (error) console.error('[Supabase] Error inserting game_player_stats:', error);
+      }
+    } catch (err) {
+      console.error('[Supabase] Failed to update game_player_stats:', err);
+    }
   }
 };
 
