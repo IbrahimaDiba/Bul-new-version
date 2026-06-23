@@ -46,6 +46,46 @@ const triggerUpdate = () => {
 
 const LS_KEY = 'bul_cache_v1';
 
+// --- FETCH PLAYER STATS FROM DB VIEW ---
+export const refreshPlayerStatsFromDB = async () => {
+  const statsRes = await supabase.from('player_season_stats').select('*');
+  if (statsRes.error) {
+    console.error('[Supabase] player_season_stats:', statsRes.error.message);
+    return;
+  }
+  
+  const statsMap = new Map();
+  if (statsRes.data) {
+    statsRes.data.forEach((s: any) => statsMap.set(s.player_id, s));
+  }
+
+  cache.players = cache.players.map(p => {
+    const s = statsMap.get(p.id) || {};
+    return {
+      ...p,
+      stats: {
+        ppg: s.ppg ?? p.stats?.ppg ?? 0,
+        rpg: s.rpg ?? p.stats?.rpg ?? 0,
+        apg: s.apg ?? p.stats?.apg ?? 0,
+        spg: s.spg ?? p.stats?.spg ?? 0,
+        bpg: s.bpg ?? p.stats?.bpg ?? 0,
+        fgp: s.fgp ?? p.stats?.fgp ?? 0,
+        tpp: s.tpp ?? p.stats?.tpp ?? 0,
+        ftp: s.ftp ?? p.stats?.ftp ?? 0,
+        ppgRank: s.ppg_rank,
+        rpgRank: s.rpg_rank,
+        apgRank: s.apg_rank,
+        spgRank: s.spg_rank,
+        bpgRank: s.bpg_rank,
+        fgpRank: s.fgp_rank,
+        tppRank: s.tpp_rank,
+        ftpRank: s.ftp_rank,
+      }
+    };
+  });
+  triggerUpdate();
+};
+
 // --- LOAD FROM LOCALSTORAGE (instant on reload) ---
 const loadFromLocalStorage = () => {
   try {
@@ -126,7 +166,7 @@ export const initSupabaseCache = async () => {
           playerClass: p.player_class || p.year,
           stats: { ppg: p.ppg, rpg: p.rpg, apg: p.apg, spg: p.spg, bpg: p.bpg, fgp: p.fgp, tpp: p.tpp, ftp: p.ftp }
         }));
-        triggerUpdate();
+        await refreshPlayerStatsFromDB();
       }
     };
 
@@ -326,8 +366,7 @@ export const getManagedTeams = (): Team[] => {
 };
 
 export const getManagedPlayers = (): Player[] => {
-  const allPlayersBase = [...cache.players];
-  return calculateAutomatedPlayerStats(allPlayersBase, cache.games);
+  return [...cache.players];
 };
 
 export const getManagedGames = (): Game[] => {
@@ -446,49 +485,7 @@ const calculateAutomatedStandings = (teams: Team[], games: AdminGameInput[]): Te
   });
 };
 
-const calculateAutomatedPlayerStats = (players: Player[], games: AdminGameInput[]): Player[] => {
-  const gamesWithPlayerStats = games.filter(g => g.status === 'completed' && g.playerStats);
-  return players.map(player => {
-    let totalPoints = 0, totalRebounds = 0, totalAssists = 0, totalSteals = 0, totalBlocks = 0;
-    let totalFgm = 0, totalFga = 0, totalTpm = 0, totalTpa = 0, totalFtm = 0, totalFta = 0;
-    let gamesPlayed = 0;
-    gamesWithPlayerStats.forEach(game => {
-      const pStats = [...(game.playerStats?.home || []), ...(game.playerStats?.away || [])].find(s => s.playerId === player.id);
-      if (pStats) {
-        totalPoints += pStats.points;
-        totalRebounds += pStats.rebounds;
-        totalAssists += pStats.assists;
-        totalSteals += pStats.steals;
-        totalBlocks += pStats.blocks;
-        totalFgm += pStats.fgm || 0;
-        totalFga += pStats.fga || 0;
-        totalTpm += pStats.tpm || 0;
-        totalTpa += pStats.tpa || 0;
-        totalFtm += pStats.ftm || 0;
-        totalFta += pStats.fta || 0;
-        gamesPlayed++;
-      }
-    });
-    if (gamesPlayed === 0) return player;
-    const fgp = totalFga > 0 ? parseFloat(((totalFgm / totalFga) * 100).toFixed(1)) : player.stats.fgp;
-    const tpp = totalTpa > 0 ? parseFloat(((totalTpm / totalTpa) * 100).toFixed(1)) : player.stats.tpp;
-    const ftp = totalFta > 0 ? parseFloat(((totalFtm / totalFta) * 100).toFixed(1)) : player.stats.ftp;
-    return {
-      ...player,
-      stats: {
-        ...player.stats,
-        ppg: parseFloat((totalPoints / gamesPlayed).toFixed(1)),
-        rpg: parseFloat((totalRebounds / gamesPlayed).toFixed(1)),
-        apg: parseFloat((totalAssists / gamesPlayed).toFixed(1)),
-        spg: parseFloat((totalSteals / gamesPlayed).toFixed(1)),
-        bpg: parseFloat((totalBlocks / gamesPlayed).toFixed(1)),
-        fgp,
-        tpp,
-        ftp
-      }
-    };
-  });
-};
+
 
 // --- DATA MODIFIERS (OPTIMISTIC SUPABASE WRITES) ---
 
@@ -651,7 +648,12 @@ export const updateAdminGameStats = async (gameId: string, playerStats: { home: 
       // 3. Insert new stats
       if (statsToInsert.length > 0) {
         const { error } = await supabase.from('game_player_stats').insert(statsToInsert);
-        if (error) console.error('[Supabase] Error inserting game_player_stats:', error);
+        if (error) {
+          console.error('[Supabase] Error inserting game_player_stats:', error);
+        } else {
+          // 4. Refresh global player stats from the DB view
+          await refreshPlayerStatsFromDB();
+        }
       }
     } catch (err) {
       console.error('[Supabase] Failed to update game_player_stats:', err);

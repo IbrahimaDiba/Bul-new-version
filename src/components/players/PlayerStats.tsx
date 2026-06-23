@@ -20,26 +20,20 @@ import { Player } from '../../types';
 
 interface PlayerStatsProps {
   player: Player;
-  allPlayers?: Player[];
   onBack: () => void;
 }
 
-const PlayerStats: React.FC<PlayerStatsProps> = ({ player, allPlayers = [], onBack }) => {
+const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [hoveredStat, setHoveredStat] = useState<string | null>(null);
 
   // Calculate real league rank for a given stat (lower index = better rank)
   const getRank = (statKey: keyof typeof player.stats): string => {
-    if (allPlayers.length === 0) return '—';
-    const sorted = [...allPlayers]
-      .filter(p => (p.stats[statKey] as number) > 0)
-      .sort((a, b) => (b.stats[statKey] as number) - (a.stats[statKey] as number));
-    const rank = sorted.findIndex(p => p.id === player.id);
-    if (rank === -1) return '—';
-    const n = rank + 1;
-    const suffix = n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th';
-    return `${n}${suffix}`;
+    const rankVal = player.stats[`${statKey}Rank` as keyof typeof player.stats] as number | undefined;
+    if (!rankVal) return '—';
+    const suffix = rankVal === 1 ? 'st' : rankVal === 2 ? 'nd' : rankVal === 3 ? 'rd' : 'th';
+    return `${rankVal}${suffix}`;
   };
 
   const handleViewDetails = () => {

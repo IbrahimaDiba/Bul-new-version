@@ -32,6 +32,15 @@ export interface PlayerStats {
   fgp: number; // Field goal percentage
   tpp: number; // Three-point percentage
   ftp: number; // Free throw percentage
+  // Real ranks from the database
+  ppgRank?: number;
+  rpgRank?: number;
+  apgRank?: number;
+  spgRank?: number;
+  bpgRank?: number;
+  fgpRank?: number;
+  tppRank?: number;
+  ftpRank?: number;
   // NBA-style advanced stats
   per?: number; // Player Efficiency Rating
   ts?: number; // True Shooting percentage
