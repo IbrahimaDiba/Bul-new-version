@@ -4,6 +4,7 @@ import { ArrowLeft, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Team, Player } from '../../types';
 import PlayerStats from './PlayerStats';
+import { getManagedPlayers } from '../../data/adminContent';
 
 interface TeamRosterProps {
   team: Team;
@@ -137,7 +138,7 @@ const TeamRoster: React.FC<TeamRosterProps> = ({ team, onBack }) => {
           </div>
         </>
       ) : (
-        <PlayerStats player={selectedPlayer} onBack={() => setSelectedPlayer(null)} />
+        <PlayerStats player={selectedPlayer} allPlayers={getManagedPlayers()} onBack={() => setSelectedPlayer(null)} />
       )}
     </motion.div>
   );

@@ -682,29 +682,29 @@ const AdminPage: React.FC = () => {
         homeTeam?.roster.map((p) => ({
           playerId: p.id,
           name: p.name,
-          minutes: 0,
-          points: 0,
-          rebounds: 0,
-          assists: 0,
-          steals: 0,
-          blocks: 0,
-          turnovers: 0,
-          fouls: 0
+          minutes: 0, points: 0, rebounds: 0, assists: 0,
+          steals: 0, blocks: 0, turnovers: 0, fouls: 0,
+          fgm: 0, fga: 0, tpm: 0, tpa: 0, ftm: 0, fta: 0
         })) || [],
       away:
         awayTeam?.roster.map((p) => ({
           playerId: p.id,
           name: p.name,
-          minutes: 0,
-          points: 0,
-          rebounds: 0,
-          assists: 0,
-          steals: 0,
-          blocks: 0,
-          turnovers: 0,
-          fouls: 0
+          minutes: 0, points: 0, rebounds: 0, assists: 0,
+          steals: 0, blocks: 0, turnovers: 0, fouls: 0,
+          fgm: 0, fga: 0, tpm: 0, tpa: 0, ftm: 0, fta: 0
         })) || []
     };
+
+    // Ensure existing stats also have the new fields
+    const normalize = (ps: any) => ({
+      ...ps,
+      fgm: ps.fgm ?? 0, fga: ps.fga ?? 0,
+      tpm: ps.tpm ?? 0, tpa: ps.tpa ?? 0,
+      ftm: ps.ftm ?? 0, fta: ps.fta ?? 0
+    });
+    existingStats.home = existingStats.home.map(normalize);
+    existingStats.away = existingStats.away.map(normalize);
 
     setTempStats(existingStats);
     setEditingStatsGameId(game.id);
@@ -1290,6 +1290,12 @@ const AdminPage: React.FC = () => {
                               <th className="p-2">BLK</th>
                               <th className="p-2">TO</th>
                               <th className="p-2">PF</th>
+                              <th className="p-2 bg-orange-50 text-orange-700">FGM</th>
+                              <th className="p-2 bg-orange-50 text-orange-700">FGA</th>
+                              <th className="p-2 bg-blue-50 text-blue-700">3PM</th>
+                              <th className="p-2 bg-blue-50 text-blue-700">3PA</th>
+                              <th className="p-2 bg-green-50 text-green-700">FTM</th>
+                              <th className="p-2 bg-green-50 text-green-700">FTA</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1303,7 +1309,18 @@ const AdminPage: React.FC = () => {
                                       min="0"
                                       value={ps[field]}
                                       onChange={(e) => updatePlayerStat('home', ps.playerId, field, parseInt(e.target.value) || 0)}
-                                      className="w-16 border rounded p-1 text-center"
+                                      className="w-14 border rounded p-1 text-center"
+                                    />
+                                  </td>
+                                ))}
+                                {(['fgm', 'fga', 'tpm', 'tpa', 'ftm', 'fta'] as const).map((field) => (
+                                  <td key={field} className="p-1">
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      value={(ps as any)[field] ?? 0}
+                                      onChange={(e) => updatePlayerStat('home', ps.playerId, field as any, parseInt(e.target.value) || 0)}
+                                      className="w-14 border rounded p-1 text-center bg-gray-50"
                                     />
                                   </td>
                                 ))}
@@ -1329,6 +1346,12 @@ const AdminPage: React.FC = () => {
                               <th className="p-2">BLK</th>
                               <th className="p-2">TO</th>
                               <th className="p-2">PF</th>
+                              <th className="p-2 bg-orange-50 text-orange-700">FGM</th>
+                              <th className="p-2 bg-orange-50 text-orange-700">FGA</th>
+                              <th className="p-2 bg-blue-50 text-blue-700">3PM</th>
+                              <th className="p-2 bg-blue-50 text-blue-700">3PA</th>
+                              <th className="p-2 bg-green-50 text-green-700">FTM</th>
+                              <th className="p-2 bg-green-50 text-green-700">FTA</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1342,7 +1365,18 @@ const AdminPage: React.FC = () => {
                                       min="0"
                                       value={ps[field]}
                                       onChange={(e) => updatePlayerStat('away', ps.playerId, field, parseInt(e.target.value) || 0)}
-                                      className="w-16 border rounded p-1 text-center"
+                                      className="w-14 border rounded p-1 text-center"
+                                    />
+                                  </td>
+                                ))}
+                                {(['fgm', 'fga', 'tpm', 'tpa', 'ftm', 'fta'] as const).map((field) => (
+                                  <td key={field} className="p-1">
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      value={(ps as any)[field] ?? 0}
+                                      onChange={(e) => updatePlayerStat('away', ps.playerId, field as any, parseInt(e.target.value) || 0)}
+                                      className="w-14 border rounded p-1 text-center bg-gray-50"
                                     />
                                   </td>
                                 ))}

@@ -153,6 +153,12 @@ export interface PlayerGameStats {
   blocks: number;
   turnovers: number;
   fouls: number;
+  fgm: number; // Field goals made
+  fga: number; // Field goals attempted
+  tpm: number; // 3-pointers made
+  tpa: number; // 3-pointers attempted
+  ftm: number; // Free throws made
+  fta: number; // Free throws attempted
 }
 
 export interface BroadcastInfo {

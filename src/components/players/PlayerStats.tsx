@@ -20,13 +20,27 @@ import { Player } from '../../types';
 
 interface PlayerStatsProps {
   player: Player;
+  allPlayers?: Player[];
   onBack: () => void;
 }
 
-const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
+const PlayerStats: React.FC<PlayerStatsProps> = ({ player, allPlayers = [], onBack }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [hoveredStat, setHoveredStat] = useState<string | null>(null);
+
+  // Calculate real league rank for a given stat (lower index = better rank)
+  const getRank = (statKey: keyof typeof player.stats): string => {
+    if (allPlayers.length === 0) return '—';
+    const sorted = [...allPlayers]
+      .filter(p => (p.stats[statKey] as number) > 0)
+      .sort((a, b) => (b.stats[statKey] as number) - (a.stats[statKey] as number));
+    const rank = sorted.findIndex(p => p.id === player.id);
+    if (rank === -1) return '—';
+    const n = rank + 1;
+    const suffix = n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th';
+    return `${n}${suffix}`;
+  };
 
   const handleViewDetails = () => {
     navigate(`/players/${player.id}/details`);
@@ -38,64 +52,56 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
       value: player.stats.ppg, 
       icon: Target, 
       color: 'text-crimson-500',
-      trend: '+2.3',
-      rank: '3rd'
+      rank: getRank('ppg')
     },
     { 
       label: 'Rebounds Per Game', 
       value: player.stats.rpg, 
       icon: Shield, 
       color: 'text-navy-500',
-      trend: '+0.8',
-      rank: '5th'
+      rank: getRank('rpg')
     },
     { 
       label: 'Assists Per Game', 
       value: player.stats.apg, 
       icon: Zap, 
       color: 'text-green-500',
-      trend: '+1.5',
-      rank: '2nd'
+      rank: getRank('apg')
     },
     { 
       label: 'Steals Per Game', 
       value: player.stats.spg, 
       icon: Crosshair, 
       color: 'text-purple-500',
-      trend: '-0.2',
-      rank: '8th'
+      rank: getRank('spg')
     },
     { 
       label: 'Blocks Per Game', 
       value: player.stats.bpg, 
       icon: Shield, 
       color: 'text-blue-500',
-      trend: '+0.5',
-      rank: '4th'
+      rank: getRank('bpg')
     },
     { 
       label: 'Field Goal %', 
       value: `${player.stats.fgp}%`, 
       icon: Target, 
       color: 'text-orange-500',
-      trend: '+1.2',
-      rank: '6th'
+      rank: getRank('fgp')
     },
     { 
       label: '3-Point %', 
       value: `${player.stats.tpp}%`, 
       icon: Crosshair, 
       color: 'text-pink-500',
-      trend: '+2.1',
-      rank: '1st'
+      rank: getRank('tpp')
     },
     { 
       label: 'Free Throw %', 
       value: `${player.stats.ftp}%`, 
       icon: Target, 
       color: 'text-teal-500',
-      trend: '+0.9',
-      rank: '7th'
+      rank: getRank('ftp')
     }
   ];
 
@@ -292,16 +298,10 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
                     </motion.div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">{stat.label}</h3>
-                      <p className="text-xs text-gray-500">League Rank: {stat.rank}</p>
+                      <p className="text-xs text-gray-500">
+                        {stat.rank !== '—' ? `League Rank: ${stat.rank}` : 'No games yet'}
+                      </p>
                     </div>
-                  </motion.div>
-                  <motion.div 
-                    className="flex flex-col items-end"
-                    whileHover={{ x: -5 }}
-                  >
-                    <span className={`text-sm font-medium ${parseFloat(stat.trend) > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                      {stat.trend}
-                    </span>
                   </motion.div>
                 </div>
                 <motion.p 

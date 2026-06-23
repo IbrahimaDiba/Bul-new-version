@@ -153,7 +153,13 @@ export const initSupabaseCache = async () => {
                 steals: s.steals || 0,
                 blocks: s.blocks || 0,
                 turnovers: s.turnovers || 0,
-                fouls: s.fouls || 0
+                fouls: s.fouls || 0,
+                fgm: s.fgm || 0,
+                fga: s.fga || 0,
+                tpm: s.tpm || 0,
+                tpa: s.tpa || 0,
+                ftm: s.ftm || 0,
+                fta: s.fta || 0
               }));
               const awayStats = gameStats.filter((s: any) => s.team_id === g.away_team_id).map((s: any) => ({
                 playerId: s.player_id,
@@ -165,7 +171,13 @@ export const initSupabaseCache = async () => {
                 steals: s.steals || 0,
                 blocks: s.blocks || 0,
                 turnovers: s.turnovers || 0,
-                fouls: s.fouls || 0
+                fouls: s.fouls || 0,
+                fgm: s.fgm || 0,
+                fga: s.fga || 0,
+                tpm: s.tpm || 0,
+                tpa: s.tpa || 0,
+                ftm: s.ftm || 0,
+                fta: s.fta || 0
               }));
               playerStats = { home: homeStats, away: awayStats };
             }
@@ -437,15 +449,44 @@ const calculateAutomatedStandings = (teams: Team[], games: AdminGameInput[]): Te
 const calculateAutomatedPlayerStats = (players: Player[], games: AdminGameInput[]): Player[] => {
   const gamesWithPlayerStats = games.filter(g => g.status === 'completed' && g.playerStats);
   return players.map(player => {
-    let totalPoints = 0; let totalRebounds = 0; let totalAssists = 0; let totalSteals = 0; let totalBlocks = 0; let gamesPlayed = 0;
+    let totalPoints = 0, totalRebounds = 0, totalAssists = 0, totalSteals = 0, totalBlocks = 0;
+    let totalFgm = 0, totalFga = 0, totalTpm = 0, totalTpa = 0, totalFtm = 0, totalFta = 0;
+    let gamesPlayed = 0;
     gamesWithPlayerStats.forEach(game => {
       const pStats = [...(game.playerStats?.home || []), ...(game.playerStats?.away || [])].find(s => s.playerId === player.id);
       if (pStats) {
-        totalPoints += pStats.points; totalRebounds += pStats.rebounds; totalAssists += pStats.assists; totalSteals += pStats.steals; totalBlocks += pStats.blocks; gamesPlayed++;
+        totalPoints += pStats.points;
+        totalRebounds += pStats.rebounds;
+        totalAssists += pStats.assists;
+        totalSteals += pStats.steals;
+        totalBlocks += pStats.blocks;
+        totalFgm += pStats.fgm || 0;
+        totalFga += pStats.fga || 0;
+        totalTpm += pStats.tpm || 0;
+        totalTpa += pStats.tpa || 0;
+        totalFtm += pStats.ftm || 0;
+        totalFta += pStats.fta || 0;
+        gamesPlayed++;
       }
     });
     if (gamesPlayed === 0) return player;
-    return { ...player, stats: { ...player.stats, ppg: parseFloat((totalPoints / gamesPlayed).toFixed(1)), rpg: parseFloat((totalRebounds / gamesPlayed).toFixed(1)), apg: parseFloat((totalAssists / gamesPlayed).toFixed(1)), spg: parseFloat((totalSteals / gamesPlayed).toFixed(1)), bpg: parseFloat((totalBlocks / gamesPlayed).toFixed(1)) } };
+    const fgp = totalFga > 0 ? parseFloat(((totalFgm / totalFga) * 100).toFixed(1)) : player.stats.fgp;
+    const tpp = totalTpa > 0 ? parseFloat(((totalTpm / totalTpa) * 100).toFixed(1)) : player.stats.tpp;
+    const ftp = totalFta > 0 ? parseFloat(((totalFtm / totalFta) * 100).toFixed(1)) : player.stats.ftp;
+    return {
+      ...player,
+      stats: {
+        ...player.stats,
+        ppg: parseFloat((totalPoints / gamesPlayed).toFixed(1)),
+        rpg: parseFloat((totalRebounds / gamesPlayed).toFixed(1)),
+        apg: parseFloat((totalAssists / gamesPlayed).toFixed(1)),
+        spg: parseFloat((totalSteals / gamesPlayed).toFixed(1)),
+        bpg: parseFloat((totalBlocks / gamesPlayed).toFixed(1)),
+        fgp,
+        tpp,
+        ftp
+      }
+    };
   });
 };
 
@@ -578,7 +619,13 @@ export const updateAdminGameStats = async (gameId: string, playerStats: { home: 
           steals: ps.steals,
           blocks: ps.blocks,
           turnovers: ps.turnovers,
-          fouls: ps.fouls
+          fouls: ps.fouls,
+          fgm: ps.fgm || 0,
+          fga: ps.fga || 0,
+          tpm: ps.tpm || 0,
+          tpa: ps.tpa || 0,
+          ftm: ps.ftm || 0,
+          fta: ps.fta || 0
         })),
         ...playerStats.away.map(ps => ({
           game_id: gameId,
@@ -591,7 +638,13 @@ export const updateAdminGameStats = async (gameId: string, playerStats: { home: 
           steals: ps.steals,
           blocks: ps.blocks,
           turnovers: ps.turnovers,
-          fouls: ps.fouls
+          fouls: ps.fouls,
+          fgm: ps.fgm || 0,
+          fga: ps.fga || 0,
+          tpm: ps.tpm || 0,
+          tpa: ps.tpa || 0,
+          ftm: ps.ftm || 0,
+          fta: ps.fta || 0
         }))
       ];
       
