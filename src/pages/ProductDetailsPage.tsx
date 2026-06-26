@@ -248,7 +248,6 @@ const ProductDetailsPage: React.FC = () => {
                  </Link>
               </div>
 
-              {/* Minimalist Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
                  {relatedProducts.map(p => (
                    <Link key={p.id} to={`/shop/product/${p.id}`} className="group block">
@@ -260,7 +259,22 @@ const ProductDetailsPage: React.FC = () => {
                          />
                          {/* Quick Add Overlay */}
                          <div className="absolute inset-x-4 bottom-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <button className="w-full bg-white/90 backdrop-blur-sm text-black rounded-xl py-3 text-sm font-medium shadow-sm hover:bg-white flex justify-center items-center gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                                const existing = cart.find((item: any) => item.id === p.id);
+                                if (existing) {
+                                  existing.qty = (existing.qty || 1) + 1;
+                                } else {
+                                  cart.push({ ...p, qty: 1 });
+                                }
+                                localStorage.setItem('cart', JSON.stringify(cart));
+                                window.dispatchEvent(new CustomEvent('cartUpdated'));
+                              }}
+                              className="w-full bg-white/90 backdrop-blur-sm text-black rounded-xl py-3 text-sm font-medium shadow-sm hover:bg-white flex justify-center items-center gap-2"
+                            >
                                <ShoppingBag className="w-4 h-4" /> Quick Add
                             </button>
                          </div>

@@ -88,10 +88,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
             {product.category}
           </span>
-          <div className="flex items-center gap-0.5 text-gold-500">
-            <Star className="w-3.5 h-3.5 fill-current" />
-            <span className="text-[10px] font-bold text-gray-700">4.9</span>
-          </div>
+          {product.inStock ? (
+            <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">En stock</span>
+          ) : (
+            <span className="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full">Épuisé</span>
+          )}
         </div>
 
         <Link to={`/shop/product/${product.id}`} className="min-w-0">

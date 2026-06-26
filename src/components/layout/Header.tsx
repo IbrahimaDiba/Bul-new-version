@@ -92,9 +92,11 @@ const Header: React.FC = () => {
     updateCartCount();
     window.addEventListener('storage', updateCartCount);
     window.addEventListener('focus', updateCartCount);
+    window.addEventListener('cartUpdated', updateCartCount);
     return () => {
       window.removeEventListener('storage', updateCartCount);
       window.removeEventListener('focus', updateCartCount);
+      window.removeEventListener('cartUpdated', updateCartCount);
     };
   }, []);
 
