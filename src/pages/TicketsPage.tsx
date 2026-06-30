@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Ticket as TicketIcon, Calendar, MapPin, CheckCircle, User, Mail, Phone, CreditCard, X, ShieldCheck, Crown, ArrowRight, Info } from 'lucide-react';
 import { getAdminTickets, ADMIN_CONTENT_EVENT } from '../data/adminContent';
 import { Ticket } from '../types';
@@ -6,6 +7,7 @@ import { Ticket } from '../types';
 // Only real data from Admin will be displayed
 
 const TicketsPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [activeTab, setActiveTab] = useState<'season' | 'game'>('season');
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
@@ -28,6 +30,24 @@ const TicketsPage: React.FC = () => {
       window.removeEventListener(ADMIN_CONTENT_EVENT, reload);
     };
   }, []);
+
+  // Auto-open modal if gameId is present in URL
+  useEffect(() => {
+    const gameId = searchParams.get('gameId');
+    if (gameId && tickets.length > 0 && !showModal) {
+      const ticketForGame = tickets.find(t => t.type === 'game' && t.gameId === gameId);
+      if (ticketForGame) {
+        setActiveTab('game');
+        setSelectedTicket(ticketForGame);
+        setCustomer({ name: '', email: '', phone: '' });
+        setError(null);
+        setPaymentMethod('wave');
+        setShowModal(true);
+        // Clear param so it doesn't reopen if closed
+        setSearchParams({});
+      }
+    }
+  }, [searchParams, tickets, showModal, setSearchParams]);
 
   const openModal = (ticket: Ticket) => {
     setSelectedTicket(ticket);

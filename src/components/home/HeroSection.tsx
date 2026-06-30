@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PlayCircle, CalendarDays, ExternalLink, Trophy, ArrowRight } from 'lucide-react';
-import { Game } from '../../types';
-import { ADMIN_CONTENT_EVENT, getManagedGames } from '../../data/adminContent';
+import { Game, Ticket as TicketType } from '../../types';
+import { ADMIN_CONTENT_EVENT, getManagedGames, getAdminTickets } from '../../data/adminContent';
 
 // Default images if none are uploaded
 const DEFAULT_SLIDE_IMAGES = [
@@ -14,11 +14,13 @@ const DEFAULT_SLIDE_IMAGES = [
 const HeroSection: React.FC = () => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [games, setGames] = useState<Game[]>([]);
+  const [tickets, setTickets] = useState<TicketType[]>([]);
   const featuredGames = games.length > 0 ? games.slice(0, 3) : [];
   
   useEffect(() => {
     const reload = () => {
       setGames(getManagedGames());
+      setTickets(getAdminTickets());
     };
     reload();
     window.addEventListener('storage', reload);
@@ -195,9 +197,11 @@ const HeroSection: React.FC = () => {
                    </>
                 ) : (
                   <>
-                     <Link to={`/tickets`} className="inline-flex items-center justify-center gap-2 bg-crimson-600 hover:bg-crimson-700 text-white px-6 sm:px-8 py-3 sm:py-4 font-black uppercase tracking-widest text-xs transition-colors shadow-lg">
-                       Get Tickets
-                     </Link>
+                     {tickets.some(t => t.type === 'game' && t.gameId === activeGame.id) && (
+                       <Link to={`/tickets?gameId=${activeGame.id}`} className="inline-flex items-center justify-center gap-2 bg-crimson-600 hover:bg-crimson-700 text-white px-6 sm:px-8 py-3 sm:py-4 font-black uppercase tracking-widest text-xs transition-colors shadow-lg">
+                         Get Tickets
+                       </Link>
+                     )}
                      <Link to={`/games/schedule`} className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 sm:px-8 py-3 sm:py-4 font-black uppercase tracking-widest text-xs transition-colors border-l-4 border-l-gold-500">
                         View Schedule
                      </Link>

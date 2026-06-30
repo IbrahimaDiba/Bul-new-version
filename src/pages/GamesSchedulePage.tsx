@@ -2,8 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, MapPin, Radio, ChevronRight, Search, Ticket, ArrowRightCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { getManagedGames, getManagedTeams, ADMIN_CONTENT_EVENT } from '../data/adminContent';
-import type { Game, Team } from '../types';
+import { getManagedGames, getManagedTeams, getAdminTickets, ADMIN_CONTENT_EVENT } from '../data/adminContent';
+import type { Game, Team, Ticket as TicketType } from '../types';
 
 function groupGamesByDate(gameList: Game[]): Map<string, Game[]> {
   const map = new Map<string, Game[]>();
@@ -25,11 +25,13 @@ const GamesSchedulePage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [allGames, setAllGames] = useState<Game[]>([]);
   const [allTeams, setAllTeams] = useState<Team[]>([]);
+  const [allTickets, setAllTickets] = useState<TicketType[]>([]);
 
   React.useEffect(() => {
     const reload = () => {
       setAllGames(getManagedGames());
       setAllTeams(getManagedTeams());
+      setAllTickets(getAdminTickets());
     };
     reload();
     window.addEventListener('storage', reload);
@@ -221,18 +223,26 @@ const GamesSchedulePage: React.FC = () => {
                             <span className="text-left md:text-right font-medium">{game.venue}</span>
                           </div>
                           
-                          {game.status !== 'postponed' && game.status !== 'cancelled' ? (
-                            <Link 
-                              to={`/tickets`}
-                              className="w-full md:w-auto flex items-center justify-center gap-2 bg-crimson-600 hover:bg-crimson-700 text-white px-5 py-2.5 rounded text-sm font-bold transition-colors"
-                            >
-                              <Ticket className="w-4 h-4" /> Get Tickets
-                            </Link>
-                          ) : (
-                            <button disabled className="w-full md:w-auto flex items-center justify-center gap-2 bg-gray-100 text-gray-400 px-5 py-2.5 rounded text-sm font-bold cursor-not-allowed">
-                              Unavailable
-                            </button>
-                          )}
+                          {(() => {
+                            const hasTicket = allTickets.some(t => t.type === 'game' && t.gameId === game.id);
+                            
+                            if (game.status !== 'postponed' && game.status !== 'cancelled' && hasTicket) {
+                              return (
+                                <Link 
+                                  to={`/tickets?gameId=${game.id}`}
+                                  className="w-full md:w-auto flex items-center justify-center gap-2 bg-crimson-600 hover:bg-crimson-700 text-white px-5 py-2.5 rounded text-sm font-bold transition-colors"
+                                >
+                                  <Ticket className="w-4 h-4" /> Get Tickets
+                                </Link>
+                              );
+                            } else {
+                              return (
+                                <button disabled className="w-full md:w-auto flex items-center justify-center gap-2 bg-gray-100 text-gray-400 px-5 py-2.5 rounded text-sm font-bold cursor-not-allowed">
+                                  Unavailable
+                                </button>
+                              );
+                            }
+                          })()}
                         </div>
 
                       </div>

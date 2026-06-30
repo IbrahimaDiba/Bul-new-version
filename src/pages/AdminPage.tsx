@@ -71,7 +71,8 @@ const AdminPage: React.FC = () => {
     type: 'season' as 'season' | 'game',
     date: '',
     venue: '',
-    inStock: true
+    inStock: true,
+    gameId: ''
   });
 
   const [newsForm, setNewsForm] = useState({
@@ -789,9 +790,10 @@ const AdminPage: React.FC = () => {
       description: ticketForm.description,
       price: Number(ticketForm.price),
       type: ticketForm.type,
-      date: ticketForm.date || undefined,
-      venue: ticketForm.venue || undefined,
-      inStock: ticketForm.inStock
+      date: ticketForm.type === 'game' ? ticketForm.date : undefined,
+      venue: ticketForm.type === 'game' ? ticketForm.venue : undefined,
+      inStock: ticketForm.inStock,
+      gameId: ticketForm.type === 'game' && ticketForm.gameId ? ticketForm.gameId : undefined
     };
 
     if (editingTicketId) {
@@ -808,7 +810,8 @@ const AdminPage: React.FC = () => {
       type: 'season',
       date: '',
       venue: '',
-      inStock: true
+      inStock: true,
+      gameId: ''
     });
     reloadAdminData();
     setFeedback({ type: 'success', text: `Ticket ${editingTicketId ? 'mis à jour' : 'ajoute'} avec succes.` });
@@ -822,7 +825,8 @@ const AdminPage: React.FC = () => {
       type: ticket.type,
       date: ticket.date || '',
       venue: ticket.venue || '',
-      inStock: ticket.inStock
+      inStock: ticket.inStock,
+      gameId: ticket.gameId || ''
     });
     setEditingTicketId(ticket.id);
   };
@@ -1785,7 +1789,7 @@ const AdminPage: React.FC = () => {
                     type="button"
                     onClick={() => {
                       setEditingTicketId(null);
-                      setTicketForm({ name: '', price: '', description: '', type: 'season', date: '', venue: '', inStock: true });
+                      setTicketForm({ name: '', price: '', description: '', type: 'season', date: '', venue: '', inStock: true, gameId: '' });
                     }}
                     className="text-gray-400 hover:text-red-500"
                   >
@@ -1820,8 +1824,11 @@ const AdminPage: React.FC = () => {
                             name: `${home} vs ${away}`,
                             date: `${new Date(game.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })} à ${game.time}`,
                             venue: game.venue,
-                            description: `Match opposant ${home} et ${away}. Placement libre.`
+                            description: `Match opposant ${home} et ${away}. Placement libre.`,
+                            gameId: game.id
                           }));
+                        } else {
+                          setTicketForm(prev => ({ ...prev, gameId: '' }));
                         }
                       }}
                     >

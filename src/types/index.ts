@@ -269,6 +269,7 @@ export interface Ticket {
   date?: string;
   venue?: string;
   inStock: boolean;
+  gameId?: string;
 }
 
 export type NavItem = {
