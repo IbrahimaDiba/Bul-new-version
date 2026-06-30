@@ -1803,10 +1803,43 @@ const AdminPage: React.FC = () => {
                 </select>
               </div>
               {ticketForm.type === 'game' && (
-                <div className="grid grid-cols-2 gap-4">
-                  <input value={ticketForm.date} onChange={(e) => setTicketForm({ ...ticketForm, date: e.target.value })} placeholder="Date (ex: 25 Oct 2024)" className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:border-crimson-600 focus:ring-1 focus:ring-crimson-600" />
-                  <input value={ticketForm.venue} onChange={(e) => setTicketForm({ ...ticketForm, venue: e.target.value })} placeholder="Lieu (ex: Dakar Arena)" className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:border-crimson-600 focus:ring-1 focus:ring-crimson-600" />
-                </div>
+                <>
+                  <div className="mb-2">
+                    <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Remplir depuis un match programmé (Optionnel)</label>
+                    <select 
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:border-crimson-600 focus:ring-1 focus:ring-crimson-600"
+                      onChange={(e) => {
+                        const gameId = e.target.value;
+                        if (!gameId) return;
+                        const game = gameItems.find(g => g.id === gameId);
+                        if (game) {
+                          const home = teamItems.find(t => t.id === game.homeTeamId)?.name || 'Home';
+                          const away = teamItems.find(t => t.id === game.awayTeamId)?.name || 'Away';
+                          setTicketForm(prev => ({
+                            ...prev,
+                            name: `${home} vs ${away}`,
+                            date: `${new Date(game.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })} à ${game.time}`,
+                            venue: game.venue,
+                            description: `Match opposant ${home} et ${away}. Placement libre.`
+                          }));
+                        }
+                      }}
+                    >
+                      <option value="">-- Sélectionner un match --</option>
+                      {gameItems.filter(g => g.status === 'scheduled').map(game => {
+                        const home = teamItems.find(t => t.id === game.homeTeamId)?.name || 'Home';
+                        const away = teamItems.find(t => t.id === game.awayTeamId)?.name || 'Away';
+                        return (
+                          <option key={game.id} value={game.id}>{home} vs {away} - {game.date}</option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <input value={ticketForm.date} onChange={(e) => setTicketForm({ ...ticketForm, date: e.target.value })} placeholder="Date (ex: 25 Oct 2024)" className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:border-crimson-600 focus:ring-1 focus:ring-crimson-600" />
+                    <input value={ticketForm.venue} onChange={(e) => setTicketForm({ ...ticketForm, venue: e.target.value })} placeholder="Lieu (ex: Dakar Arena)" className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:border-crimson-600 focus:ring-1 focus:ring-crimson-600" />
+                  </div>
+                </>
               )}
               <div className="flex items-center gap-2">
                 <input type="checkbox" id="ticketInStock" checked={ticketForm.inStock} onChange={(e) => setTicketForm({ ...ticketForm, inStock: e.target.checked })} />
