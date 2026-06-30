@@ -908,12 +908,12 @@ const AdminPage: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6 mb-6">
-          <div className="flex gap-2 sm:gap-3 flex-wrap">
+          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2">
             {(['overview', 'hero', 'orders', 'tickets', 'news', 'products', 'games', 'teams', 'players', 'sponsors'] as Tab[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-md text-sm font-bold uppercase ${
+                className={`flex-shrink-0 px-4 py-2 rounded-md text-sm font-bold uppercase ${
                   activeTab === tab ? 'bg-navy-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -1034,8 +1034,8 @@ const AdminPage: React.FC = () => {
             {orderItems.length === 0 ? (
               <p className="text-gray-500 text-center py-10">Aucune commande pour le moment.</p>
             ) : (
-              <div className="overflow-x-auto text-left">
-                <table className="w-full text-sm text-gray-600">
+              <div className="overflow-x-auto text-left pb-2">
+                <table className="w-full text-sm text-gray-600 min-w-[700px]">
                   <thead className="bg-gray-50 text-gray-500 uppercase font-bold text-xs">
                     <tr>
                       <th className="px-4 py-3">Date</th>
@@ -1372,8 +1372,8 @@ const AdminPage: React.FC = () => {
                   <div className="flex-1 overflow-auto p-6 space-y-8">
                     <section>
                       <h3 className="text-lg font-black text-navy-900 mb-4 border-b pb-2">Home Team</h3>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
+                      <div className="overflow-x-auto pb-2">
+                        <table className="w-full text-sm min-w-[800px]">
                           <thead>
                             <tr className="text-left border-b bg-gray-50">
                               <th className="p-2">Joueur</th>
@@ -1428,8 +1428,8 @@ const AdminPage: React.FC = () => {
 
                     <section>
                       <h3 className="text-lg font-black text-navy-900 mb-4 border-b pb-2">Away Team</h3>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
+                      <div className="overflow-x-auto pb-2">
+                        <table className="w-full text-sm min-w-[800px]">
                           <thead>
                             <tr className="text-left border-b bg-gray-50">
                               <th className="p-2">Joueur</th>
