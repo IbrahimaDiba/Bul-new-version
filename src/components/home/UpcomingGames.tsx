@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, MapPin, ArrowRight, Ticket } from 'lucide-react';
-import { Game } from '../../types';
-import { ADMIN_CONTENT_EVENT, getManagedGames } from '../../data/adminContent';
+import { Game, Ticket as TicketType } from '../../types';
+import { ADMIN_CONTENT_EVENT, getManagedGames, getAdminTickets } from '../../data/adminContent';
 
 const UpcomingGames: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
+  const [tickets, setTickets] = useState<TicketType[]>([]);
 
   useEffect(() => {
-    const reload = () => setGames(getManagedGames());
+    const reload = () => {
+      setGames(getManagedGames());
+      setTickets(getAdminTickets());
+    };
     reload();
     window.addEventListener('storage', reload);
     window.addEventListener(ADMIN_CONTENT_EVENT, reload);
@@ -116,13 +120,29 @@ const UpcomingGames: React.FC = () => {
                    <span className="truncate">{game.venue}</span>
                  </div>
                  
-                 <Link
-                   to={`/tickets/${game.id}`}
-                   className="flex items-center justify-center gap-2 w-full bg-navy-900 hover:bg-crimson-600 text-white p-3 text-xs font-black uppercase tracking-widest transition-colors shadow-sm"
-                 >
-                   <Ticket className="w-3.5 h-3.5" />
-                   Tickets
-                 </Link>
+                 {(() => {
+                   const hasTicket = tickets.some(t => t.type === 'game' && t.gameId === game.id);
+                   if (hasTicket) {
+                     return (
+                       <Link
+                         to={`/tickets?gameId=${game.id}`}
+                         className="flex items-center justify-center gap-2 w-full bg-navy-900 hover:bg-crimson-600 text-white p-3 text-xs font-black uppercase tracking-widest transition-colors shadow-sm"
+                       >
+                         <Ticket className="w-3.5 h-3.5" />
+                         Tickets
+                       </Link>
+                     );
+                   } else {
+                     return (
+                       <button
+                         disabled
+                         className="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-400 p-3 text-xs font-black uppercase tracking-widest cursor-not-allowed"
+                       >
+                         Unavailable
+                       </button>
+                     );
+                   }
+                 })()}
               </div>
 
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-crimson-600 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
