@@ -223,7 +223,7 @@ const GamesSchedulePage: React.FC = () => {
                           
                           {game.status !== 'postponed' && game.status !== 'cancelled' ? (
                             <Link 
-                              to={`/tickets/${game.id}`}
+                              to={`/tickets`}
                               className="w-full md:w-auto flex items-center justify-center gap-2 bg-crimson-600 hover:bg-crimson-700 text-white px-5 py-2.5 rounded text-sm font-bold transition-colors"
                             >
                               <Ticket className="w-4 h-4" /> Get Tickets

@@ -195,7 +195,7 @@ const HeroSection: React.FC = () => {
                    </>
                 ) : (
                   <>
-                     <Link to={`/tickets/${activeGame.id}`} className="inline-flex items-center justify-center gap-2 bg-crimson-600 hover:bg-crimson-700 text-white px-6 sm:px-8 py-3 sm:py-4 font-black uppercase tracking-widest text-xs transition-colors shadow-lg">
+                     <Link to={`/tickets`} className="inline-flex items-center justify-center gap-2 bg-crimson-600 hover:bg-crimson-700 text-white px-6 sm:px-8 py-3 sm:py-4 font-black uppercase tracking-widest text-xs transition-colors shadow-lg">
                        Get Tickets
                      </Link>
                      <Link to={`/games/schedule`} className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 sm:px-8 py-3 sm:py-4 font-black uppercase tracking-widest text-xs transition-colors border-l-4 border-l-gold-500">
