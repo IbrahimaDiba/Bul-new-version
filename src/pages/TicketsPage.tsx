@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Ticket as TicketIcon, Calendar, MapPin, CheckCircle, User, Mail, Phone, CreditCard, X, ShieldCheck, Crown, ArrowRight, Info } from 'lucide-react';
-import { getAdminTickets, ADMIN_CONTENT_EVENT } from '../data/adminContent';
+import { getAdminTickets, getManagedGames, ADMIN_CONTENT_EVENT } from '../data/adminContent';
 import { Ticket } from '../types';
 
 const fallbackTickets: Ticket[] = [
@@ -23,7 +23,26 @@ const TicketsPage: React.FC = () => {
   useEffect(() => {
     const reload = () => {
       const adminTickets = getAdminTickets();
-      setTickets(adminTickets.length > 0 ? adminTickets : fallbackTickets);
+      const seasonPasses = adminTickets.filter(t => t.type === 'season');
+      const finalSeasonPasses = seasonPasses.length > 0 ? seasonPasses : fallbackTickets.filter(t => t.type === 'season');
+
+      const games = getManagedGames();
+      const scheduledGames = games.filter(g => g.status === 'scheduled');
+      
+      const gameTickets: Ticket[] = scheduledGames.map(game => ({
+        id: `game-${game.id}`,
+        name: `${game.homeTeam.name} vs ${game.awayTeam.name}`,
+        price: 5000,
+        description: `Match de saison régulière. Placement libre.`,
+        type: 'game',
+        date: `${new Date(game.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })} à ${game.time}`,
+        venue: game.venue,
+        inStock: true
+      }));
+
+      const finalGameTickets = gameTickets.length > 0 ? gameTickets : fallbackTickets.filter(t => t.type === 'game');
+
+      setTickets([...finalSeasonPasses, ...finalGameTickets]);
     };
     reload();
     window.addEventListener('storage', reload);
