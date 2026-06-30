@@ -3,12 +3,7 @@ import { Ticket as TicketIcon, Calendar, MapPin, CheckCircle, User, Mail, Phone,
 import { getAdminTickets, ADMIN_CONTENT_EVENT } from '../data/adminContent';
 import { Ticket } from '../types';
 
-const fallbackTickets: Ticket[] = [
-  { id: '1', name: 'Season Pass (VIP)', price: 150000, description: 'Accès VIP à tous les matchs à domicile. Sièges courtside. Rencontres avec les joueurs et accès au lounge VIP.', type: 'season', inStock: true },
-  { id: '2', name: 'Season Pass (Standard)', price: 75000, description: 'Accès garanti à tous les matchs à domicile de la saison régulière. Placement libre.', type: 'season', inStock: true },
-  { id: '3', name: 'Wildcats vs Bulls', date: '25 Oct 2024', venue: 'Wildcat Arena', price: 5000, type: 'game', inStock: true },
-  { id: '4', name: 'Eagles vs Tigers', date: '28 Oct 2024', venue: 'Dakar Arena', price: 5000, type: 'game', inStock: false }
-];
+// Only real data from Admin will be displayed
 
 const TicketsPage: React.FC = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -23,7 +18,7 @@ const TicketsPage: React.FC = () => {
   useEffect(() => {
     const reload = () => {
       const adminTickets = getAdminTickets();
-      setTickets(adminTickets.length > 0 ? adminTickets : fallbackTickets);
+      setTickets(adminTickets);
     };
     reload();
     window.addEventListener('storage', reload);
@@ -165,9 +160,16 @@ const TicketsPage: React.FC = () => {
         </div>
 
         {/* ── TICKETS GRID ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {tickets.filter(t => t.type === activeTab).map(ticket => {
-            const isVIP = ticket.name.toLowerCase().includes('vip');
+        {tickets.filter(t => t.type === activeTab).length === 0 ? (
+          <div className="bg-white p-10 rounded-3xl shadow-sm text-center border border-gray-100 mt-8">
+            <TicketIcon className="w-16 h-16 text-gray-200 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-navy-900 mb-2">Aucun billet disponible</h3>
+            <p className="text-gray-500">Revenez plus tard pour de nouveaux événements ou pass.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {tickets.filter(t => t.type === activeTab).map(ticket => {
+              const isVIP = ticket.name.toLowerCase().includes('vip');
             const isSoldOut = !ticket.inStock;
 
             return (
@@ -263,6 +265,7 @@ const TicketsPage: React.FC = () => {
             );
           })}
         </div>
+        )}
       </div>
 
       {/* ── MODAL DE PAIEMENT PREMIUM (GLASSMORPHISM) ── */}
