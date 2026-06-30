@@ -123,10 +123,10 @@ const TicketsPage: React.FC = () => {
               <TicketIcon className="w-4 h-4 text-crimson-500" />
               Billetterie Officielle
             </div>
-            <h1 className="text-5xl sm:text-7xl font-black text-white uppercase tracking-tighter mb-6 leading-[1.1]">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white uppercase tracking-tighter mb-4 sm:mb-6 leading-[1.1]">
               Ne ratez <span className="text-transparent bg-clip-text bg-gradient-to-r from-crimson-500 to-orange-500">aucune seconde</span> de l'action.
             </h1>
-            <p className="text-xl text-gray-300 font-medium max-w-xl">
+            <p className="text-lg sm:text-xl text-gray-300 font-medium max-w-xl">
               Réservez vos places maintenant. Que ce soit pour un match décisif ou pour toute la saison, sécurisez votre accès VIP.
             </p>
           </div>
@@ -139,13 +139,13 @@ const TicketsPage: React.FC = () => {
 
       <div className="max-w-6xl mx-auto px-4 -mt-8 relative z-20">
         {/* ── TABS CAPSULE ── */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-white p-1.5 rounded-full shadow-xl shadow-navy-900/5 flex items-center border border-gray-100">
+        <div className="flex justify-center mb-8 sm:mb-12">
+          <div className="bg-white p-1 sm:p-1.5 rounded-3xl sm:rounded-full shadow-xl shadow-navy-900/5 flex flex-col sm:flex-row items-stretch sm:items-center border border-gray-100 gap-1 sm:gap-0 w-full sm:w-auto">
             <button
               onClick={() => setActiveTab('season')}
-              className={`px-8 py-3.5 rounded-full font-black uppercase tracking-widest text-sm transition-all duration-300 ${
+              className={`px-4 sm:px-8 py-3 sm:py-3.5 rounded-2xl sm:rounded-full font-black uppercase tracking-widest text-xs sm:text-sm transition-all duration-300 flex-1 sm:flex-none ${
                 activeTab === 'season' 
-                  ? 'bg-navy-900 text-white shadow-md transform scale-105' 
+                  ? 'bg-navy-900 text-white shadow-md transform scale-100 sm:scale-105' 
                   : 'text-gray-500 hover:text-navy-900 hover:bg-gray-50'
               }`}
             >
@@ -153,9 +153,9 @@ const TicketsPage: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('game')}
-              className={`px-8 py-3.5 rounded-full font-black uppercase tracking-widest text-sm transition-all duration-300 ${
+              className={`px-4 sm:px-8 py-3 sm:py-3.5 rounded-2xl sm:rounded-full font-black uppercase tracking-widest text-xs sm:text-sm transition-all duration-300 flex-1 sm:flex-none ${
                 activeTab === 'game' 
-                  ? 'bg-navy-900 text-white shadow-md transform scale-105' 
+                  ? 'bg-navy-900 text-white shadow-md transform scale-100 sm:scale-105' 
                   : 'text-gray-500 hover:text-navy-900 hover:bg-gray-50'
               }`}
             >
@@ -198,8 +198,8 @@ const TicketsPage: React.FC = () => {
                   )}
                 </div>
 
-                <div className="p-8 sm:p-10 flex flex-col h-full relative z-10">
-                  <div className="mb-8">
+                <div className="p-6 sm:p-10 flex flex-col h-full relative z-10">
+                  <div className="mb-6 sm:mb-8">
                     <h3 className={`text-3xl font-black mb-4 tracking-tight ${isVIP ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500' : 'text-navy-900'}`}>
                       {ticket.name}
                     </h3>
@@ -233,18 +233,18 @@ const TicketsPage: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="mt-auto pt-8 border-t border-gray-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                  <div className="mt-auto pt-6 sm:pt-8 border-t border-gray-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
                     <div>
                       <p className={`text-xs uppercase tracking-widest font-bold mb-1 ${isVIP ? 'text-gray-400' : 'text-gray-500'}`}>Prix total</p>
-                      <span className={`text-4xl font-black ${isVIP ? 'text-white' : 'text-navy-900'}`}>
-                        {ticket.price.toLocaleString('fr-FR')} <span className="text-xl font-bold">FCFA</span>
+                      <span className={`text-3xl sm:text-4xl font-black ${isVIP ? 'text-white' : 'text-navy-900'}`}>
+                        {ticket.price.toLocaleString('fr-FR')} <span className="text-lg sm:text-xl font-bold">FCFA</span>
                       </span>
                     </div>
                     <button
                       disabled={isSoldOut}
                       onClick={() => openModal(ticket)}
                       className={`
-                        group/btn relative px-8 py-4 rounded-xl font-black text-sm uppercase tracking-widest overflow-hidden transition-all
+                        w-full sm:w-auto group/btn relative px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-black text-sm uppercase tracking-widest overflow-hidden transition-all
                         ${isSoldOut ? 'bg-gray-800 text-gray-500 cursor-not-allowed' : 
                           isVIP 
                             ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-black shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(234,179,8,0.5)]' 
@@ -273,7 +273,7 @@ const TicketsPage: React.FC = () => {
           <div className="bg-white w-full max-w-4xl rounded-[2rem] overflow-hidden shadow-2xl relative z-10 flex flex-col md:flex-row transform transition-all animate-in fade-in zoom-in-95 duration-200 max-h-[90vh]">
             
             {/* Colonne Gauche : Résumé (Dark) */}
-            <div className="md:w-5/12 bg-navy-900 p-8 sm:p-10 text-white flex flex-col relative overflow-hidden">
+            <div className="md:w-5/12 bg-navy-900 p-6 sm:p-10 text-white flex flex-col relative overflow-hidden">
               {/* Bg Effect */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-crimson-600 rounded-full blur-[100px] opacity-20 -translate-y-1/2 translate-x-1/4"></div>
               
@@ -304,7 +304,7 @@ const TicketsPage: React.FC = () => {
             </div>
 
             {/* Colonne Droite : Formulaire (Light) */}
-            <div className="md:w-7/12 p-8 sm:p-10 bg-white overflow-y-auto">
+            <div className="md:w-7/12 p-6 sm:p-10 bg-white overflow-y-auto">
               <div className="flex justify-between items-center mb-8">
                 <h3 className="text-2xl font-black text-navy-900">Informations & Paiement</h3>
                 <button onClick={closeModal} className="hidden md:flex w-10 h-10 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors">
