@@ -1,25 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, CreditCard, User, Mail, Phone, MapPin, Trash2, Plus, Minus, Package } from 'lucide-react';
-import { addAdminOrder } from '../data/adminContent';
+import { ShoppingCart, ArrowLeft, CreditCard, User, Mail, Phone, MapPin, Trash2, Plus, Minus, Package, Lock } from 'lucide-react';
 
 const CartPage: React.FC = () => {
   const [cart, setCart] = useState<any[]>([]);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'wave' | 'orange_money'>('wave');
+  const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
 
   const [customer, setCustomer] = useState({ name: '', email: '', phone: '', address: '' });
 
-  // Load cart from localStorage
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('cart') || '[]');
     setCart(stored);
   }, []);
 
-  // Sync cart to localStorage and dispatch event
   const syncCart = (updatedCart: any[]) => {
     setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
@@ -55,7 +52,7 @@ const CartPage: React.FC = () => {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-      addAdminOrder({
+      localStorage.setItem('pendingOrder', JSON.stringify({
         customerName: customer.name,
         customerEmail: customer.email,
         customerPhone: customer.phone,
@@ -67,9 +64,9 @@ const CartPage: React.FC = () => {
           name: item.name
         })),
         totalAmount: total,
-        status: 'pending',
+        status: 'paid',
         date: new Date().toISOString()
-      });
+      }));
 
       const res = await fetch(`${supabaseUrl}/functions/v1/naboopay`, {
         method: 'POST',
@@ -108,54 +105,62 @@ const CartPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-6 px-4 sm:px-6 sm:py-10 lg:py-12">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
 
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate('/shop')}
-            className="flex items-center gap-2 text-gray-500 hover:text-navy-900 transition-colors font-medium"
-          >
-            <ArrowLeft className="w-5 h-5" /> Back to Shop
-          </button>
-        </div>
+      {/* ─── TOP BAR ─── */}
+      <div className="bg-white border-b border-gray-100 sticky top-0 z-10 px-4 py-3 flex items-center gap-3">
+        <button
+          onClick={() => navigate('/shop')}
+          className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4 text-gray-700" />
+        </button>
+        <h1 className="text-base font-black text-navy-900 uppercase tracking-tight flex items-center gap-2">
+          <ShoppingCart className="w-4 h-4" />
+          Mon Panier
+          {itemCount > 0 && (
+            <span className="bg-crimson-600 text-white text-xs font-black px-2 py-0.5 rounded-full">
+              {itemCount}
+            </span>
+          )}
+        </h1>
+      </div>
 
-        <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
+      <div className="max-w-2xl mx-auto px-4 py-6 pb-40 lg:pb-6 lg:max-w-5xl">
+        {cart.length === 0 ? (
 
-          {/* ════════ LEFT: CART ITEMS ════════ */}
-          <div className="flex-1 min-w-0">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="px-6 py-5 border-b border-gray-100 flex items-center gap-3">
-                <ShoppingCart className="w-5 h-5 text-navy-900" />
-                <h1 className="text-xl font-black text-navy-900 uppercase tracking-tight">
-                  Mon Panier
-                </h1>
-                {itemCount > 0 && (
-                  <span className="ml-auto text-sm text-gray-500 font-medium">
-                    {itemCount} article{itemCount > 1 ? 's' : ''}
-                  </span>
-                )}
+          /* ─── EMPTY CART ─── */
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+              <Package className="w-10 h-10 text-gray-300" />
+            </div>
+            <h2 className="text-xl font-black text-navy-900 mb-2">Votre panier est vide</h2>
+            <p className="text-gray-400 text-sm mb-8">Ajoutez des articles depuis la boutique</p>
+            <button
+              onClick={() => navigate('/shop')}
+              className="bg-navy-900 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-navy-800 transition-colors"
+            >
+              Voir la boutique
+            </button>
+          </div>
+
+        ) : (
+          <div className="lg:grid lg:grid-cols-[1fr_400px] lg:gap-8 lg:items-start">
+
+            {/* ─── LEFT: CART ITEMS ─── */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4 lg:mb-0">
+              <div className="px-4 sm:px-6 py-4 border-b border-gray-50">
+                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                  {itemCount} article{itemCount > 1 ? 's' : ''}
+                </p>
               </div>
 
-              {cart.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-                  <Package className="w-16 h-16 text-gray-200 mb-4" />
-                  <p className="text-gray-400 font-medium text-lg mb-2">Votre panier est vide</p>
-                  <p className="text-gray-400 text-sm mb-6">Ajoutez des articles depuis la boutique</p>
-                  <button
-                    onClick={() => navigate('/shop')}
-                    className="bg-navy-900 text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-navy-800 transition-colors"
-                  >
-                    Voir la boutique
-                  </button>
-                </div>
-              ) : (
-                <ul className="divide-y divide-gray-50">
-                  {cart.map((item, index) => (
-                    <li key={`${item.id}-${item.selectedSize}-${item.selectedColor}`} className="flex items-center gap-4 px-6 py-5">
+              <ul className="divide-y divide-gray-50">
+                {cart.map((item, index) => (
+                  <li key={`${item.id}-${index}`} className="px-4 sm:px-6 py-4">
+                    <div className="flex gap-3 sm:gap-4">
                       {/* Image */}
-                      <div className="w-20 h-20 rounded-xl bg-gray-50 border border-gray-100 overflow-hidden shrink-0 flex items-center justify-center p-2">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gray-50 border border-gray-100 shrink-0 flex items-center justify-center p-1.5 sm:p-2">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -163,188 +168,208 @@ const CartPage: React.FC = () => {
                         />
                       </div>
 
-                      {/* Info */}
+                      {/* Info + Controls */}
                       <div className="flex-1 min-w-0">
-                        <p className="font-black text-navy-900 text-sm sm:text-base leading-tight truncate">{item.name}</p>
-                        <div className="flex flex-wrap gap-2 mt-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="font-black text-navy-900 text-sm leading-tight line-clamp-2 flex-1">
+                            {item.name}
+                          </p>
+                          <button
+                            onClick={() => removeItem(index)}
+                            className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Badges */}
+                        <div className="flex flex-wrap gap-1.5 mt-1">
                           {item.selectedSize && (
-                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded font-medium">
-                              Taille: {item.selectedSize}
+                            <span className="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full font-medium">
+                              {item.selectedSize}
                             </span>
                           )}
                           {item.selectedColor && (
-                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded font-medium">
-                              Couleur: {item.selectedColor}
+                            <span className="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full font-medium">
+                              {item.selectedColor}
                             </span>
                           )}
                         </div>
-                        <p className="text-crimson-600 font-black text-sm mt-1.5">
-                          {(item.price * (item.qty || 1)).toLocaleString('fr-FR')} FCFA
-                        </p>
-                      </div>
 
-                      {/* Quantity + Delete */}
-                      <div className="flex flex-col items-end gap-3 shrink-0">
-                        {/* Quantity controls */}
-                        <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-                          <button
-                            onClick={() => updateQty(index, -1)}
-                            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 hover:text-navy-900 transition-colors"
-                          >
-                            <Minus className="w-3.5 h-3.5" />
-                          </button>
-                          <span className="w-8 text-center text-sm font-black text-navy-900 tabular-nums">
-                            {item.qty || 1}
-                          </span>
-                          <button
-                            onClick={() => updateQty(index, 1)}
-                            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 hover:text-navy-900 transition-colors"
-                          >
-                            <Plus className="w-3.5 h-3.5" />
-                          </button>
+                        {/* Price + Qty */}
+                        <div className="flex items-center justify-between mt-2">
+                          <p className="text-crimson-600 font-black text-sm tabular-nums">
+                            {(item.price * (item.qty || 1)).toLocaleString('fr-FR')} FCFA
+                          </p>
+                          {/* Quantity */}
+                          <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                            <button
+                              onClick={() => updateQty(index, -1)}
+                              className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 active:bg-gray-200 transition-colors"
+                            >
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="w-7 text-center text-sm font-black text-navy-900 tabular-nums">
+                              {item.qty || 1}
+                            </span>
+                            <button
+                              onClick={() => updateQty(index, 1)}
+                              className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 active:bg-gray-200 transition-colors"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </button>
+                          </div>
                         </div>
-
-                        {/* Delete */}
-                        <button
-                          onClick={() => removeItem(index)}
-                          className="text-gray-300 hover:text-red-500 transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
                       </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
 
-          {/* ════════ RIGHT: ORDER SUMMARY + PAYMENT ════════ */}
-          <div className="w-full md:w-96 shrink-0">
-            <div className="bg-gradient-to-br from-navy-900 to-crimson-900 rounded-2xl shadow-xl p-6 text-white sticky top-28">
-              <h2 className="text-xl font-black uppercase tracking-tight mb-6">Récapitulatif</h2>
+            {/* ─── RIGHT: ORDER SUMMARY ─── */}
+            <div className="lg:sticky lg:top-20">
 
-              {/* Price breakdown */}
-              <div className="space-y-2 mb-4 pb-4 border-b border-white/10">
-                <div className="flex justify-between text-sm text-white/70">
-                  <span>Sous-total ({itemCount} art.)</span>
-                  <span>{total.toLocaleString('fr-FR')} FCFA</span>
+              {/* Summary card */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-4">
+                <h2 className="text-sm font-black text-navy-900 uppercase tracking-widest mb-4">Récapitulatif</h2>
+                <div className="space-y-2 text-sm mb-4">
+                  <div className="flex justify-between text-gray-500">
+                    <span>Sous-total ({itemCount} art.)</span>
+                    <span className="font-medium text-gray-900">{total.toLocaleString('fr-FR')} FCFA</span>
+                  </div>
+                  <div className="flex justify-between text-gray-500">
+                    <span>Livraison</span>
+                    <span className="text-green-600 font-bold">Gratuite</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm text-white/70">
-                  <span>Livraison</span>
-                  <span className="text-green-400 font-bold">Gratuite</span>
+                <div className="border-t border-gray-100 pt-3 flex justify-between items-center">
+                  <span className="font-black text-navy-900">Total</span>
+                  <span className="text-xl font-black text-navy-900 tabular-nums">
+                    {total.toLocaleString('fr-FR')} FCFA
+                  </span>
                 </div>
               </div>
-              <div className="flex justify-between items-center mb-6">
-                <span className="text-lg font-black">Total</span>
-                <span className="text-2xl font-black">{total.toLocaleString('fr-FR')} FCFA</span>
-              </div>
 
-              {/* Form */}
-              <form onSubmit={handlePayment} className="space-y-4">
-                <div className="space-y-2 bg-white/10 p-4 rounded-xl">
-                  <h3 className="text-xs font-black uppercase tracking-widest border-b border-white/20 pb-2 mb-3">
-                    Informations de livraison
-                  </h3>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                    <input
-                      required
-                      value={customer.name}
-                      onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
-                      placeholder="Nom complet"
-                      className="w-full bg-black/20 border border-white/10 rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-white/30 placeholder-white/40"
-                    />
-                  </div>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                    <input
-                      required
-                      type="email"
-                      value={customer.email}
-                      onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
-                      placeholder="Email"
-                      className="w-full bg-black/20 border border-white/10 rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-white/30 placeholder-white/40"
-                    />
-                  </div>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                    <input
-                      required
-                      value={customer.phone}
-                      onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
-                      placeholder="Téléphone (ex: 770000000)"
-                      className="w-full bg-black/20 border border-white/10 rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-white/30 placeholder-white/40"
-                    />
-                  </div>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 w-4 h-4 text-white/40" />
-                    <textarea
-                      required
-                      value={customer.address}
-                      onChange={(e) => setCustomer({ ...customer, address: e.target.value })}
-                      placeholder="Adresse complète"
-                      rows={2}
-                      className="w-full bg-black/20 border border-white/10 rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-white/30 placeholder-white/40 resize-none"
-                    />
-                  </div>
-                </div>
+              {/* Payment form — collapsible on mobile */}
+              <div className="bg-gradient-to-br from-navy-900 to-navy-800 rounded-2xl overflow-hidden shadow-xl">
 
-                {/* Payment method */}
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('wave')}
-                    className={`flex-1 py-3 rounded-xl font-black text-sm border-2 transition-all ${
-                      paymentMethod === 'wave'
-                        ? 'bg-blue-500 border-blue-400 text-white shadow-lg shadow-blue-500/30'
-                        : 'bg-white/5 border-white/15 text-white/60 hover:bg-white/10'
-                    }`}
-                  >
-                    💙 Wave
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('orange_money')}
-                    className={`flex-1 py-3 rounded-xl font-black text-sm border-2 transition-all ${
-                      paymentMethod === 'orange_money'
-                        ? 'bg-orange-500 border-orange-400 text-white shadow-lg shadow-orange-500/30'
-                        : 'bg-white/5 border-white/15 text-white/60 hover:bg-white/10'
-                    }`}
-                  >
-                    🟠 Orange Money
-                  </button>
-                </div>
-
-                {/* Error */}
-                {paymentError && (
-                  <div className="bg-red-500/20 border border-red-400/30 text-red-200 text-sm rounded-xl px-4 py-3">
-                    ⚠️ {paymentError}
-                  </div>
-                )}
-
-                {/* Submit */}
+                {/* Form header - toggle on mobile */}
                 <button
-                  type="submit"
-                  disabled={cart.length === 0 || isLoading}
-                  className="w-full flex items-center justify-center bg-gold-400 hover:bg-gold-500 disabled:opacity-50 disabled:cursor-not-allowed text-navy-900 font-black py-4 rounded-xl text-base transition-all hover:scale-[1.02] active:scale-100 shadow-lg shadow-gold-400/30"
+                  type="button"
+                  onClick={() => setShowForm(!showForm)}
+                  className="w-full flex items-center justify-between px-4 sm:px-6 py-4 lg:cursor-default"
                 >
-                  {isLoading ? (
-                    <><span className="animate-spin mr-2">⏳</span> Connexion à NabooPay...</>
-                  ) : (
-                    <><CreditCard className="w-5 h-5 mr-2" /> Payer {total.toLocaleString('fr-FR')} FCFA</>
-                  )}
+                  <span className="text-sm font-black text-white uppercase tracking-widest">
+                    Informations de livraison
+                  </span>
+                  <span className="text-white/50 text-xs lg:hidden">
+                    {showForm ? '▲ Masquer' : '▼ Afficher'}
+                  </span>
                 </button>
 
-                <p className="text-center text-white/40 text-xs">
-                  🔒 Paiement sécurisé via NabooPay
-                </p>
-              </form>
+                <div className={`${showForm ? 'block' : 'hidden'} lg:block px-4 sm:px-6 pb-6`}>
+                  <form onSubmit={handlePayment} className="space-y-3">
+                    {/* Fields */}
+                    {[
+                      { icon: User, key: 'name', placeholder: 'Nom complet', type: 'text' },
+                      { icon: Mail, key: 'email', placeholder: 'Email', type: 'email' },
+                      { icon: Phone, key: 'phone', placeholder: 'Téléphone (ex: 770000000)', type: 'tel' },
+                    ].map(({ icon: Icon, key, placeholder, type }) => (
+                      <div key={key} className="relative">
+                        <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                        <input
+                          required
+                          type={type}
+                          value={(customer as any)[key]}
+                          onChange={(e) => setCustomer({ ...customer, [key]: e.target.value })}
+                          placeholder={placeholder}
+                          className="w-full bg-white/10 border border-white/10 rounded-xl py-3 pl-9 pr-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/30 focus:bg-white/15 transition-all"
+                        />
+                      </div>
+                    ))}
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-3.5 w-4 h-4 text-white/30" />
+                      <textarea
+                        required
+                        value={customer.address}
+                        onChange={(e) => setCustomer({ ...customer, address: e.target.value })}
+                        placeholder="Adresse complète"
+                        rows={2}
+                        className="w-full bg-white/10 border border-white/10 rounded-xl py-3 pl-9 pr-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/30 focus:bg-white/15 transition-all resize-none"
+                      />
+                    </div>
+
+                    {/* Payment method */}
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      {[
+                        { id: 'wave', label: '💙 Wave', active: 'bg-blue-500 border-blue-400 shadow-lg shadow-blue-500/30' },
+                        { id: 'orange_money', label: '🟠 Orange Money', active: 'bg-orange-500 border-orange-400 shadow-lg shadow-orange-500/30' },
+                      ].map(({ id, label, active }) => (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => setPaymentMethod(id as any)}
+                          className={`py-3 rounded-xl font-black text-sm border-2 transition-all ${
+                            paymentMethod === id
+                              ? `${active} text-white`
+                              : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white/70'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Error */}
+                    {paymentError && (
+                      <div className="bg-red-500/20 border border-red-400/30 text-red-200 text-xs rounded-xl px-4 py-3 flex items-start gap-2">
+                        <span className="shrink-0">⚠️</span>
+                        <span>{paymentError}</span>
+                      </div>
+                    )}
+
+                    {/* Submit */}
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full flex items-center justify-center bg-gold-400 hover:bg-gold-500 disabled:opacity-60 disabled:cursor-not-allowed text-navy-900 font-black py-4 rounded-xl text-sm sm:text-base transition-all active:scale-95 shadow-lg mt-2"
+                    >
+                      {isLoading ? (
+                        <><span className="animate-spin mr-2 text-base">⏳</span> Connexion à NabooPay...</>
+                      ) : (
+                        <><CreditCard className="w-5 h-5 mr-2" /> Payer {total.toLocaleString('fr-FR')} FCFA</>
+                      )}
+                    </button>
+
+                    <div className="flex items-center justify-center gap-1.5 text-white/30 text-xs pt-1">
+                      <Lock className="w-3 h-3" />
+                      <span>Paiement sécurisé via NabooPay</span>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </div>
           </div>
-
-        </div>
+        )}
       </div>
+
+      {/* ─── MOBILE STICKY BOTTOM BAR ─── */}
+      {cart.length > 0 && (
+        <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 px-4 py-3 safe-area-pb z-20">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-500">{itemCount} article{itemCount > 1 ? 's' : ''}</span>
+            <span className="font-black text-navy-900 tabular-nums">{total.toLocaleString('fr-FR')} FCFA</span>
+          </div>
+          <button
+            onClick={() => { setShowForm(true); window.scrollTo({ top: 9999, behavior: 'smooth' }); }}
+            className="w-full flex items-center justify-center bg-navy-900 hover:bg-navy-800 text-white font-black py-3.5 rounded-xl text-sm transition-colors"
+          >
+            <CreditCard className="w-4 h-4 mr-2" /> Procéder au paiement
+          </button>
+        </div>
+      )}
+
     </div>
   );
 };

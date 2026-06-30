@@ -43,9 +43,12 @@ const ShopPage: React.FC = () => {
     reload();
     window.addEventListener('storage', reload);
     window.addEventListener(ADMIN_CONTENT_EVENT, reload);
+    // Fallback: stop loading after 8s even if Supabase returns nothing
+    const timeout = setTimeout(() => setIsLoading(false), 8000);
     return () => {
       window.removeEventListener('storage', reload);
       window.removeEventListener(ADMIN_CONTENT_EVENT, reload);
+      clearTimeout(timeout);
     };
   }, []);
 

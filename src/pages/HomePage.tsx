@@ -12,6 +12,8 @@ import { Player } from '../types';
 
 const HomePage: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterSent, setNewsletterSent] = useState(false);
 
   useEffect(() => {
     const reload = () => setPlayers(getManagedPlayers());
@@ -74,19 +76,40 @@ const HomePage: React.FC = () => {
                   Sign up for our newsletter to get the latest league news, game schedules, and exclusive merchandise offers straight to your inbox.
                 </p>
                 
-                <form className="flex flex-col sm:flex-row gap-0 shadow-sm">
-                  <input
-                    type="email"
-                    placeholder="ENTER YOUR EMAIL..."
-                    className="bg-gray-50 border border-gray-200 text-navy-900 px-4 py-4 flex-grow focus:outline-none focus:border-navy-900 focus:ring-1 focus:ring-navy-900 text-xs font-bold uppercase tracking-wide rounded-l-sm"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-navy-900 hover:bg-navy-800 text-white px-8 py-4 font-black text-xs uppercase tracking-widest transition-colors rounded-r-sm shrink-0"
-                  >
-                    Subscribe
-                  </button>
-                </form>
+              <form
+                className="flex flex-col sm:flex-row gap-0 shadow-sm"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (newsletterEmail) {
+                    setNewsletterSent(true);
+                    setNewsletterEmail('');
+                    setTimeout(() => setNewsletterSent(false), 4000);
+                  }
+                }}
+              >
+                {newsletterSent ? (
+                  <div className="flex-1 bg-green-50 border border-green-200 text-green-700 font-bold text-sm px-4 py-4 rounded-sm">
+                    ✅ Merci ! Vous êtes inscrit.
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="email"
+                      required
+                      value={newsletterEmail}
+                      onChange={(e) => setNewsletterEmail(e.target.value)}
+                      placeholder="ENTER YOUR EMAIL..."
+                      className="bg-gray-50 border border-gray-200 text-navy-900 px-4 py-4 flex-grow focus:outline-none focus:border-navy-900 focus:ring-1 focus:ring-navy-900 text-xs font-bold uppercase tracking-wide rounded-l-sm"
+                    />
+                    <button
+                      type="submit"
+                      className="bg-navy-900 hover:bg-navy-800 text-white px-8 py-4 font-black text-xs uppercase tracking-widest transition-colors rounded-r-sm shrink-0"
+                    >
+                      Subscribe
+                    </button>
+                  </>
+                )}
+              </form>
               </div>
             </div>
             

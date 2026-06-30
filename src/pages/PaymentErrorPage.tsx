@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { XCircle, RefreshCw } from 'lucide-react';
 
 const PaymentErrorPage: React.FC = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Nettoyer la commande en attente — le paiement a échoué
+    localStorage.removeItem('pendingOrder');
+  }, []);
 
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center p-4">

@@ -340,7 +340,8 @@ export const initSupabaseCache = async () => {
       if (oRes.data) cache.orders = oRes.data.map(o => ({
         id: o.id, customerName: o.customer_name, customerEmail: o.customer_email,
         customerPhone: o.customer_phone, shippingAddress: o.shipping_address,
-        totalAmount: o.total_amount, status: o.status, date: o.order_date, items: []
+        totalAmount: o.total_amount, status: o.status, date: o.order_date,
+        items: Array.isArray(o.items) ? o.items : []
       }));
 
       // Try to fetch hero images if table exists
@@ -885,11 +886,35 @@ export const addAdminOrder = async (payload: Omit<Order, 'id'> & { id?: string }
   cache.orders.unshift(item);
   triggerUpdate();
   const { error } = await supabase.from('orders').insert({
-    id: item.id, customer_name: item.customerName, customer_email: item.customerEmail,
-    customer_phone: item.customerPhone, shipping_address: item.shippingAddress,
-    total_amount: item.totalAmount, status: item.status
+    id: item.id,
+    customer_name: item.customerName,
+    customer_email: item.customerEmail,
+    customer_phone: item.customerPhone,
+    shipping_address: item.shippingAddress,
+    total_amount: item.totalAmount,
+    status: item.status,
+    order_date: item.date || new Date().toISOString(),
+    items: item.items || []
   });
-  if (error) throw error;
+  if (error) {
+    console.error('[Supabase] addAdminOrder error:', error.message);
+    // If items column doesn't exist, retry without it
+    if (error.message?.includes('items')) {
+      const { error: retryError } = await supabase.from('orders').insert({
+        id: item.id,
+        customer_name: item.customerName,
+        customer_email: item.customerEmail,
+        customer_phone: item.customerPhone,
+        shipping_address: item.shippingAddress,
+        total_amount: item.totalAmount,
+        status: item.status,
+        order_date: item.date || new Date().toISOString()
+      });
+      if (retryError) throw retryError;
+    } else {
+      throw error;
+    }
+  }
   return item;
 };
 export const updateAdminOrder = async (id: string, payload: Partial<Order>): Promise<void> => {
