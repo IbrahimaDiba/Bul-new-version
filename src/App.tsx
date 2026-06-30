@@ -38,6 +38,8 @@ const LoginPage = lazy(() => import('./pages/LoginPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
 const PaymentErrorPage = lazy(() => import('./pages/PaymentErrorPage'));
+const PaymentTicketSuccessPage = lazy(() => import('./pages/PaymentTicketSuccessPage'));
+const TicketScanPage = lazy(() => import('./pages/TicketScanPage'));
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -86,6 +88,9 @@ const AppContent: React.FC = () => {
               <Route path="/cart" element={<CartPage />} />
               <Route path="/paiement-reussi" element={<PaymentSuccessPage />} />
               <Route path="/paiement-echoue" element={<PaymentErrorPage />} />
+              <Route path="/ticket-reussi" element={<PaymentTicketSuccessPage />} />
+              <Route path="/ticket-echoue" element={<PaymentErrorPage />} />
+              <Route path="/admin/scan" element={<TicketScanPage />} />
               <Route path="/chatbot" element={<ChatbotPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/admin" element={<AdminPage />} />
