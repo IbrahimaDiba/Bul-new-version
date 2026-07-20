@@ -677,14 +677,20 @@ const AdminPage: React.FC = () => {
     setEditingTeamId(team.id);
   };
 
-  const handleStatsSubmit = (e: React.FormEvent) => {
+  const handleStatsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingStatsGameId) return;
 
-    updateAdminGameStats(editingStatsGameId, tempStats);
-    setEditingStatsGameId(null);
-    reloadAdminData();
-    setFeedback({ type: 'success', text: 'Statistiques enregistrées avec succès.' });
+    try {
+      setFeedback({ type: 'success', text: 'Enregistrement des statistiques en cours...' });
+      await updateAdminGameStats(editingStatsGameId, tempStats);
+      setEditingStatsGameId(null);
+      reloadAdminData();
+      setFeedback({ type: 'success', text: 'Statistiques enregistrées avec succès.' });
+    } catch (error: any) {
+      console.error('[Admin] Error saving stats:', error);
+      setFeedback({ type: 'error', text: `Erreur stats: ${error.message || 'Enregistrement échoué'}` });
+    }
   };
 
   const openStatsEditor = (game: any) => {
