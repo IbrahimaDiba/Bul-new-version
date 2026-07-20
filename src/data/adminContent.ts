@@ -48,44 +48,116 @@ const triggerUpdate = () => {
 
 const LS_KEY = 'bul_cache_v1';
 
-// --- FETCH PLAYER STATS FROM DB VIEW ---
+// --- FETCH PLAYER STATS FROM GAME DATA ---
 export const refreshPlayerStatsFromDB = async () => {
-  const statsRes = await supabase.from('player_season_stats').select('*');
+  // Fetch all game_player_stats rows and compute per-game averages client-side
+  const statsRes = await supabase.from('game_player_stats').select('*');
   if (statsRes.error) {
-    console.error('[Supabase] player_season_stats:', statsRes.error.message);
+    console.error('[Supabase] game_player_stats fetch for averages:', statsRes.error.message);
     return;
   }
-  
-  const statsMap = new Map();
-  if (statsRes.data) {
-    statsRes.data.forEach((s: any) => statsMap.set(s.player_id, s));
+
+  if (!statsRes.data || statsRes.data.length === 0) {
+    console.log('[Stats] No game_player_stats rows found, keeping player table defaults.');
+    return;
   }
 
+  // Group stats by player_id
+  const playerGamesMap = new Map<string, any[]>();
+  statsRes.data.forEach((row: any) => {
+    const pid = row.player_id;
+    if (!playerGamesMap.has(pid)) playerGamesMap.set(pid, []);
+    playerGamesMap.get(pid)!.push(row);
+  });
+
+  // Compute per-game averages for each player
+  const statsMap = new Map<string, {
+    ppg: number; rpg: number; apg: number; spg: number; bpg: number;
+    fgp: number; tpp: number; ftp: number;
+  }>();
+
+  playerGamesMap.forEach((games, playerId) => {
+    const n = games.length;
+    if (n === 0) return;
+
+    let totalPts = 0, totalReb = 0, totalAst = 0, totalStl = 0, totalBlk = 0;
+    let totalFgm = 0, totalFga = 0, totalTpm = 0, totalTpa = 0, totalFtm = 0, totalFta = 0;
+
+    games.forEach((g: any) => {
+      totalPts += g.points || 0;
+      totalReb += g.rebounds || 0;
+      totalAst += g.assists || 0;
+      totalStl += g.steals || 0;
+      totalBlk += g.blocks || 0;
+      totalFgm += g.fgm || 0;
+      totalFga += g.fga || 0;
+      totalTpm += g.tpm || 0;
+      totalTpa += g.tpa || 0;
+      totalFtm += g.ftm || 0;
+      totalFta += g.fta || 0;
+    });
+
+    const round1 = (v: number) => Math.round(v * 10) / 10;
+
+    statsMap.set(playerId, {
+      ppg: round1(totalPts / n),
+      rpg: round1(totalReb / n),
+      apg: round1(totalAst / n),
+      spg: round1(totalStl / n),
+      bpg: round1(totalBlk / n),
+      fgp: totalFga > 0 ? round1((totalFgm / totalFga) * 100) : 0,
+      tpp: totalTpa > 0 ? round1((totalTpm / totalTpa) * 100) : 0,
+      ftp: totalFta > 0 ? round1((totalFtm / totalFta) * 100) : 0,
+    });
+  });
+
+  // Compute ranks per stat category
+  const allPlayerIds = Array.from(statsMap.keys());
+  const statKeys = ['ppg', 'rpg', 'apg', 'spg', 'bpg', 'fgp', 'tpp', 'ftp'] as const;
+  const ranksMap = new Map<string, Record<string, number>>();
+
+  statKeys.forEach(key => {
+    const sorted = [...allPlayerIds].sort((a, b) => {
+      const va = statsMap.get(a)?.[key] ?? 0;
+      const vb = statsMap.get(b)?.[key] ?? 0;
+      return vb - va; // Descending
+    });
+    sorted.forEach((pid, idx) => {
+      if (!ranksMap.has(pid)) ranksMap.set(pid, {});
+      ranksMap.get(pid)![key + 'Rank'] = idx + 1;
+    });
+  });
+
+  // Update cache players with computed stats
   cache.players = cache.players.map(p => {
-    const s = statsMap.get(p.id) || {};
+    const computed = statsMap.get(p.id);
+    if (!computed) return p; // No game stats for this player, keep defaults
+    const ranks = ranksMap.get(p.id) || {};
     return {
       ...p,
       stats: {
-        ppg: s.ppg ?? p.stats?.ppg ?? 0,
-        rpg: s.rpg ?? p.stats?.rpg ?? 0,
-        apg: s.apg ?? p.stats?.apg ?? 0,
-        spg: s.spg ?? p.stats?.spg ?? 0,
-        bpg: s.bpg ?? p.stats?.bpg ?? 0,
-        fgp: s.fgp ?? p.stats?.fgp ?? 0,
-        tpp: s.tpp ?? p.stats?.tpp ?? 0,
-        ftp: s.ftp ?? p.stats?.ftp ?? 0,
-        ppgRank: s.ppg_rank,
-        rpgRank: s.rpg_rank,
-        apgRank: s.apg_rank,
-        spgRank: s.spg_rank,
-        bpgRank: s.bpg_rank,
-        fgpRank: s.fgp_rank,
-        tppRank: s.tpp_rank,
-        ftpRank: s.ftp_rank,
+        ppg: computed.ppg,
+        rpg: computed.rpg,
+        apg: computed.apg,
+        spg: computed.spg,
+        bpg: computed.bpg,
+        fgp: computed.fgp,
+        tpp: computed.tpp,
+        ftp: computed.ftp,
+        ppgRank: ranks.ppgRank,
+        rpgRank: ranks.rpgRank,
+        apgRank: ranks.apgRank,
+        spgRank: ranks.spgRank,
+        bpgRank: ranks.bpgRank,
+        fgpRank: ranks.fgpRank,
+        tppRank: ranks.tppRank,
+        ftpRank: ranks.ftpRank,
       }
     };
   });
+
   triggerUpdate();
+  console.log(`[Stats] Computed season averages for ${statsMap.size} players from ${statsRes.data.length} game stat rows.`);
 };
 
 // --- LOAD FROM LOCALSTORAGE (instant on reload) ---
