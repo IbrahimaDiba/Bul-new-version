@@ -697,24 +697,51 @@ const AdminPage: React.FC = () => {
     const homeTeam = managedTeams.find((t) => t.id === game.homeTeamId);
     const awayTeam = managedTeams.find((t) => t.id === game.awayTeamId);
 
-    const existingStats = game.playerStats || {
-      home:
-        homeTeam?.roster.map((p) => ({
-          playerId: p.id,
-          name: p.name,
-          minutes: 0, points: 0, rebounds: 0, assists: 0,
-          steals: 0, blocks: 0, turnovers: 0, fouls: 0,
-          fgm: 0, fga: 0, tpm: 0, tpa: 0, ftm: 0, fta: 0
-        })) || [],
-      away:
-        awayTeam?.roster.map((p) => ({
-          playerId: p.id,
-          name: p.name,
-          minutes: 0, points: 0, rebounds: 0, assists: 0,
-          steals: 0, blocks: 0, turnovers: 0, fouls: 0,
-          fgm: 0, fga: 0, tpm: 0, tpa: 0, ftm: 0, fta: 0
-        })) || []
-    };
+    // Build a lookup of all players by ID for name resolution
+    const allPlayersMap = new Map<string, string>();
+    homeTeam?.roster.forEach((p) => allPlayersMap.set(p.id, p.name));
+    awayTeam?.roster.forEach((p) => allPlayersMap.set(p.id, p.name));
+
+    const emptyPlayerStats = (playerId: string, name: string) => ({
+      playerId,
+      name,
+      minutes: 0, points: 0, rebounds: 0, assists: 0,
+      steals: 0, blocks: 0, turnovers: 0, fouls: 0,
+      fgm: 0, fga: 0, tpm: 0, tpa: 0, ftm: 0, fta: 0
+    });
+
+    let existingStats: { home: PlayerGameStats[]; away: PlayerGameStats[] };
+
+    if (game.playerStats) {
+      // Re-populate names from roster (they are empty when loaded from DB)
+      const resolveNames = (statsList: PlayerGameStats[]) =>
+        statsList.map((ps) => ({
+          ...ps,
+          name: allPlayersMap.get(ps.playerId) || ps.name || 'Joueur inconnu'
+        }));
+
+      existingStats = {
+        home: resolveNames(game.playerStats.home),
+        away: resolveNames(game.playerStats.away)
+      };
+
+      // Add any new roster players not yet in saved stats
+      homeTeam?.roster.forEach((p) => {
+        if (!existingStats.home.find((ps) => ps.playerId === p.id)) {
+          existingStats.home.push(emptyPlayerStats(p.id, p.name));
+        }
+      });
+      awayTeam?.roster.forEach((p) => {
+        if (!existingStats.away.find((ps) => ps.playerId === p.id)) {
+          existingStats.away.push(emptyPlayerStats(p.id, p.name));
+        }
+      });
+    } else {
+      existingStats = {
+        home: homeTeam?.roster.map((p) => emptyPlayerStats(p.id, p.name)) || [],
+        away: awayTeam?.roster.map((p) => emptyPlayerStats(p.id, p.name)) || []
+      };
+    }
 
     // Ensure existing stats also have the new fields
     const normalize = (ps: any) => ({
