@@ -196,12 +196,13 @@ const PlayerDetailsPage: React.FC = () => {
                 <div className="col-span-1 lg:col-span-2 space-y-8">
                   <div>
                     <h3 className="text-xl font-bold text-navy-900 mb-4 border-b-2 border-gray-100 pb-2 inline-block">2025-2026 Regular Season</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                       {[
                         { label: 'Points', value: player.stats.ppg, icon: Target },
                         { label: 'Rebounds', value: player.stats.rpg, icon: Shield },
                         { label: 'Assists', value: player.stats.apg, icon: Zap },
-                        { label: 'Steals', value: player.stats.spg, icon: Crosshair }
+                        { label: 'Steals', value: player.stats.spg, icon: Crosshair },
+                        { label: 'Blocks', value: player.stats.bpg, icon: TrendingUp }
                       ].map((stat, i) => (
                         <div key={i} className="bg-gray-50 border border-gray-100 rounded-lg p-4 flex flex-col items-center justify-center text-center">
                           <stat.icon className="h-6 w-6 text-gray-400 mb-2" />
