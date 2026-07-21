@@ -26,8 +26,10 @@ const HomePage: React.FC = () => {
     };
   }, []);
 
-  // Get a featured player
-  const featuredPlayer = players[0];
+  // Get the real top performer (highest PPG)
+  const featuredPlayer = players.length > 0
+    ? players.reduce((best, p) => (p.stats?.ppg ?? 0) > (best.stats?.ppg ?? 0) ? p : best, players[0])
+    : undefined;
 
   return (
     <div className="bg-gray-50 font-sans pb-20">
