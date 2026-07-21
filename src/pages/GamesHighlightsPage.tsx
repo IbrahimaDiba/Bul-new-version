@@ -151,14 +151,14 @@ const GamesHighlightsPage: React.FC = () => {
                       Final · {formatDate(game.date)}
                     </span>
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-navy-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-navy-900 flex flex-wrap items-center gap-x-2 gap-y-1 break-words">
                     <Link
                       to={`/teams/${game.homeTeam.id}`}
                       className="hover:text-crimson-600 transition-colors"
                     >
                       {game.homeTeam.name}
                     </Link>
-                    <span className="text-gray-400 font-normal mx-2">vs</span>
+                    <span className="text-gray-400 font-normal">vs</span>
                     <Link
                       to={`/teams/${game.awayTeam.id}`}
                       className="hover:text-crimson-600 transition-colors"
@@ -206,7 +206,7 @@ const GamesHighlightsPage: React.FC = () => {
                           className="flex gap-3 text-sm sm:text-base text-gray-700 leading-relaxed"
                         >
                           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-crimson-500" />
-                          <span>{line}</span>
+                          <span className="break-words min-w-0 flex-1">{line}</span>
                         </li>
                       ))}
                     </ul>
