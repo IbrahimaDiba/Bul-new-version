@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Award, Target, Shield, Zap } from 'lucide-react';
+import { ChevronRight, Award, Target, Shield, Zap, Crosshair, TrendingUp } from 'lucide-react';
 import { Player } from '../../types';
 import { teams } from '../../data/mockData';
 
@@ -55,34 +55,48 @@ const PlayerStatsCard: React.FC<PlayerStatsCardProps> = ({ player }) => {
             </div>
 
             {/* Core Stats Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-4 mb-8">
               <div className="bg-gray-50 border border-gray-200 p-2 sm:p-4">
-                 <div className="flex items-center gap-1.5 mb-1">
+                 <div className="flex items-center gap-1 sm:gap-1.5 mb-1">
                     <Target className="w-3 h-3 text-crimson-600" />
-                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">PPG</span>
+                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest truncate">PPG</span>
                  </div>
-                 <p className="text-xl sm:text-3xl font-black text-navy-900 tabular-nums">{player.stats.ppg}</p>
+                 <p className="text-lg sm:text-3xl font-black text-navy-900 tabular-nums">{player.stats.ppg}</p>
               </div>
               <div className="bg-gray-50 border border-gray-200 p-2 sm:p-4">
-                 <div className="flex items-center gap-1.5 mb-1">
+                 <div className="flex items-center gap-1 sm:gap-1.5 mb-1">
                     <Shield className="w-3 h-3 text-blue-600" />
-                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">RPG</span>
+                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest truncate">RPG</span>
                  </div>
-                 <p className="text-xl sm:text-3xl font-black text-navy-900 tabular-nums">{player.stats.rpg}</p>
+                 <p className="text-lg sm:text-3xl font-black text-navy-900 tabular-nums">{player.stats.rpg}</p>
               </div>
               <div className="bg-gray-50 border border-gray-200 p-2 sm:p-4">
-                 <div className="flex items-center gap-1.5 mb-1">
+                 <div className="flex items-center gap-1 sm:gap-1.5 mb-1">
                     <Zap className="w-3 h-3 text-gold-500" />
-                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">APG</span>
+                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest truncate">APG</span>
                  </div>
-                 <p className="text-xl sm:text-3xl font-black text-navy-900 tabular-nums">{player.stats.apg}</p>
+                 <p className="text-lg sm:text-3xl font-black text-navy-900 tabular-nums">{player.stats.apg}</p>
               </div>
               <div className="bg-gray-50 border border-gray-200 p-2 sm:p-4">
-                 <div className="flex items-center gap-1.5 mb-1">
-                    <Target className="w-3 h-3 text-emerald-600" />
-                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">FG%</span>
+                 <div className="flex items-center gap-1 sm:gap-1.5 mb-1">
+                    <Crosshair className="w-3 h-3 text-purple-600" />
+                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest truncate">SPG</span>
                  </div>
-                 <p className="text-xl sm:text-3xl font-black text-navy-900 tabular-nums">{player.stats.fgp}%</p>
+                 <p className="text-lg sm:text-3xl font-black text-navy-900 tabular-nums">{player.stats.spg}</p>
+              </div>
+              <div className="bg-gray-50 border border-gray-200 p-2 sm:p-4">
+                 <div className="flex items-center gap-1 sm:gap-1.5 mb-1">
+                    <TrendingUp className="w-3 h-3 text-orange-600" />
+                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest truncate">BPG</span>
+                 </div>
+                 <p className="text-lg sm:text-3xl font-black text-navy-900 tabular-nums">{player.stats.bpg}</p>
+              </div>
+              <div className="bg-gray-50 border border-gray-200 p-2 sm:p-4">
+                 <div className="flex items-center gap-1 sm:gap-1.5 mb-1">
+                    <Target className="w-3 h-3 text-emerald-600" />
+                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest truncate">FG%</span>
+                 </div>
+                 <p className="text-lg sm:text-3xl font-black text-navy-900 tabular-nums">{player.stats.fgp}%</p>
               </div>
             </div>
           </div>
