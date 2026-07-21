@@ -96,7 +96,7 @@ const LeadersPage: React.FC = () => {
         
         {/* ══════════════ STAT CATEGORY TABS ══════════════ */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-10">
-          <div className="flex overflow-x-auto scrollbar-none">
+          <div className="flex flex-wrap border-b border-gray-200">
             {categories.map((cat) => {
               const Icon = cat.icon;
               const isActive = activeCategory === cat.key;
@@ -104,13 +104,13 @@ const LeadersPage: React.FC = () => {
                 <button
                   key={cat.key}
                   onClick={() => setActiveCategory(cat.key)}
-                  className={`flex items-center justify-center gap-2 flex-1 min-w-[120px] px-4 py-4 text-xs font-bold uppercase tracking-wider transition-all border-b-4 ${
+                  className={`flex items-center justify-center gap-2 flex-[1_1_30%] sm:flex-1 min-w-[100px] px-2 sm:px-4 py-3 sm:py-4 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all border-b-4 ${
                     isActive
                       ? 'text-navy-900 border-crimson-600 bg-gray-50'
                       : 'text-gray-400 border-transparent hover:text-navy-900 hover:bg-gray-50'
                   }`}
                 >
-                  <Icon className={`h-4 w-4 ${isActive ? 'text-crimson-600' : 'text-gray-400'}`} />
+                  <Icon className={`h-3 w-3 sm:h-4 sm:w-4 ${isActive ? 'text-crimson-600' : 'text-gray-400'}`} />
                   {cat.shortLabel}
                 </button>
               );

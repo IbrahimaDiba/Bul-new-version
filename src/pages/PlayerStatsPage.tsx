@@ -425,8 +425,8 @@ const PlayerStatsPage: React.FC = () => {
 
                     {/* Quick Stats Grid for Mobile Card */}
                     <div className="grid grid-cols-4 gap-2 border-t border-gray-50 pt-4">
-                       {columns.slice(0, 4).map(col => (
-                         <div key={col.key} className={`text-center p-2 ${sortKey === col.key ? 'bg-crimson-50 text-crimson-600' : 'bg-gray-50 text-gray-500'}`}>
+                       {columns.map(col => (
+                         <div key={col.key} className={`text-center p-2 rounded-sm ${sortKey === col.key ? 'bg-crimson-50 text-crimson-600 shadow-sm border border-crimson-100' : 'bg-gray-50 text-gray-500 border border-transparent'}`}>
                             <p className="text-[9px] font-black uppercase tracking-widest mb-1">{col.shortLabel}</p>
                             <p className="font-black text-sm tabular-nums">{col.accessor(player)}{col.unit || ''}</p>
                          </div>
