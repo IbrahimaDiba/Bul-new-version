@@ -67,7 +67,7 @@ const StandingsPreview: React.FC = () => {
               <tr className="bg-navy-900 text-white">
                 <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-left text-xs sm:text-sm w-8 sm:w-12">#</th>
                 <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-left text-xs sm:text-sm">Team</th>
-                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm">Record</th>
+                <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm whitespace-nowrap">Record</th>
                 <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm whitespace-nowrap">Win %</th>
                 <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm whitespace-nowrap">Last 10</th>
                 <th className="py-2.5 sm:py-3 px-4 sm:px-6 text-center text-xs sm:text-sm whitespace-nowrap">Streak</th>
@@ -104,7 +104,7 @@ const StandingsPreview: React.FC = () => {
                         </span>
                       </Link>
                     </td>
-                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold tabular-nums">{team.record}</td>
+                    <td className="py-3 sm:py-4 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold tabular-nums whitespace-nowrap">{team.record}</td>
                     <td className="py-3 sm:py-4 px-4 sm:px-6 text-center text-sm whitespace-nowrap">
                       {winPercentage.toFixed(3).substring(1)}
                     </td>

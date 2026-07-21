@@ -113,7 +113,7 @@ const StandingsPage: React.FC = () => {
                 <tr className="bg-navy-900 text-white border-b-4 border-crimson-600">
                   <th className="px-4 sm:px-5 py-3 sm:py-4 w-8 sm:w-12 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">Rank</th>
                   <th className="px-4 sm:px-4 py-3 sm:py-4 text-[10px] sm:text-xs font-bold uppercase tracking-wider sm:tracking-widest">Team</th>
-                  <th className="px-4 sm:px-4 py-3 sm:py-4 w-12 sm:w-20 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest">W-L</th>
+                  <th className="px-4 sm:px-4 py-3 sm:py-4 w-12 sm:w-20 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest whitespace-nowrap">W-L</th>
                   <th className="px-4 sm:px-4 py-3 sm:py-4 w-12 sm:w-20 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest whitespace-nowrap">Win %</th>
                   <th className="px-4 sm:px-4 py-3 sm:py-4 w-10 sm:w-16 text-center text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest whitespace-nowrap">GB</th>
                   <th className="px-4 py-4 w-20 text-center text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Home</th>
@@ -162,7 +162,7 @@ const StandingsPage: React.FC = () => {
                           </div>
                         </Link>
                       </td>
-                      <td className="px-4 sm:px-4 py-3 sm:py-4 text-center font-black text-navy-900 tabular-nums text-[10px] sm:text-base">
+                      <td className="px-4 sm:px-4 py-3 sm:py-4 text-center font-black text-navy-900 tabular-nums text-[10px] sm:text-base whitespace-nowrap">
                         {team.record}
                       </td>
                       <td className="px-4 sm:px-4 py-3 sm:py-4 text-center whitespace-nowrap">
