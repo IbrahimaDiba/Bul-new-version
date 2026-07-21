@@ -1,10 +1,10 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, {   Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import ChatbotFloatingButton from './components/layout/ChatbotFloatingButton';
 import ScrollToTop from './components/layout/ScrollToTop';
-import { getIsSupabaseLoaded, ADMIN_CONTENT_EVENT } from './data/adminContent';
+
 import { Loader2 } from 'lucide-react';
 
 // Lazy loading the routes for code splitting (massive performance boost on mobile)

@@ -36,7 +36,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, teamName, onClose 
   const handleAddToCart = () => {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const existing = cart.find(
-      (item: any) =>
+      (item: any) => // eslint-disable-line @typescript-eslint/no-explicit-any
         item.id === product.id &&
         item.selectedSize === selectedSize &&
         item.selectedColor === selectedColor

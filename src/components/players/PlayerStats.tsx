@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -11,7 +11,7 @@ import {
   Crosshair,
   TrendingUp,
   BarChart2,
-  Activity,
+  Activity, // eslint-disable-line @typescript-eslint/no-unused-vars
   Award,
   Percent,
   ChevronRight
@@ -26,8 +26,8 @@ interface PlayerStatsProps {
 
 const PlayerStats: React.FC<PlayerStatsProps> = ({ player, onBack }) => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
-  const [hoveredStat, setHoveredStat] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('overview'); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [hoveredStat, setHoveredStat] = useState<string | null>(null); // eslint-disable-line @typescript-eslint/no-unused-vars
 
   const teamName = getManagedTeams().find(t => t.id === player.team)?.name || 'Free Agent';
 

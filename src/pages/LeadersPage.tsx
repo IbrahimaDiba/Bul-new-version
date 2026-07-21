@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Target, Shield, Zap, Crosshair, Star, TrendingUp, ChevronRight, Medal } from 'lucide-react';
+import { Trophy, Target, Shield, Zap, Crosshair, Star, TrendingUp,  Medal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getManagedPlayers, getManagedTeams, ADMIN_CONTENT_EVENT } from '../data/adminContent';
 import { Player, Team } from '../types';

@@ -126,7 +126,7 @@ const PlayerStatsPage: React.FC = () => {
     };
   }, []);
 
-  const getTeamName  = (id: string) => managedTeams.find((t) => t.id === id)?.name || '';
+  const getTeamName = React.useCallback((id: string) => managedTeams.find((t) => t.id === id)?.name || '', [managedTeams]);
 
   const sortCol = columns.find((c) => c.key === sortKey) || columns[0];
 

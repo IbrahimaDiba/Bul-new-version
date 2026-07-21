@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Search, ChevronRight, Trophy, ArrowRightCircle, BarChart2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getManagedGames, getManagedTeams, ADMIN_CONTENT_EVENT } from '../data/adminContent';
-import type { Game, PlayerGameStats, Team } from '../types';
+import type { Game,  Team } from '../types';
 
 function groupGamesByDateNewestFirst(gameList: Game[]): Map<string, Game[]> {
   const sorted = [...gameList].sort((a, b) => {

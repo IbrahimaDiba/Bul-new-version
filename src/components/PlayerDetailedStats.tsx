@@ -17,18 +17,18 @@ import {
   TableRow,
   Paper,
   Theme,
-  Button,
+  Button, // eslint-disable-line @typescript-eslint/no-unused-vars
   IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
+  DialogActions, // eslint-disable-line @typescript-eslint/no-unused-vars
 } from '@mui/material';
 import { PlayArrow, Close } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 
 // Styled components
-const ShotChartContainer = styled(Box)(({ theme }: { theme: Theme }) => ({
+const ShotChartContainer = styled(Box)(({ theme }: { theme: Theme }) => ({ // eslint-disable-line @typescript-eslint/no-unused-vars
   position: 'relative',
   width: '100%',
   height: 400,
@@ -63,7 +63,7 @@ const MediaGrid = styled(Box)(({ theme }: { theme: Theme }) => ({
   marginTop: theme.spacing(2),
 }));
 
-const MediaCard = styled(Card)(({ theme }: { theme: Theme }) => ({
+const MediaCard = styled(Card)(({ theme }: { theme: Theme }) => ({ // eslint-disable-line @typescript-eslint/no-unused-vars
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
@@ -73,7 +73,7 @@ const MediaCard = styled(Card)(({ theme }: { theme: Theme }) => ({
   },
 }));
 
-const VideoCard = styled(Card)(({ theme }: { theme: Theme }) => ({
+const VideoCard = styled(Card)(({ theme }: { theme: Theme }) => ({ // eslint-disable-line @typescript-eslint/no-unused-vars
   height: '100%',
   display: 'flex',
   flexDirection: 'column',

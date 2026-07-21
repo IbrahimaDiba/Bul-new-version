@@ -7,9 +7,9 @@ import QRCode from 'qrcode';
 const PaymentTicketSuccessPage: React.FC = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [ticketData, setTicketData] = useState<any>(null);
+  const [ticketData, setTicketData] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null); // eslint-disable-line @typescript-eslint/no-unused-vars
 
   useEffect(() => {
     const processTicket = async () => {

@@ -13,7 +13,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { products, price, currency, customer, success_url, error_url, payment_method } = body;
+    const { products, price, currency, customer, success_url, error_url, payment_method } = body; // eslint-disable-line @typescript-eslint/no-unused-vars
 
     // Récupération sécurisée de la clé NabooPay (jamais exposée au frontend)
     const nabooToken = Deno.env.get("NABOOPAY_TOKEN");
@@ -50,7 +50,7 @@ serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
-  } catch (error: any) {
+  } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

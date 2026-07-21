@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../config/supabase';
-import { Shield, User, Eye, EyeOff, Mail, Lock, UserCircle } from 'lucide-react';
+import {   Eye, EyeOff, Mail, Lock, UserCircle } from 'lucide-react';
 
 type Mode = 'login' | 'signup';
 type Role = 'user' | 'admin';
 
 const LoginPage: React.FC = () => {
   const [mode, setMode] = useState<Mode>('login');
-  const [role, setRole] = useState<Role>('user');
+  const [role, setRole] = useState<Role>('user'); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

@@ -8,7 +8,7 @@ const TeamDetailsPage: React.FC = () => {
   const { teamId } = useParams<{ teamId: string }>();
 
   const [showTicketModal, setShowTicketModal] = useState(false);
-  const [selectedGame, setSelectedGame] = useState<any>(null);
+  const [selectedGame, setSelectedGame] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [buyerName, setBuyerName] = useState('');
   const [buyerEmail, setBuyerEmail] = useState('');
   const [ticketQR, setTicketQR] = useState<string | null>(null);

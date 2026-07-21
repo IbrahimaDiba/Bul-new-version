@@ -1,4 +1,4 @@
-import { Game, NewsArticle, Player, Product, Team, Achievement, SocialMedia, TeamStats, Arena, TeamHistory, GameStats, BroadcastInfo } from '../types';
+import { Game, NewsArticle, Player, Product, Team } from '../types';
 
 // Mock Teams
 export const teams: Team[] = [

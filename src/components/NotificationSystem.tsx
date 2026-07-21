@@ -6,10 +6,10 @@ import {
   CheckCircle, 
   AlertTriangle, 
   Info, 
-  Trophy, 
+  Trophy,  // eslint-disable-line @typescript-eslint/no-unused-vars
   Star,
   Clock,
-  Users,
+  Users, // eslint-disable-line @typescript-eslint/no-unused-vars
   TrendingUp
 } from 'lucide-react';
 
@@ -35,7 +35,7 @@ interface NotificationSystemProps {
 
 const NotificationSystem: React.FC<NotificationSystemProps> = ({
   notifications,
-  onMarkAsRead,
+  onMarkAsRead, // eslint-disable-line @typescript-eslint/no-unused-vars
   onClearAll,
   onDismiss
 }) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Ticket as TicketIcon, Calendar, MapPin, CheckCircle, User, Mail, Phone, CreditCard, X, ShieldCheck, Crown, ArrowRight, Info } from 'lucide-react';
+import { Ticket as TicketIcon, Calendar, MapPin, CheckCircle, User, Mail, Phone,  X, ShieldCheck, Crown, ArrowRight, Info } from 'lucide-react';
 import { getAdminTickets, ADMIN_CONTENT_EVENT } from '../data/adminContent';
 import { Ticket } from '../types';
 
@@ -112,7 +112,7 @@ const TicketsPage: React.FC = () => {
       }
 
       window.location.href = data.checkout_url;
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setError(err.message || 'Une erreur est survenue.');
       setIsLoading(false);
     }

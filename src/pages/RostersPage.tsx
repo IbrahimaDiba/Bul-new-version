@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import { Users, LayoutGrid, List } from 'lucide-react';
 import { ADMIN_CONTENT_EVENT, getManagedPlayers, getManagedTeams } from '../data/adminContent';
 import { Player, Team } from '../types';

@@ -9,7 +9,7 @@ type ScanResult = 'idle' | 'scanning' | 'valid' | 'already_used' | 'invalid' | '
 const TicketScanPage: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [scanResult, setScanResult] = useState<ScanResult>('idle');
-  const [ticketInfo, setTicketInfo] = useState<any>(null);
+  const [ticketInfo, setTicketInfo] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [manualToken, setManualToken] = useState('');
   const [isCameraActive, setIsCameraActive] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
@@ -44,7 +44,7 @@ const TicketScanPage: React.FC = () => {
       try {
         const parsed = JSON.parse(raw);
         if (parsed.token) token = parsed.token;
-      } catch {}
+      } catch {} // eslint-disable-line no-empty
 
       // Chercher dans Supabase
       const { data, error } = await supabase

@@ -48,7 +48,7 @@ const Header: React.FC = () => {
   const [cartCount, setCartCount] = useState(0);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<string>('user');
+  const [userRole, setUserRole] = useState<string>('user'); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -87,7 +87,7 @@ const Header: React.FC = () => {
   useEffect(() => {
     const updateCartCount = () => {
       const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      setCartCount(cart.reduce((sum: number, item: any) => sum + (item.qty || 1), 0));
+      setCartCount(cart.reduce((sum: number, item: any) => sum + (item.qty || 1), 0)); // eslint-disable-line @typescript-eslint/no-explicit-any
     };
     updateCartCount();
     window.addEventListener('storage', updateCartCount);

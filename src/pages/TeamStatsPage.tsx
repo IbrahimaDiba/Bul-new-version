@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { BarChart3, TrendingUp, Shield, Crosshair, ArrowUpDown } from 'lucide-react';
+import {  TrendingUp, Shield, Crosshair, ArrowUpDown } from 'lucide-react';
 import { ADMIN_CONTENT_EVENT, getManagedTeams } from '../data/adminContent';
 import { Team } from '../types';
 import { Link } from 'react-router-dom';

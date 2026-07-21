@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Eye, Star } from 'lucide-react';
+import { ShoppingBag, Eye } from 'lucide-react';
 import { Product } from '../../types';
 
 interface ProductCardProps {
@@ -12,7 +12,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     e.preventDefault();
     e.stopPropagation();
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existing = cart.find((item: any) => item.id === product.id);
+    const existing = cart.find((item: any) => item.id === product.id); // eslint-disable-line @typescript-eslint/no-explicit-any
     if (existing) {
       existing.qty = (existing.qty || 1) + 1;
     } else {

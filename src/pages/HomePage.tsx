@@ -5,7 +5,7 @@ import StandingsPreview from '../components/home/StandingsPreview';
 import UpcomingGames from '../components/home/UpcomingGames';
 import FeaturedProducts from '../components/home/FeaturedProducts';
 import PlayerStatsCard from '../components/players/PlayerStatsCard';
-import { ArrowRight, Ticket, BellRing } from 'lucide-react';
+import { ArrowRight, Ticket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ADMIN_CONTENT_EVENT, getManagedPlayers } from '../data/adminContent';
 import { Player } from '../types';
