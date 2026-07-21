@@ -151,38 +151,38 @@ const LeadersPage: React.FC = () => {
                           {/* Accent Color Line */}
                           <div className={`absolute left-0 top-0 bottom-0 w-2 ${isFirst ? 'bg-crimson-600' : 'bg-gray-200 group-hover:bg-navy-900 transition-colors'}`} />
 
-                          <div className={`flex items-center p-4 sm:p-6 pl-6 sm:pl-8 ${isFirst ? 'py-6 sm:py-8' : ''}`}>
+                          <div className={`flex items-center p-3 sm:p-6 pl-4 sm:pl-8 ${isFirst ? 'py-5 sm:py-8' : ''}`}>
                             
                             {/* Rank */}
-                            <div className={`shrink-0 w-8 sm:w-12 text-center font-black italic mr-4 ${isFirst ? 'text-4xl text-gray-200' : 'text-2xl text-gray-200 group-hover:text-gray-300'}`}>
+                            <div className={`shrink-0 w-6 sm:w-12 text-center font-black italic mr-3 sm:mr-4 ${isFirst ? 'text-3xl sm:text-4xl text-gray-200' : 'text-xl sm:text-2xl text-gray-200 group-hover:text-gray-300'}`}>
                               #{index + 1}
                             </div>
 
                             {/* Avatar */}
-                            <div className="relative shrink-0 mr-4 sm:mr-6">
-                              <div className={`rounded-sm overflow-hidden bg-gray-100 ${isFirst ? 'w-20 h-20 sm:w-24 sm:h-24 border-2 border-crimson-600' : 'w-16 h-16 border border-gray-200 group-hover:border-navy-900'}`}>
+                            <div className="relative shrink-0 mr-3 sm:mr-6">
+                              <div className={`rounded-sm overflow-hidden bg-gray-100 ${isFirst ? 'w-16 h-16 sm:w-24 sm:h-24 border-2 border-crimson-600' : 'w-12 h-12 sm:w-16 sm:h-16 border border-gray-200 group-hover:border-navy-900'}`}>
                                 <img src={player.avatar} alt={player.name} className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-300" />
                               </div>
-                              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-white border border-gray-200 rounded-sm flex items-center justify-center p-1 shadow-sm">
+                              <div className={`absolute -bottom-2 -right-2 bg-white border border-gray-200 rounded-sm flex items-center justify-center p-0.5 shadow-sm ${isFirst ? 'w-6 h-6 sm:w-8 sm:h-8' : 'w-5 h-5 sm:w-8 sm:h-8'}`}>
                                 <img src={getTeamLogo(player.team)} alt="" className="w-full h-full object-contain" />
                               </div>
                             </div>
 
                             {/* Info */}
                             <div className="flex-1 min-w-0">
-                              <h3 className={`font-black text-navy-900 truncate uppercase tracking-tight group-hover:text-crimson-600 transition-colors ${isFirst ? 'text-2xl sm:text-3xl mb-1' : 'text-lg sm:text-xl'}`}>
+                              <h3 className={`font-black text-navy-900 truncate uppercase tracking-tight group-hover:text-crimson-600 transition-colors ${isFirst ? 'text-xl sm:text-3xl mb-1' : 'text-base sm:text-xl'}`}>
                                 {player.name}
                               </h3>
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{getTeamName(player.team)}</span>
-                                <span className="text-gray-300 mx-1">•</span>
-                                <span className="text-gray-400 text-xs font-semibold">{player.position}</span>
+                              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                <span className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-widest truncate max-w-[100px] sm:max-w-[200px]">{getTeamName(player.team)}</span>
+                                <span className="text-gray-300 hidden sm:inline">•</span>
+                                <span className="text-gray-400 text-[10px] sm:text-xs font-semibold">{player.position}</span>
                               </div>
                             </div>
 
                             {/* Stat Value */}
-                            <div className="shrink-0 text-right ml-4">
-                              <div className={`font-black tabular-nums tracking-tighter ${isFirst ? 'text-4xl sm:text-5xl text-crimson-600' : 'text-3xl text-navy-900'}`}>
+                            <div className="shrink-0 text-right ml-2 sm:ml-4">
+                              <div className={`font-black tabular-nums tracking-tighter ${isFirst ? 'text-3xl sm:text-5xl text-crimson-600' : 'text-2xl sm:text-3xl text-navy-900'}`}>
                                 {statValue}{currentCategory.unit || ''}
                               </div>
                             </div>
@@ -227,14 +227,14 @@ const LeadersPage: React.FC = () => {
                         onClick={() => setActiveCategory(cat.key)} 
                         className="w-full flex items-center justify-between bg-gray-50 border border-gray-100 p-3 rounded-sm hover:border-crimson-300 hover:bg-white transition-colors"
                       >
-                        <div className="flex items-center gap-3">
-                          <img src={leader?.avatar} alt="" className="w-10 h-10 rounded-sm object-cover object-top grayscale group-hover:grayscale-0" />
-                          <div className="text-left">
-                            <div className="font-bold text-navy-900 text-sm group-hover:text-crimson-600 transition-colors uppercase tracking-tight">{leader?.name}</div>
-                            <div className="text-[10px] font-semibold text-gray-500 uppercase">{getTeamName(leader?.team)}</div>
+                        <div className="flex items-center gap-3 min-w-0 pr-2">
+                          <img src={leader?.avatar} alt="" className="w-10 h-10 shrink-0 rounded-sm object-cover object-top grayscale group-hover:grayscale-0" />
+                          <div className="text-left min-w-0">
+                            <div className="font-bold text-navy-900 text-sm group-hover:text-crimson-600 transition-colors uppercase tracking-tight truncate max-w-[140px] sm:max-w-[200px]">{leader?.name}</div>
+                            <div className="text-[10px] font-semibold text-gray-500 uppercase truncate max-w-[140px] sm:max-w-[200px]">{getTeamName(leader?.team)}</div>
                           </div>
                         </div>
-                        <div className="text-xl font-black text-navy-900 tabular-nums">
+                        <div className="shrink-0 text-xl font-black text-navy-900 tabular-nums">
                           {Number(leader?.stats?.[cat.key]) || 0}{cat.unit}
                         </div>
                       </button>
