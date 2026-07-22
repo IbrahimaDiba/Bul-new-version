@@ -426,15 +426,6 @@ const ChatbotPage: React.FC = () => {
     el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
   }, [input]);
 
-  // ── Keyboard shortcut Cmd+N ──
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'n') { e.preventDefault(); newConvo(); }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [convos, newConvo]);
-
   // ── Conversation actions ──
   const newConvo = useCallback(() => {
     const c = makeConversation();
@@ -445,6 +436,15 @@ const ChatbotPage: React.FC = () => {
     setInput('');
     setTimeout(() => inputRef.current?.focus(), 50);
   }, [convos, persist]);
+
+  // ── Keyboard shortcut Cmd+N ──
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'n') { e.preventDefault(); newConvo(); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [convos, newConvo]);
 
   const selectConvo = (id: string) => {
     setActiveId(id);
