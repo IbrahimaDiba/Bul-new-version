@@ -11,7 +11,8 @@ import {
   BarChart3,
   Video,
   Image as ImageIcon,
-  ChevronRight
+  ChevronRight,
+  TrendingUp
 } from 'lucide-react';
 import ShotChart from '../components/ShotChart';
 import { ADMIN_CONTENT_EVENT, getManagedPlayers, getManagedTeams } from '../data/adminContent';
