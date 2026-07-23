@@ -154,7 +154,9 @@ const PlayerDetailsPage: React.FC = () => {
             </div>
             <div className="text-center">
               <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">PER</p>
-              <p className="text-2xl font-black text-navy-900">{player.stats.per || '24.5'}</p>
+              <p className="text-2xl font-black text-navy-900">
+                {player.stats.per || ((player.stats.ppg * 1.0 + player.stats.rpg * 0.8 + player.stats.apg * 1.2 + (player.stats.spg || 0) * 2.5 + (player.stats.bpg || 0) * 2.0) * 0.7 || 15.0).toFixed(1)}
+              </p>
             </div>
           </div>
         </div>
