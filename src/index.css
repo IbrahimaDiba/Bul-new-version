@@ -6,3 +6,14 @@
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* Remove default blue tap highlight on mobile devices for a premium feel */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Custom text selection color to match brand instead of default blue */
+::selection {
+  background-color: #B22222; /* crimson-600 */
+  color: white;
+}
