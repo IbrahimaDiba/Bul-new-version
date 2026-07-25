@@ -31,16 +31,32 @@ const ProductDetailsPage: React.FC = () => {
     };
   }, []);
 
+  // Categories that should always show size selection
+  const CLOTHING_CATEGORIES = ['jerseys', 'shorts', 'hoodies', 't-shirts'];
+  const DEFAULT_CLOTHING_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
+
   useEffect(() => {
     const foundProduct = allProducts.find((p) => p.id === productId);
     setProduct(foundProduct);
     if (foundProduct) {
-      if (foundProduct.sizes && foundProduct.sizes.length > 0) setSelectedSize(foundProduct.sizes[0]);
+      // Use product sizes if defined, otherwise use defaults for clothing
+      const sizes = foundProduct.sizes && foundProduct.sizes.length > 0
+        ? foundProduct.sizes
+        : CLOTHING_CATEGORIES.includes(foundProduct.category?.toLowerCase()) ? DEFAULT_CLOTHING_SIZES : [];
+      if (sizes.length > 0) setSelectedSize(sizes[0]);
       if (foundProduct.colors && foundProduct.colors.length > 0) setSelectedColor(foundProduct.colors[0]);
     }
     // Scroll to top on load cleanly
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [productId, allProducts]);
+
+  // Compute the available sizes for the current product
+  const availableSizes = useMemo(() => {
+    if (!product) return [];
+    if (product.sizes && product.sizes.length > 0) return product.sizes;
+    if (CLOTHING_CATEGORIES.includes(product.category?.toLowerCase())) return DEFAULT_CLOTHING_SIZES;
+    return [];
+  }, [product]);
 
   const relatedProducts = useMemo(() => {
     if (!product) return [];
@@ -51,6 +67,11 @@ const ProductDetailsPage: React.FC = () => {
 
   const handleAddToCart = () => {
     if (!product) return;
+    // Require size selection for clothing items
+    if (availableSizes.length > 0 && !selectedSize) {
+      alert('Veuillez choisir une taille avant d\'ajouter au panier.');
+      return;
+    }
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const existing = cart.find((item: any) => item.id === product.id && item.selectedSize === selectedSize && item.selectedColor === selectedColor); // eslint-disable-line @typescript-eslint/no-explicit-any
     
@@ -94,7 +115,7 @@ const ProductDetailsPage: React.FC = () => {
            className="flex items-center gap-2 text-sm text-gray-500 hover:text-black transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-2 transition-transform" strokeWidth={1.5} /> 
-          Back to all products
+          Retour à la boutique
         </button>
       </div>
 
@@ -138,14 +159,14 @@ const ProductDetailsPage: React.FC = () => {
             <div className="space-y-10 mb-12">
                
                {/* Size Selector */}
-               {product.sizes && product.sizes.length > 0 && (
+               {availableSizes.length > 0 && (
                  <div>
                     <div className="flex justify-between items-baseline mb-4">
-                       <span className="text-sm font-medium text-black">Select Size</span>
-                       <button className="text-sm text-gray-400 hover:text-black transition-colors">Size Guide</button>
+                       <span className="text-sm font-medium text-black">Choisir la Taille</span>
+                       <button className="text-sm text-gray-400 hover:text-black transition-colors">Guide des tailles</button>
                     </div>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                       {product.sizes.map((size: string) => (
+                    <div className="grid grid-cols-5 gap-3">
+                       {availableSizes.map((size: string) => (
                          <button
                            key={size}
                            onClick={() => setSelectedSize(size)}
@@ -165,7 +186,7 @@ const ProductDetailsPage: React.FC = () => {
                {/* Color Selector */}
                {product.colors && product.colors.length > 0 && (
                  <div>
-                    <span className="block text-sm font-medium text-black mb-4">Select Color: <span className="text-gray-500 font-normal">{selectedColor}</span></span>
+                    <span className="block text-sm font-medium text-black mb-4">Choisir la Couleur : <span className="text-gray-500 font-normal">{selectedColor}</span></span>
                     <div className="flex flex-wrap gap-4">
                        {product.colors.map((color: string) => (
                          <button
@@ -213,7 +234,7 @@ const ProductDetailsPage: React.FC = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         className="flex items-center gap-2"
                       >
-                         Added to Bag
+                         Ajouté au panier ✓
                       </motion.div>
                     ) : (
                       <motion.div 
@@ -222,14 +243,14 @@ const ProductDetailsPage: React.FC = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         className="flex items-center gap-2"
                       >
-                         Add to Bag
+                         Ajouter au panier
                       </motion.div>
                     )}
                   </AnimatePresence>
                </button>
                
                <p className="text-center text-xs text-gray-500 font-light mt-4">
-                 Free standard shipping and returns.
+                 Livraison standard gratuite.
                </p>
             </div>
 
