@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Player, ShotChart, PlayerMedia, DetailedPlayerStats } from '../types';
+import { getManagedGames, getManagedTeams } from '../data/adminContent';
 import {
   Box,
   Tab,
@@ -404,11 +405,51 @@ export const PlayerDetailedStats: React.FC<PlayerDetailedStatsProps> = ({ player
     );
   };
 
-  const renderDetailedStats = (stats: DetailedPlayerStats) => {
-    if (!stats || !stats.gameLog || stats.gameLog.length === 0) {
+  const renderDetailedStats = () => {
+    // We will generate the real Game Log from the actual database (Supabase)
+    const allGames = getManagedGames();
+    
+    // Filter games where this player actually played (has stats)
+    const playerGameLog = allGames
+      .filter(g => g.status === 'completed' && g.playerStats)
+      .map(g => {
+        const isHome = g.homeTeamId === player.team;
+        const teamStats = isHome ? g.playerStats?.home : g.playerStats?.away;
+        const pStats = teamStats?.find(p => p.playerId === player.id);
+        
+        if (!pStats) return null; // Player didn't play in this game
+        
+        const oppTeamId = isHome ? g.awayTeamId : g.homeTeamId;
+        const oppTeam = getManagedTeams().find(t => t.id === oppTeamId);
+        const isWin = isHome ? (g.homeScore || 0) > (g.awayScore || 0) : (g.awayScore || 0) > (g.homeScore || 0);
+        
+        const fgPct = pStats.fga > 0 ? ((pStats.fgm / pStats.fga) * 100).toFixed(1) : '0.0';
+        const tppPct = pStats.tpa > 0 ? ((pStats.tpm / pStats.tpa) * 100).toFixed(1) : '0.0';
+        const ftpPct = pStats.fta > 0 ? ((pStats.ftm / pStats.fta) * 100).toFixed(1) : '0.0';
+        
+        return {
+          gameId: g.id,
+          date: g.date,
+          opponent: oppTeam ? oppTeam.abbreviation : oppTeamId,
+          result: isWin ? 'W' : 'L',
+          minutes: pStats.minutes,
+          points: pStats.points,
+          rebounds: pStats.rebounds,
+          assists: pStats.assists,
+          steals: pStats.steals || 0,
+          blocks: pStats.blocks || 0,
+          turnovers: pStats.turnovers || 0,
+          fg: `${pStats.fgm}-${pStats.fga} (${fgPct}%)`,
+          three: `${pStats.tpm}-${pStats.tpa} (${tppPct}%)`,
+          ft: `${pStats.ftm}-${pStats.fta} (${ftpPct}%)`
+        };
+      })
+      .filter(Boolean); // Remove nulls
+
+    if (playerGameLog.length === 0) {
       return (
         <Typography variant="body1" color="text.secondary" align="center">
-          Detailed statistics are not available for this player.
+          Aucune donnée de match disponible pour ce joueur. (Jouez un match pour voir les statistiques détaillées)
         </Typography>
       );
     }
@@ -416,82 +457,52 @@ export const PlayerDetailedStats: React.FC<PlayerDetailedStatsProps> = ({ player
     return (
       <Box>
         <Typography variant="h6" gutterBottom>
-          Detailed Statistics {stats.season}
+          Statistiques Détaillées
         </Typography>
         
         <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
-          Game Log
+          Historique des Matchs (Game Log)
         </Typography>
         <TableContainer component={Paper}>
           <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell>Date</TableCell>
-                <TableCell>Opponent</TableCell>
-                <TableCell>Result</TableCell>
+                <TableCell>Opp</TableCell>
+                <TableCell>Res</TableCell>
                 <TableCell>MIN</TableCell>
                 <TableCell>PTS</TableCell>
                 <TableCell>REB</TableCell>
                 <TableCell>AST</TableCell>
+                <TableCell>STL</TableCell>
+                <TableCell>BLK</TableCell>
+                <TableCell>TOV</TableCell>
                 <TableCell>FG%</TableCell>
                 <TableCell>3P%</TableCell>
                 <TableCell>FT%</TableCell>
-                <TableCell>+/-</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {stats.gameLog.map((game) => (
+              {playerGameLog.map((game: any) => (
                 <TableRow key={game.gameId}>
                   <TableCell>{game.date}</TableCell>
                   <TableCell>{game.opponent}</TableCell>
-                  <TableCell>{game.result}</TableCell>
+                  <TableCell sx={{ color: game.result === 'W' ? 'green' : 'red', fontWeight: 'bold' }}>{game.result}</TableCell>
                   <TableCell>{game.minutes}</TableCell>
                   <TableCell>{game.points}</TableCell>
                   <TableCell>{game.rebounds}</TableCell>
                   <TableCell>{game.assists}</TableCell>
-                  <TableCell>{game.shooting.fg}</TableCell>
-                  <TableCell>{game.shooting.three}</TableCell>
-                  <TableCell>{game.shooting.ft}</TableCell>
-                  <TableCell>{game.plusMinus}</TableCell>
+                  <TableCell>{game.steals}</TableCell>
+                  <TableCell>{game.blocks}</TableCell>
+                  <TableCell>{game.turnovers}</TableCell>
+                  <TableCell>{game.fg}</TableCell>
+                  <TableCell>{game.three}</TableCell>
+                  <TableCell>{game.ft}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
-
-        {stats.advancedStats && (
-          <>
-            <Typography variant="subtitle1" sx={{ mt: 4, mb: 1 }}>
-              Advanced Statistics
-            </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 2 }}>
-              <Card>
-                <CardContent>
-                  <Typography variant="subtitle2">PER</Typography>
-                  <Typography variant="h6">{stats.advancedStats.per}</Typography>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent>
-                  <Typography variant="subtitle2">True Shooting %</Typography>
-                  <Typography variant="h6">{stats.advancedStats.trueShooting}%</Typography>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent>
-                  <Typography variant="subtitle2">Usage Rate</Typography>
-                  <Typography variant="h6">{stats.advancedStats.usageRate}%</Typography>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent>
-                  <Typography variant="subtitle2">Win Shares</Typography>
-                  <Typography variant="h6">{stats.advancedStats.winShares}</Typography>
-                </CardContent>
-              </Card>
-            </Box>
-          </>
-        )}
       </Box>
     );
   };
@@ -532,11 +543,7 @@ export const PlayerDetailedStats: React.FC<PlayerDetailedStatsProps> = ({ player
       </TabPanel>
 
       <TabPanel value={tabValue} index={3}>
-        {player.detailedStats ? renderDetailedStats(player.detailedStats) : (
-          <Typography variant="body1" color="text.secondary" align="center">
-            Detailed statistics are not available for this player.
-          </Typography>
-        )}
+        {renderDetailedStats()}
       </TabPanel>
     </Box>
   );
