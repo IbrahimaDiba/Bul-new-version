@@ -109,7 +109,7 @@ const ProductDetailsPage: React.FC = () => {
     <div className="min-h-screen bg-white font-sans selection:bg-black selection:text-white">
       
       {/* ══════════════ NAVIGATION BAR ══════════════ */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         <button
            onClick={() => navigate('/shop')}
            className="flex items-center gap-2 text-sm text-gray-500 hover:text-black transition-colors group"
@@ -120,11 +120,11 @@ const ProductDetailsPage: React.FC = () => {
       </div>
 
       {/* ══════════════ PRODUCT HERO SECTION ══════════════ */}
-      <div className="max-w-7xl mx-auto px-6 pb-24">
-        <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-32 sm:pb-24">
+        <div className="flex flex-col lg:flex-row gap-6 sm:gap-16 lg:gap-24">
           
-          {/* Image Area - Massive & Clean */}
-          <div className="w-full lg:w-[60%] flex items-center justify-center bg-[#F9F9F9] rounded-3xl p-12 sm:p-24 aspect-square lg:aspect-auto">
+          {/* Image Area */}
+          <div className="w-full lg:w-[60%] flex items-center justify-center bg-[#F9F9F9] rounded-2xl sm:rounded-3xl p-6 sm:p-24 aspect-square lg:aspect-auto">
             <motion.img
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -135,28 +135,28 @@ const ProductDetailsPage: React.FC = () => {
             />
           </div>
 
-          {/* Details Area - Typography Focus */}
-          <div className="w-full lg:w-[40%] flex flex-col justify-center pt-8">
+          {/* Details Area */}
+          <div className="w-full lg:w-[40%] flex flex-col justify-center pt-2 sm:pt-8">
             
-            <div className="mb-2 text-sm text-gray-500 uppercase tracking-widest">
+            <div className="mb-1 sm:mb-2 text-xs sm:text-sm text-gray-500 uppercase tracking-widest">
               {product.category}
             </div>
 
-            <h1 className="text-4xl sm:text-5xl font-semibold text-black tracking-tight leading-[1.1] mb-6">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-semibold text-black tracking-tight leading-[1.1] mb-3 sm:mb-6">
               {product.name}
             </h1>
 
-            <div className="text-2xl font-light text-gray-900 mb-10">
+            <div className="text-xl sm:text-2xl font-light text-gray-900 mb-4 sm:mb-10">
               {product.price.toLocaleString('fr-FR')} FCFA
             </div>
 
             {/* Description */}
-            <p className="text-gray-500 text-base leading-relaxed font-light mb-12 max-w-md">
+            <p className="text-gray-500 text-sm sm:text-base leading-relaxed font-light mb-6 sm:mb-12 max-w-md">
               {product.description}
             </p>
 
             {/* Selectors */}
-            <div className="space-y-10 mb-12">
+            <div className="space-y-6 sm:space-y-10 mb-6 sm:mb-12">
                
                {/* Size Selector */}
                {availableSizes.length > 0 && (
@@ -165,12 +165,12 @@ const ProductDetailsPage: React.FC = () => {
                        <span className="text-sm font-medium text-black">Choisir la Taille</span>
                        <button className="text-sm text-gray-400 hover:text-black transition-colors">Guide des tailles</button>
                     </div>
-                    <div className="grid grid-cols-5 gap-3">
+                    <div className="grid grid-cols-5 gap-2 sm:gap-3">
                        {availableSizes.map((size: string) => (
                          <button
                            key={size}
                            onClick={() => setSelectedSize(size)}
-                           className={`h-14 rounded-full border transition-all duration-200 text-sm font-medium ${
+                           className={`h-11 sm:h-14 rounded-full border transition-all duration-200 text-xs sm:text-sm font-medium ${
                              selectedSize === size 
                              ? 'border-black bg-black text-white' 
                              : 'border-gray-200 text-gray-900 hover:border-black bg-white'
@@ -214,8 +214,8 @@ const ProductDetailsPage: React.FC = () => {
                )}
             </div>
 
-            {/* Action Buttons */}
-            <div className="space-y-4">
+            {/* Action Buttons - Desktop */}
+            <div className="hidden sm:block space-y-4">
                <button
                   type="button"
                   onClick={handleAddToCart}
@@ -311,6 +311,30 @@ const ProductDetailsPage: React.FC = () => {
            </div>
         </section>
       )}
+      {/* ══════════════ MOBILE STICKY BOTTOM BAR ══════════════ */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0">
+            <p className="text-xs text-gray-400 font-medium">Prix</p>
+            <p className="text-lg font-black text-black leading-tight">{product.price.toLocaleString('fr-FR')} <span className="text-xs font-bold text-gray-400">FCFA</span></p>
+          </div>
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!product.inStock}
+            className={`flex-1 rounded-full py-3.5 text-sm font-bold transition-all flex items-center justify-center gap-2 ${
+              product.inStock 
+              ? 'bg-black text-white active:scale-95' 
+              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            {isAdded ? 'Ajouté ✓' : 'Ajouter au panier'}
+          </button>
+        </div>
+        {availableSizes.length > 0 && selectedSize && (
+          <p className="text-center text-[10px] text-gray-400 mt-1">Taille sélectionnée : <span className="font-bold text-black">{selectedSize}</span></p>
+        )}
+      </div>
 
     </div>
   );

@@ -46,31 +46,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           )}
         </div>
 
-        {/* Action Overlay */}
+        {/* Action Overlay - Desktop */}
         <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black/60 to-transparent backdrop-blur-[2px] hidden md:flex gap-2">
-          <button 
-            onClick={handleAddToCart}
-            disabled={!product.inStock}
-            className="flex-1 bg-white hover:bg-navy-900 hover:text-white text-navy-900 py-2.5 rounded-sm text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ShoppingBag className="w-4 h-4" /> Add to Cart
-          </button>
           <Link 
             to={`/shop/product/${product.id}`}
-            className="w-12 bg-white/20 hover:bg-white text-white hover:text-navy-900 border border-white/30 hover:border-white transition-all rounded-sm flex items-center justify-center shadow-lg"
+            className="flex-1 bg-white hover:bg-navy-900 hover:text-white text-navy-900 py-2.5 rounded-sm text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2 shadow-lg"
           >
-            <Eye className="w-4 h-4" />
+            <Eye className="w-4 h-4" /> Voir le produit
           </Link>
         </div>
 
-        {/* Mobile quick add button */}
-        <button 
-          onClick={handleAddToCart}
-          disabled={!product.inStock}
-          className="md:hidden absolute bottom-3 right-3 w-12 h-12 bg-crimson-600 text-white rounded-full shadow-xl flex items-center justify-center active:scale-95 transition-transform disabled:bg-gray-400"
-        >
-          <ShoppingBag className="w-5 h-5" />
-        </button>
+        {/* Mobile: tap the whole card to go to detail page */}
+        <Link 
+          to={`/shop/product/${product.id}`}
+          className="md:hidden absolute inset-0 z-10"
+          aria-label={`Voir ${product.name}`}
+        />
 
         {/* Out of Stock Overlay */}
         {!product.inStock && (
@@ -112,20 +103,27 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </span>
             </div>
           
-          {product.sizes && (
-            <div className="flex -space-x-1">
-              {product.sizes.slice(0, 3).map((s, i) => (
-                <div key={i} className="w-6 h-6 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-[9px] font-bold text-gray-500 group-hover:border-gray-200 transition-colors">
-                  {s}
-                </div>
-              ))}
-              {product.sizes.length > 3 && (
-                <div className="w-6 h-6 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-[9px] font-bold text-navy-900">
-                  +{product.sizes.length - 3}
-                </div>
-              )}
-            </div>
-          )}
+          {(() => {
+            const CLOTHING_CATS = ['jerseys', 'shorts', 'hoodies', 't-shirts'];
+            const sizes = product.sizes && product.sizes.length > 0
+              ? product.sizes
+              : CLOTHING_CATS.includes(product.category?.toLowerCase()) ? ['S', 'M', 'L', 'XL', 'XXL'] : [];
+            if (sizes.length === 0) return null;
+            return (
+              <div className="flex -space-x-1">
+                {sizes.slice(0, 3).map((s, i) => (
+                  <div key={i} className="w-6 h-6 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-[9px] font-bold text-gray-500 group-hover:border-gray-200 transition-colors">
+                    {s}
+                  </div>
+                ))}
+                {sizes.length > 3 && (
+                  <div className="w-6 h-6 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-[9px] font-bold text-navy-900">
+                    +{sizes.length - 3}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </div>
       
