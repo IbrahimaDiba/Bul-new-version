@@ -239,7 +239,7 @@ const AdminPage: React.FC = () => {
   };
 
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, callback: (urlOrBase64: string) => void, bucket: string = 'bul-assets') => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, callback: (urlOrBase64: string) => void, bucket: string = 'bul-assets', maxSize: number = 800) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -252,17 +252,16 @@ const AdminPage: React.FC = () => {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const max_size = 2000; // High resolution size for crisp images
 
         if (width > height) {
-          if (width > max_size) {
-            height *= max_size / width;
-            width = max_size;
+          if (width > maxSize) {
+            height *= maxSize / width;
+            width = maxSize;
           }
         } else {
-          if (height > max_size) {
-            width *= max_size / height;
-            height = max_size;
+          if (height > maxSize) {
+            width *= maxSize / height;
+            height = maxSize;
           }
         }
 
@@ -1023,7 +1022,7 @@ const AdminPage: React.FC = () => {
                   <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-crimson-500 hover:bg-gray-50 transition-colors">
                     <Upload className="w-5 h-5 text-gray-400" />
                     <span className="text-sm text-gray-600">Choisir une photo</span>
-                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setHeroImageForm({ imageUrl: base64 }))} className="hidden" />
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setHeroImageForm({ imageUrl: base64 }), 'bul-assets', 1920)} className="hidden" />
                   </label>
                   {heroImageForm.imageUrl && (
                     <div className="w-24 h-16 rounded-lg border overflow-hidden bg-gray-100 flex-shrink-0">
@@ -1152,7 +1151,7 @@ const AdminPage: React.FC = () => {
                   <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-crimson-500 hover:bg-gray-50 transition-colors">
                     <Upload className="w-5 h-5 text-gray-400" />
                     <span className="text-sm text-gray-600">Choisir une photo</span>
-                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setNewsForm({ ...newsForm, image: base64 }))} className="hidden" />
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setNewsForm({ ...newsForm, image: base64 }), 'bul-assets', 800)} className="hidden" />
                   </label>
                   {newsForm.image && (
                     <div className="w-16 h-16 rounded-lg border overflow-hidden bg-gray-100 flex-shrink-0">
@@ -1231,7 +1230,7 @@ const AdminPage: React.FC = () => {
                   <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-crimson-500 hover:bg-gray-50 transition-colors">
                     <Upload className="w-5 h-5 text-gray-400" />
                     <span className="text-sm text-gray-600">Choisir une photo</span>
-                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setProductForm({ ...productForm, image: base64 }))} className="hidden" />
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setProductForm({ ...productForm, image: base64 }), 'bul-assets', 800)} className="hidden" />
                   </label>
                   {productForm.image && (
                     <div className="w-16 h-16 rounded-lg border overflow-hidden bg-gray-100 flex-shrink-0">
@@ -1350,7 +1349,7 @@ const AdminPage: React.FC = () => {
                   <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-crimson-500 hover:bg-gray-50 transition-colors">
                     <Upload className="w-5 h-5 text-gray-400" />
                     <span className="text-sm text-gray-600">Choisir une image</span>
-                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setGameForm({ ...gameForm, coverImage: base64 }))} className="hidden" />
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setGameForm({ ...gameForm, coverImage: base64 }), 'bul-assets', 1200)} className="hidden" />
                   </label>
                   {gameForm.coverImage && (
                     <div className="w-20 h-16 rounded-lg border overflow-hidden bg-gray-100 flex-shrink-0">
@@ -1560,7 +1559,7 @@ const AdminPage: React.FC = () => {
                   <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-crimson-500 hover:bg-gray-50 transition-colors">
                     <Upload className="w-5 h-5 text-gray-400" />
                     <span className="text-sm text-gray-600">Choisir un logo</span>
-                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setTeamForm({ ...teamForm, logo: base64 }))} className="hidden" />
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setTeamForm({ ...teamForm, logo: base64 }), 'bul-assets', 400)} className="hidden" />
                   </label>
                   {teamForm.logo && (
                     <div className="w-16 h-16 rounded-lg border overflow-hidden bg-gray-100 flex-shrink-0 p-2">
@@ -1684,7 +1683,7 @@ const AdminPage: React.FC = () => {
                   <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-crimson-500 hover:bg-gray-50 transition-colors">
                     <Upload className="w-5 h-5 text-gray-400" />
                     <span className="text-sm text-gray-600">Choisir une photo</span>
-                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setPlayerForm({ ...playerForm, avatar: base64 }))} className="hidden" />
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setPlayerForm({ ...playerForm, avatar: base64 }), 'bul-assets', 400)} className="hidden" />
                   </label>
                   {playerForm.avatar && (
                     <div className="relative w-12 h-12 rounded-full border overflow-hidden bg-gray-100 flex-shrink-0 group">
@@ -1773,7 +1772,7 @@ const AdminPage: React.FC = () => {
                   <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover:border-crimson-500 hover:bg-gray-50 transition-colors">
                     <Upload className="w-5 h-5 text-gray-400" />
                     <span className="text-sm text-gray-600">Choisir un logo</span>
-                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setSponsorForm({ ...sponsorForm, logo: base64 }))} className="hidden" />
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, (base64) => setSponsorForm({ ...sponsorForm, logo: base64 }), 'bul-assets', 400)} className="hidden" />
                   </label>
                   {sponsorForm.logo && (
                     <div className="w-16 h-16 rounded-lg border overflow-hidden bg-gray-100 flex-shrink-0 p-2">
