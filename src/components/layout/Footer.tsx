@@ -13,7 +13,7 @@ const Footer: React.FC = () => {
               <img src="/bul_logo.png" alt="BUL HOOPS" className="h-28 w-auto object-contain" />
             </Link>
             <p className="mt-4 text-gray-400">
-              The premier basketball league for university students. Showcasing talent, fostering competition, and building future stars.
+              La ligue de basketball universitaire de référence. Révéler les talents, favoriser la compétition et former les stars de demain.
             </p>
             <div className="mt-6 flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -33,50 +33,47 @@ const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4">Liens Rapides</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/teams" className="text-gray-400 hover:text-white transition-colors">Teams</Link>
+                <Link to="/teams" className="text-gray-400 hover:text-white transition-colors">Équipes</Link>
               </li>
               <li>
-                <Link to="/players" className="text-gray-400 hover:text-white transition-colors">Players</Link>
+                <Link to="/players" className="text-gray-400 hover:text-white transition-colors">Joueurs</Link>
               </li>
               <li>
-                <Link to="/games/schedule" className="text-gray-400 hover:text-white transition-colors">Schedule</Link>
+                <Link to="/games/schedule" className="text-gray-400 hover:text-white transition-colors">Calendrier</Link>
               </li>
               <li>
-                <Link to="/games/results" className="text-gray-400 hover:text-white transition-colors">Results</Link>
+                <Link to="/games/results" className="text-gray-400 hover:text-white transition-colors">Résultats</Link>
               </li>
               <li>
                 <Link to="/games/highlights" className="text-gray-400 hover:text-white transition-colors">Highlights</Link>
               </li>
               <li>
-                <Link to="/news" className="text-gray-400 hover:text-white transition-colors">News</Link>
+                <Link to="/news" className="text-gray-400 hover:text-white transition-colors">Actualités</Link>
               </li>
               <li>
-                <Link to="/shop" className="text-gray-400 hover:text-white transition-colors">Shop</Link>
+                <Link to="/shop" className="text-gray-400 hover:text-white transition-colors">Boutique</Link>
               </li>
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Contact */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Resources</h3>
-            <ul className="space-y-2">
+            <h3 className="text-lg font-semibold mb-4">Contact</h3>
+            <ul className="space-y-3">
               <li>
-                <Link to="/about" className="text-gray-400 hover:text-white transition-colors">About Us</Link>
+                <a href="mailto:contact@thebul.org" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-crimson-500 shrink-0" />
+                  contact@thebul.org
+                </a>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact</Link>
-              </li>
-              <li>
-                <Link to="/faq" className="text-gray-400 hover:text-white transition-colors">FAQs</Link>
-              </li>
-              <li>
-                <Link to="/media" className="text-gray-400 hover:text-white transition-colors">Media</Link>
-              </li>
-              <li>
-                <Link to="/careers" className="text-gray-400 hover:text-white transition-colors">Careers</Link>
+                <a href="https://www.instagram.com/thebul.off" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                  <Instagram className="w-4 h-4 text-crimson-500 shrink-0" />
+                  @thebul.off
+                </a>
               </li>
             </ul>
           </div>
@@ -85,12 +82,12 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Newsletter</h3>
             <p className="text-gray-400 mb-4">
-              Subscribe to our newsletter and stay updated with the latest news and events.
+              Abonnez-vous à notre newsletter pour rester informé des dernières actualités et événements.
             </p>
             <form className="flex">
               <input
                 type="email"
-                placeholder="Your email"
+                placeholder="Votre email"
                 className="bg-navy-800 text-white px-4 py-2 rounded-l-md focus:outline-none w-full"
               />
               <button
@@ -105,17 +102,17 @@ const Footer: React.FC = () => {
 
         <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} Basketball University League. All rights reserved.
+            © {new Date().getFullYear()} Basketball University League. Tous droits réservés.
           </p>
           <div className="mt-4 md:mt-0 flex space-x-6">
-            <Link to="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
-              Privacy Policy
+            <Link to="/privacy-policy" className="text-gray-400 hover:text-white text-sm transition-colors">
+              Politique de confidentialité
             </Link>
-            <Link to="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
-              Terms of Service
+            <Link to="/terms-of-service" className="text-gray-400 hover:text-white text-sm transition-colors">
+              Conditions d'utilisation
             </Link>
             <Link to="/cookie-policy" className="text-gray-400 hover:text-white text-sm transition-colors">
-              Cookie Policy
+              Cookies
             </Link>
           </div>
         </div>
