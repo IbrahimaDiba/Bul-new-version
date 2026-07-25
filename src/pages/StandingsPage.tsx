@@ -167,7 +167,7 @@ const StandingsPage: React.FC = () => {
                       </td>
                       <td className="px-4 sm:px-4 py-3 sm:py-4 text-center whitespace-nowrap">
                         <span className="inline-flex px-1.5 sm:px-2 py-0.5 bg-gray-100 font-bold tabular-nums text-[10px] sm:text-sm text-navy-900 border border-gray-200">
-                          {team.winPercentage.toFixed(3).substring(1)}
+                          {team.winPercentage === 1 ? '1.000' : team.winPercentage.toFixed(3).replace(/^0/, '')}
                         </span>
                       </td>
                       <td className="px-4 sm:px-4 py-3 sm:py-4 text-center font-bold text-gray-500 tabular-nums text-[10px] sm:text-base whitespace-nowrap">

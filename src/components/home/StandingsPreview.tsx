@@ -77,7 +77,9 @@ const StandingsPreview: React.FC = () => {
               {filteredTeams.map((team, index) => {
                 // Parse the record (e.g., "18-5") to get wins and losses
                 const [wins, losses] = team.record.split('-').map(Number);
-                const winPercentage = wins / (wins + losses);
+                const totalGames = wins + losses;
+                const winPercentage = totalGames > 0 ? wins / totalGames : 0;
+                const formattedWinPct = winPercentage === 1 ? '1.000' : winPercentage.toFixed(3).replace(/^0/, '');
                 
                 // Use real data for last 10 games and streak
                 const last10 = team.stats?.lastTenGames || '-';
@@ -106,7 +108,7 @@ const StandingsPreview: React.FC = () => {
                     </td>
                     <td className="py-3 sm:py-4 px-4 sm:px-6 text-center text-xs sm:text-sm font-semibold tabular-nums whitespace-nowrap">{team.record}</td>
                     <td className="py-3 sm:py-4 px-4 sm:px-6 text-center text-sm whitespace-nowrap">
-                      {winPercentage.toFixed(3).substring(1)}
+                      {formattedWinPct}
                     </td>
                     <td className="py-3 sm:py-4 px-4 sm:px-6 text-center text-sm whitespace-nowrap">{last10}</td>
                     <td className="py-3 sm:py-4 px-4 sm:px-6 text-center font-medium text-sm whitespace-nowrap">
