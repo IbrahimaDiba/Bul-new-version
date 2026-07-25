@@ -48,23 +48,16 @@ const triggerUpdate = () => {
 
 const LS_KEY = 'bul_cache_v1';
 
-// --- FETCH PLAYER STATS FROM GAME DATA ---
-export const refreshPlayerStatsFromDB = async () => {
-  // Fetch all game_player_stats rows and compute per-game averages client-side
-  const statsRes = await supabase.from('game_player_stats').select('*');
-  if (statsRes.error) {
-    console.error('[Supabase] game_player_stats fetch for averages:', statsRes.error.message);
-    return;
-  }
-
-  if (!statsRes.data || statsRes.data.length === 0) {
+// --- COMPUTE PLAYER AVERAGES FROM GAME STATS DATA ---
+const computePlayerAverages = (statsData: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (!statsData || statsData.length === 0) {
     console.log('[Stats] No game_player_stats rows found, keeping player table defaults.');
     return;
   }
 
   // Group stats by player_id
   const playerGamesMap = new Map<string, any[]>(); // eslint-disable-line @typescript-eslint/no-explicit-any
-  statsRes.data.forEach((row: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+  statsData.forEach((row: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     const pid = row.player_id;
     if (!playerGamesMap.has(pid)) playerGamesMap.set(pid, []);
     playerGamesMap.get(pid)!.push(row);
@@ -157,7 +150,17 @@ export const refreshPlayerStatsFromDB = async () => {
   });
 
   triggerUpdate();
-  console.log(`[Stats] Computed season averages for ${statsMap.size} players from ${statsRes.data.length} game stat rows.`);
+  console.log(`[Stats] Computed season averages for ${statsMap.size} players from ${statsData.length} game stat rows.`);
+};
+
+// --- FETCH PLAYER STATS FROM GAME DATA (network wrapper) ---
+export const refreshPlayerStatsFromDB = async () => {
+  const statsRes = await supabase.from('game_player_stats').select('*');
+  if (statsRes.error) {
+    console.error('[Supabase] game_player_stats fetch for averages:', statsRes.error.message);
+    return;
+  }
+  computePlayerAverages(statsRes.data || []);
 };
 
 // --- LOAD FROM LOCALSTORAGE (instant on reload) ---
@@ -229,7 +232,7 @@ export const initSupabaseCache = async () => {
       }
     };
 
-    const fetchPlayers = async () => {
+    const fetchPlayers = async (gameStatsData?: any[]) => {
       const res = await supabase.from('players').select('id, team_id, name, position, jersey_number, height, weight, year, hometown, avatar, date_of_birth, player_class, ppg, rpg, apg, spg, bpg, fgp, tpp, ftp');
       if (res.error) { console.error('[Supabase] players:', res.error.message); return; }
       if (res.data) {
@@ -242,22 +245,23 @@ export const initSupabaseCache = async () => {
           playerClass: p.player_class || p.year,
           stats: { ppg: p.ppg, rpg: p.rpg, apg: p.apg, spg: p.spg, bpg: p.bpg, fgp: p.fgp, tpp: p.tpp, ftp: p.ftp }
         }));
-        await refreshPlayerStatsFromDB();
+        // Use pre-fetched stats data if available, otherwise fetch fresh
+        if (gameStatsData) {
+          computePlayerAverages(gameStatsData);
+        } else {
+          await refreshPlayerStatsFromDB();
+        }
       }
     };
 
-    const fetchGames = async () => {
-      const [res, statsRes] = await Promise.all([
-        supabase.from('games').select('*'),
-        supabase.from('game_player_stats').select('*')
-      ]);
-
+    const fetchGames = async (gameStatsData?: any[]) => {
+      const res = await supabase.from('games').select('*');
       if (res.error) { console.error('[Supabase] games:', res.error.message); return; }
       if (res.data) {
         cache.games = res.data.map(g => {
           let playerStats = undefined;
-          if (statsRes.data && statsRes.data.length > 0) {
-            const gameStats = statsRes.data.filter((s: any) => s.game_id === g.id); // eslint-disable-line @typescript-eslint/no-explicit-any
+          if (gameStatsData && gameStatsData.length > 0) {
+            const gameStats = gameStatsData.filter((s: any) => s.game_id === g.id); // eslint-disable-line @typescript-eslint/no-explicit-any
             if (gameStats.length > 0) {
               const homeStats = gameStats.filter((s: any) => s.team_id === g.home_team_id).map((s: any) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
                 playerId: s.player_id,
@@ -340,56 +344,37 @@ export const initSupabaseCache = async () => {
     };
 
     const fetchProducts = async () => {
-      // Step 1: Fetch metadata only (extremely fast, avoids statement timeouts due to large base64 image strings)
-      const res = await supabase.from('products').select('id, name, description, price, category, in_stock, featured, team_id');
+      // Single query: images are now compressed to 800px so this is safe
+      const res = await supabase.from('products').select('*');
       if (res.error) {
-        console.error('[Supabase] products metadata:', res.error.message);
+        console.error('[Supabase] products:', res.error.message);
         return;
       }
       if (res.data) {
-        // Populate cache with metadata instantly, images will lazy load in the background
         cache.products = res.data.map(p => ({
           id: p.id,
           name: p.name,
           description: p.description,
           price: p.price,
-          image: '', // Filled in asynchronously below
+          image: p.image || '',
           category: p.category,
           inStock: p.in_stock,
           featured: p.featured,
           team: p.team_id
         }));
         triggerUpdate();
-
-        // Step 2: Fetch images asynchronously in the background, row by row, to avoid overloading the query
-        res.data.forEach(prod => {
-          supabase
-            .from('products')
-            .select('image')
-            .eq('id', prod.id)
-            .single()
-            .then(imgRes => {
-              if (imgRes.data && imgRes.data.image) {
-                const idx = cache.products.findIndex(p => p.id === prod.id);
-                if (idx !== -1) {
-                  cache.products[idx].image = imgRes.data.image;
-                  triggerUpdate();
-                  saveToLocalStorage(); // Persist dynamically loaded image to local storage
-                }
-              }
-            })
-            .catch(err => {
-              console.error(`[Supabase] Failed to fetch image for product ${prod.id}:`, err);
-            });
-        });
       }
     };
 
-    // Lancement de toutes les requêtes en parallèle, chaque requête mettra à jour l'écran dès qu'elle a fini
+    // Step 1: Fetch game_player_stats ONCE (shared between players and games)
+    const statsRes = await supabase.from('game_player_stats').select('*');
+    const sharedGameStats = statsRes.data || [];
+
+    // Step 2: Launch all other fetches in parallel, passing shared stats
     await Promise.all([
       fetchTeams(),
-      fetchPlayers(),
-      fetchGames(),
+      fetchPlayers(sharedGameStats),
+      fetchGames(sharedGameStats),
       fetchNews(),
       fetchSponsors(),
       fetchProducts()
