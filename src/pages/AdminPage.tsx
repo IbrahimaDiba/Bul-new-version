@@ -104,7 +104,8 @@ const AdminPage: React.FC = () => {
     status: 'scheduled' as 'scheduled' | 'live' | 'completed',
     homeScore: '',
     awayScore: '',
-    coverImage: ''
+    coverImage: '',
+    videoHighlights: [] as string[]
   });
 
   const [teamForm, setTeamForm] = useState({
@@ -567,7 +568,8 @@ const AdminPage: React.FC = () => {
       status: gameForm.status,
       homeScore: gameForm.status !== 'scheduled' ? Number(gameForm.homeScore) : undefined,
       awayScore: gameForm.status !== 'scheduled' ? Number(gameForm.awayScore) : undefined,
-      coverImage: gameForm.coverImage || undefined
+      coverImage: gameForm.coverImage || undefined,
+      videoHighlights: gameForm.videoHighlights
     };
 
     try {
@@ -607,7 +609,8 @@ const AdminPage: React.FC = () => {
       status: game.status,
       homeScore: game.homeScore?.toString() || '',
       awayScore: game.awayScore?.toString() || '',
-      coverImage: game.coverImage || ''
+      coverImage: game.coverImage || '',
+      videoHighlights: game.videoHighlights || []
     });
     setEditingGameId(game.id);
   };
@@ -1357,6 +1360,34 @@ const AdminPage: React.FC = () => {
                     </div>
                   )}
                 </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-500 uppercase">Vidéos Highlights (Liens YouTube)</label>
+                <div className="flex gap-2">
+                  <input type="text" id="new-highlight-url" placeholder="https://youtube.com/watch?v=..." className="flex-1 border rounded-lg p-2 text-sm" />
+                  <button type="button" onClick={() => {
+                    const input = document.getElementById('new-highlight-url') as HTMLInputElement;
+                    if (input.value) {
+                      setGameForm({ ...gameForm, videoHighlights: [...(gameForm.videoHighlights || []), input.value] });
+                      input.value = '';
+                    }
+                  }} className="bg-navy-900 text-white px-3 py-2 rounded-lg text-sm font-bold">Ajouter</button>
+                </div>
+                {gameForm.videoHighlights && gameForm.videoHighlights.length > 0 && (
+                  <ul className="mt-2 space-y-2">
+                    {gameForm.videoHighlights.map((url, idx) => (
+                      <li key={idx} className="flex justify-between items-center bg-gray-50 p-2 rounded border">
+                        <span className="text-xs truncate text-gray-600 max-w-[200px] sm:max-w-xs">{url}</span>
+                        <button type="button" onClick={() => {
+                           const newHighlights = [...gameForm.videoHighlights];
+                           newHighlights.splice(idx, 1);
+                           setGameForm({ ...gameForm, videoHighlights: newHighlights });
+                        }} className="text-crimson-500 hover:text-crimson-700 p-1"><X className="w-4 h-4" /></button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
               <button type="submit" className="w-full bg-crimson-600 hover:bg-crimson-700 text-white font-bold px-5 py-3 rounded-lg">
                 {editingGameId ? 'Mettre à jour' : 'Ajouter match'}

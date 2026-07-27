@@ -138,6 +138,7 @@ export interface Game {
   awayScore?: number;
   date: string;
   time: string;
+  videoHighlights?: string[];
   venue: string;
   isFeatured: boolean;
   isCompleted: boolean;
