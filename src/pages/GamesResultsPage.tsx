@@ -29,19 +29,7 @@ function getWinner(game: Game): 'home' | 'away' | 'tie' | null {
   return 'tie';
 }
 
-const getYouTubeEmbedUrl = (url: string) => {
-  try {
-    let videoId = '';
-    if (url.includes('youtube.com/watch')) {
-      videoId = new URL(url).searchParams.get('v') || '';
-    } else if (url.includes('youtu.be/')) {
-      videoId = url.split('youtu.be/')[1].split('?')[0];
-    }
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
-  } catch {
-    return url;
-  }
-};
+
 
 const GamesResultsPage: React.FC = () => {
   const [teamFilter, setTeamFilter] = useState<string>('all');
@@ -49,7 +37,6 @@ const GamesResultsPage: React.FC = () => {
   const [allGames, setAllGames] = useState<Game[]>([]);
   const [allTeams, setAllTeams] = useState<Team[]>([]);
   const [selectedStatsGame, setSelectedStatsGame] = useState<Game | null>(null);
-  const [activeModalTab, setActiveModalTab] = useState<'stats' | 'highlights'>('stats');
 
   React.useEffect(() => {
     const loadGames = () => {
@@ -270,10 +257,10 @@ const GamesResultsPage: React.FC = () => {
                             View Home Team
                            </Link>
                            <button 
-                            onClick={() => { setSelectedStatsGame(game); setActiveModalTab('stats'); }}
+                            onClick={() => setSelectedStatsGame(game)}
                             className="flex-1 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-widest hover:bg-gray-50 hover:text-navy-900 transition-colors border-r border-gray-100 flex items-center justify-center gap-2"
                            >
-                            <BarChart2 className="w-4 h-4" /> {(game.videoHighlights && game.videoHighlights.length > 0) ? 'Stats & Vidéos' : 'Box Score'}
+                            <BarChart2 className="w-4 h-4" /> Box Score
                            </button>
                            <Link 
                             to={`/teams/${game.awayTeam.id}`} 
@@ -328,41 +315,10 @@ const GamesResultsPage: React.FC = () => {
                     </div>
                     <button onClick={() => setSelectedStatsGame(null)} className="text-white hover:text-crimson-400 p-2"><X className="w-6 h-6" /></button>
                   </div>
-                  {(selectedStatsGame.videoHighlights && selectedStatsGame.videoHighlights.length > 0) && (
-                    <div className="flex gap-4">
-                      <button 
-                        onClick={() => setActiveModalTab('stats')}
-                        className={`pb-2 text-sm font-bold uppercase tracking-widest border-b-2 transition-colors ${activeModalTab === 'stats' ? 'border-crimson-500 text-white' : 'border-transparent text-gray-400 hover:text-gray-200'}`}
-                      >
-                        Statistiques
-                      </button>
-                      <button 
-                        onClick={() => setActiveModalTab('highlights')}
-                        className={`pb-2 text-sm font-bold uppercase tracking-widest border-b-2 transition-colors ${activeModalTab === 'highlights' ? 'border-crimson-500 text-white' : 'border-transparent text-gray-400 hover:text-gray-200'}`}
-                      >
-                        Vidéos / Actions
-                      </button>
-                    </div>
-                  )}
+
                 </div>
                 <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-gray-50">
-                  {activeModalTab === 'highlights' ? (
-                    <div className="space-y-6">
-                      {selectedStatsGame.videoHighlights?.map((url, idx) => (
-                        <div key={idx} className="bg-white rounded-xl shadow-sm overflow-hidden border p-2">
-                          <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                            <iframe 
-                              src={getYouTubeEmbedUrl(url)} 
-                              className="absolute top-0 left-0 w-full h-full rounded-lg"
-                              title={`Highlight ${idx + 1}`}
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                              allowFullScreen
-                            ></iframe>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (!selectedStatsGame.stats?.playerStats?.home?.length && !selectedStatsGame.stats?.playerStats?.away?.length) ? (
+                  {(!selectedStatsGame.stats?.playerStats?.home?.length && !selectedStatsGame.stats?.playerStats?.away?.length) ? (
                     <div className="text-center py-10">
                       <BarChart2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                       <p className="text-gray-500 text-lg">Les statistiques détaillées ne sont pas encore disponibles pour ce match.</p>
