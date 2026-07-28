@@ -14,7 +14,6 @@ type AdminGameInput = {
   status: 'scheduled' | 'live' | 'completed';
   homeScore?: number;
   awayScore?: number;
-  videoHighlights?: string[];
   playerStats?: {
     home: PlayerGameStats[];
     away: PlayerGameStats[];
@@ -307,7 +306,6 @@ export const initSupabaseCache = async () => {
             id: g.id, homeTeamId: g.home_team_id, awayTeamId: g.away_team_id,
             date: g.game_date, time: g.game_time, venue: g.venue, status: g.status,
             homeScore: g.home_score, awayScore: g.away_score,
-            videoHighlights: g.highlight_video_url ? (g.highlight_video_url.startsWith('[') ? JSON.parse(g.highlight_video_url) : [g.highlight_video_url]) : [],
             coverImage: g.cover_image || undefined,
             playerStats: playerStats
           };
@@ -466,7 +464,6 @@ export const getManagedGames = (): Game[] => {
       id: ag.id, date: ag.date, time: ag.time, venue: ag.venue,
       isFeatured: false, isCompleted: ag.status === 'completed', status: ag.status,
       homeTeam, awayTeam, homeScore: ag.homeScore, awayScore: ag.awayScore,
-      videoHighlights: ag.videoHighlights,
       coverImage: ag.coverImage,
       stats: { playerStats: populatedPlayerStats }
     };
@@ -621,7 +618,6 @@ export const addAdminGame = async (payload: Omit<AdminGameInput, 'id'> & { id?: 
     id: item.id, home_team_id: item.homeTeamId, away_team_id: item.awayTeamId,
     game_date: item.date, game_time: item.time, venue: item.venue, status: item.status,
     home_score: item.homeScore || 0, away_score: item.awayScore || 0,
-    highlight_video_url: item.videoHighlights ? JSON.stringify(item.videoHighlights) : null,
     cover_image: item.coverImage || null
   });
   if (error) throw error;
@@ -796,7 +792,6 @@ export const updateAdminGame = async (id: string, payload: Partial<AdminGameInpu
       home_team_id: item.homeTeamId, away_team_id: item.awayTeamId,
       game_date: item.date, game_time: item.time, venue: item.venue, status: item.status,
       home_score: item.homeScore, away_score: item.awayScore,
-      highlight_video_url: item.videoHighlights ? JSON.stringify(item.videoHighlights) : null,
       cover_image: item.coverImage || null
     }).eq('id', id);
     if (error) {
