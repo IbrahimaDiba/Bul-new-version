@@ -796,6 +796,7 @@ export const updateAdminGame = async (id: string, payload: Partial<AdminGameInpu
       home_team_id: item.homeTeamId, away_team_id: item.awayTeamId,
       game_date: item.date, game_time: item.time, venue: item.venue, status: item.status,
       home_score: item.homeScore, away_score: item.awayScore,
+      highlight_video_url: item.videoHighlights ? JSON.stringify(item.videoHighlights) : null,
       cover_image: item.coverImage || null
     }).eq('id', id);
     if (error) {

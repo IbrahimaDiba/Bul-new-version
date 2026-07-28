@@ -593,9 +593,17 @@ const AdminPage: React.FC = () => {
       });
       reloadAdminData();
       setFeedback({ type: 'success', text: `Match ${editingGameId ? 'mis à jour' : 'ajouté'} avec succès.` });
-    } catch (err) {
-      console.error(err);
-      setFeedback({ type: 'error', text: "Erreur lors de l'enregistrement du match dans la base de données." });
+    } catch (err: any) {
+      console.error('[Admin] Error saving game:', err);
+      let errorMsg = "Erreur lors de l'enregistrement du match dans la base de données.";
+      if (err.message) {
+        if (err.message.includes('row-level security')) {
+          errorMsg = 'Permission refusée (RLS). Assurez-vous que les policies de la table "games" autorisent les modifications.';
+        } else {
+          errorMsg = `Erreur: ${err.message}`;
+        }
+      }
+      setFeedback({ type: 'error', text: errorMsg });
     }
   };
 
