@@ -66,7 +66,7 @@ const AwardsPage: React.FC = () => {
   const dynamicAwards = useMemo(() => {
     if (players.length === 0) return [];
 
-    const currentSeason = '2024–2025';
+    const currentSeason = '2025–2026';
 
     // Scoring Champion: Highest PPG
     const sortedByPoints = [...players].sort((a, b) => b.stats.ppg - a.stats.ppg);

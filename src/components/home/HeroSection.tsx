@@ -69,9 +69,11 @@ const HeroSection: React.FC = () => {
         {/* Content */}
         <div className="relative z-20 h-full flex flex-col justify-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <span className="inline-flex items-center gap-2 bg-crimson-600 text-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg mb-6">
-              <Trophy className="w-3 h-3" /> Season 2024 – 2025
-            </span>
+            <div className="flex justify-center md:justify-start">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 text-white text-[10px] font-bold uppercase tracking-widest border border-white/20 mb-6">
+                <Trophy className="w-3 h-3" /> Season 2025 – 2026
+              </div>
+            </div>
             <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tighter leading-none mb-6">
               Basketball<br />
               <span className="text-crimson-500">University</span><br />
