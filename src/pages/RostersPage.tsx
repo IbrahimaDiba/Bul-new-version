@@ -86,8 +86,8 @@ const RostersPage: React.FC = () => {
             type="button"
             className={`flex-1 py-4 px-6 font-black text-xs tracking-widest uppercase transition-all ${
               activeConference === 'East'
-                ? 'bg-navy-900 text-white border-b-4 border-crimson-600'
-                : 'text-gray-500 hover:text-navy-900 hover:bg-gray-50 border-b-4 border-transparent'
+                ? 'bg-crimson-600 text-white border-b-4 border-crimson-600'
+                : 'text-gray-500 hover:text-crimson-600 hover:bg-gray-50 border-b-4 border-transparent'
             }`}
             onClick={() => {
               setActiveConference('East');
@@ -101,8 +101,8 @@ const RostersPage: React.FC = () => {
             type="button"
             className={`flex-1 py-4 px-6 font-black text-xs tracking-widest uppercase transition-all ${
               activeConference === 'West'
-                ? 'bg-navy-900 text-white border-b-4 border-crimson-600'
-                : 'text-gray-500 hover:text-navy-900 hover:bg-gray-50 border-b-4 border-transparent'
+                ? 'bg-crimson-600 text-white border-b-4 border-crimson-600'
+                : 'text-gray-500 hover:text-crimson-600 hover:bg-gray-50 border-b-4 border-transparent'
             }`}
             onClick={() => {
               setActiveConference('West');

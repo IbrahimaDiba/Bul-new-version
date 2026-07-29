@@ -85,8 +85,8 @@ const StandingsPage: React.FC = () => {
             type="button"
             className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-all whitespace-nowrap outline-none flex-1 sm:flex-none justify-center border-b-4 ${
               activeConference === 'East'
-                ? 'text-navy-900 border-crimson-600 bg-gray-50/50'
-                : 'text-gray-500 border-transparent hover:text-navy-900 hover:bg-gray-50'
+                ? 'text-crimson-600 border-crimson-600 bg-gray-50/50'
+                : 'text-gray-500 border-transparent hover:text-crimson-600 hover:bg-gray-50'
             }`}
             onClick={() => setActiveConference('East')}
           >
@@ -96,8 +96,8 @@ const StandingsPage: React.FC = () => {
             type="button"
             className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-all whitespace-nowrap outline-none flex-1 sm:flex-none justify-center border-b-4 ${
               activeConference === 'West'
-                ? 'text-navy-900 border-crimson-600 bg-gray-50/50'
-                : 'text-gray-500 border-transparent hover:text-navy-900 hover:bg-gray-50'
+                ? 'text-crimson-600 border-crimson-600 bg-gray-50/50'
+                : 'text-gray-500 border-transparent hover:text-crimson-600 hover:bg-gray-50'
             }`}
             onClick={() => setActiveConference('West')}
           >
