@@ -364,19 +364,25 @@ export const initSupabaseCache = async () => {
       }
     };
 
-    // Step 1: Fetch game_player_stats ONCE (shared between players and games)
-    const statsRes = await supabase.from('game_player_stats').select('*');
-    const sharedGameStats = statsRes.data || [];
-
-    // Step 2: Launch all other fetches in parallel, passing shared stats
-    await Promise.all([
+    // Launch independent fetches immediately so they don't wait for stats
+    const independentFetches = Promise.all([
       fetchTeams(),
-      fetchPlayers(sharedGameStats),
-      fetchGames(sharedGameStats),
       fetchNews(),
       fetchSponsors(),
       fetchProducts()
     ]);
+
+    // Fetch stats, then fetch players and games that depend on them
+    const dependentFetches = supabase.from('game_player_stats').select('*').then(async (statsRes) => {
+      const sharedGameStats = statsRes.data || [];
+      await Promise.all([
+        fetchPlayers(sharedGameStats),
+        fetchGames(sharedGameStats)
+      ]);
+    });
+
+    // Wait for all fetches to complete
+    await Promise.all([independentFetches, dependentFetches]);
 
     isSupabaseLoaded = true;
     saveToLocalStorage(); // Persist fresh data for next reload
