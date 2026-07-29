@@ -91,7 +91,7 @@ const TeamsPage: React.FC = () => {
                     {/* Team Color Accent Bar */}
                     <div 
                       className="absolute top-0 left-0 w-full h-2 transition-all duration-300 group-hover:h-3"
-                      style={{ backgroundColor: team.primaryColor || '#1a365d' }} 
+                      style={{ backgroundColor: team.primaryColor || '#d4af37' }} 
                     />
 
                     {/* Faint Logo Watermark */}
@@ -104,7 +104,7 @@ const TeamsPage: React.FC = () => {
                          {/* Subtle glowing shadow based on team color */}
                          <div 
                            className="absolute inset-0 blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-full"
-                           style={{ backgroundColor: team.primaryColor || '#1a365d' }}
+                           style={{ backgroundColor: team.primaryColor || '#d4af37' }}
                          ></div>
                          <img
                            src={team.logo}
